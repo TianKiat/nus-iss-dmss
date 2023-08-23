@@ -29,3 +29,63 @@ NUS ISS Designing Modern Software Solutions Practice Module
     ➜  press h to show help 
     ```
 3. Go to the link provided.
+
+# To setup backend app
+1. Run
+   ```
+   pip install virtualenv
+   ```
+2. Go to the backend folder
+   ```
+   cd backend
+   ```
+Note: If already have existing virtual environment, can remove the virtualenv using this command
+```
+rm -r <your environment name>
+```
+3. Create virtualenv
+   ```
+   virtualenv <your environment name>
+   ```
+4. Activate virtualenv that is created
+   ```
+   <your environment name>\Scripts\activate
+   ```
+5. Run the pip install command to install the libraries
+   ```
+   pip install -r requirements.txt
+   ```
+6. Deactivate virtualenv
+   ```
+   deactivate
+   ```
+   
+# To run backend app
+1. Go to the backend folder
+   ```
+   cd backend
+   ```
+2. Activate virtualenv that is created
+   ```
+   <your environment name>\Scripts\activate
+   ```
+3. Go to the backend app folder
+   ```
+   cd app
+   ```
+4. Start fastapi
+   ```
+   python main.py
+   ```
+5. Stop fastapi
+   ```
+   ctrl + c
+   ```
+6. Go to the backend folder
+   ```
+   cd ..
+   ```
+7. Deactivate virtualenv
+   ```
+   deactivate
+   ```
