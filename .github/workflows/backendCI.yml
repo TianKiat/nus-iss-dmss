@@ -22,36 +22,39 @@
 #         run: pip install -r requirements.txt
 
 #       - name: Run pytest for unit testing and generate JSON report
-#         run: pytest path/to/backend/tests --junitxml=pytest-results.xml
-#         # Convert the JUnit XML to JSON
-#         run: python -m junit2json.junit2json pytest-results.xml > pytest-results.json
+#         run: |
+#           pytest path/to/backend/tests --junitxml=reports/backend/pytest-results.xml
+#           # Convert the JUnit XML to JSON
+#           python -m junit2json.junit2json reports/backend/pytest-results.xml > reports/backend/pytest-results.json
 
 #       - name: Upload pytest results as artifact
 #         if: always() # Upload the artifact even if previous steps fail
 #         uses: actions/upload-artifact@v2
 #         with:
 #           name: pytest-results
-#           path: pytest-results.json
+#           path: reports/backend/pytest-results.json
 
 #       - name: Run pylint for linting and generate JSON report
-#         run: pylint backend/ --output-format=json > pylint-report.json
+#         run: |
+#           pylint backend/ --output-format=json > reports/backend/pylint-report.json
 
 #       - name: Upload pylint report as artifact
 #         if: always() # Upload the artifact even if previous steps fail
 #         uses: actions/upload-artifact@v2
 #         with:
 #           name: pylint-report
-#           path: pylint-report.json
+#           path: reports/backend/pylint-report.json
 
 #       - name: Run Bandit for SAST and generate JSON report
-#         run: bandit -r backend/ -f json -o bandit-report.json
+#         run: |
+#           bandit -r backend/ -f json -o reports/backend/bandit-report.json
 
 #       - name: Upload Bandit report as artifact
 #         if: always() # Upload the artifact even if previous steps fail
 #         uses: actions/upload-artifact@v2
 #         with:
 #           name: bandit-report
-#           path: bandit-report.json
+#           path: reports/backend/bandit-report.json
 
 #       - name: Run OWASP ZAP for DAST
 #         run: |
@@ -59,7 +62,7 @@
 #           # Perform your DAST scan (as shown previously)
 
 #           # Generate the ZAP report
-#           ./zap-cli.py report -o zap-report.json -f json
+#           ./zap-cli.py report -o reports/backend/zap-report.json -f json
 
 #           # Stop OWASP ZAP (as shown previously)
 
@@ -68,4 +71,4 @@
 #         uses: actions/upload-artifact@v2
 #         with:
 #           name: zap-report
-#           path: zap-report.json
+#           path: reports/backend/zap-report.json
