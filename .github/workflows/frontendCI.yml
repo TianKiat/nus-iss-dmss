@@ -1,0 +1,97 @@
+# name: Frontend CI/CD on Pull Request
+
+# on:
+#   pull_request:
+#     paths:
+#       - 'frontend/**' # Specify the path to your frontend code
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v2
+
+#       - name: Set up Node.js
+#         uses: actions/setup-node@v2
+#         with:
+#           node-version: 14 # Use the version of Node.js you need
+
+#       - name: Install dependencies using pnpm
+#         run: |
+#           npm install -g pnpm # Install pnpm globally
+#           pnpm install
+#         working-directory: frontend
+
+#       - name: Build frontend
+#         run: pnpm run build # Adjust the build command to match your Vite.js setup
+#         working-directory: frontend
+
+#       - name: Upload build artifacts
+#         if: success() # Upload the artifacts only if the build succeeds
+#         uses: actions/upload-artifact@v2
+#         with:
+#           name: frontend-reports
+#           path: reports/frontend/dist # Adjust the path to the build output directory
+
+#       - name: Run Unit Tests and Generate Report
+#         run: |
+#           # Run unit tests and generate a JUnit XML report
+#           pnpm run test -- --reporters=default jest-junit
+#         working-directory: frontend
+
+#       - name: Upload Unit Test Report as Artifact
+#         if: always() # Upload the artifact even if previous steps fail
+#         uses: actions/upload-artifact@v2
+#         with:
+#           name: frontend-reports
+#           path: reports/frontend/unit-test-report.xml
+
+#       - name: Lint frontend code and Generate Report
+#         run: |
+#           # Run linting and generate an HTML report
+#           pnpm run lint -- --format=html --output-file=reports/frontend/lint-report.html
+#         working-directory: frontend
+
+#       - name: Upload Linting Report as Artifact
+#         if: always() # Upload the artifact even if previous steps fail
+#         uses: actions/upload-artifact@v2
+#         with:
+#           name: frontend-reports
+#           path: reports/frontend/lint-report.html
+
+#       - name: Run npm audit
+#         run: |
+#           pnpm audit --json > reports/frontend/npm-audit-report.json
+#           cat reports/frontend/npm-audit-report.json
+#         working-directory: frontend
+
+#       - name: Install Java
+#         uses: actions/setup-java@v2
+#         with:
+#           java-version: 11 # Use the version of Java required by OWASP ZAP
+
+#       - name: Install and Run OWASP ZAP
+#         run: |
+#           # Download and install OWASP ZAP (replace with the actual download URL)
+#           wget -q https://github.com/zaproxy/zaproxy/releases/download/v2.11.0/ZAP_2.11.0_Linux.tar.gz -O frontend/zap.tar.gz
+#           tar -xzf frontend/zap.tar.gz
+#           cd frontend/ZAP_2.11.0
+#           ./zap.sh -daemon -port 8080
+#         working-directory: frontend
+
+#       - name: Run OWASP ZAP Scan
+#         run: |
+#           # Start your Vite.js application or server
+#           # Perform any necessary setup for your application (e.g., starting it on a specific port)
+#           # Run the ZAP spider and active scan
+#           ./zap-cli.py quick-scan -o reports/frontend/zap-report.html -l Medium --spider -r 'http://localhost:3000'  # Adjust the target URL and scan options
+#         working-directory: frontend
+
+#       - name: Upload OWASP ZAP Report as Artifact
+#         if: success() # Upload the artifact only if the scan succeeds
+#         uses: actions/upload-artifact@v2
+#         with:
+#           name: frontend-reports
+#           path: reports/frontend/zap-report.html
