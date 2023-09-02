@@ -19,36 +19,56 @@ INSERT INTO ROLES VALUES
 /* Create USER_PROFILES table */
 DROP TABLE IF EXISTS USER_PROFILES;
 CREATE TABLE USER_PROFILES (
-	profileID		INTEGER			NOT NULL 	AUTO_INCREMENT,
+	profileID		VARBINARY(16)	NOT NULL,
     profileName		VARCHAR(100)	NOT NULL,
     PRIMARY KEY (profileID)
 );
 
-INSERT INTO USER_PROFILES (profileName) VALUES
-('Moses'),
-('Amy'),
-('Joe');
+DROP TRIGGER IF EXISTS INSERT_USER_PROFILES;
+-- DELIMITER //
+-- CREATE TRIGGER INSERT_USER_PROFILES
+-- BEFORE INSERT
+-- ON USER_PROFILES FOR EACH ROW
+-- BEGIN
+-- 	INSERT INTO USER_PROFILES VALUES (UUID_TO_BIN(UUID(), TRUE), NEW.profileName);
+-- END;
+-- DELIMITER ;
+
+INSERT INTO USER_PROFILES VALUES
+(UUID_TO_BIN(UUID(), TRUE), 'Moses'),
+(UUID_TO_BIN(UUID(), TRUE), 'Amy'),
+(UUID_TO_BIN(UUID(), TRUE), 'Joe');
 
 /* Create USERS table */
 DROP TABLE IF EXISTS USERS;
 CREATE TABLE USERS (
-	userID			INTEGER			NOT NULL	AUTO_INCREMENT,
+	userID			VARBINARY(16)	NOT NULL,
     username		VARCHAR(25)		NOT NULL,
     userPassword	VARCHAR(50)		NOT NULL,
     roleID			INTEGER			NOT NULL,
-    profileID		INTEGER			NOT NULL,
+    profileID		VARBINARY(16)	NOT NULL,
     PRIMARY KEY (userID),
     UNIQUE (username),
     FOREIGN KEY (roleID) REFERENCES ROLES (roleID),
     FOREIGN KEY (profileID) REFERENCES USER_PROFILES (profileID)
 );
 
-INSERT INTO USERS (username, userPassword, roleID, profileID) VALUES
-('moses', '123', 1, 1),
-('amy', '123',  2, 2),
-('joe', '123', 3, 3);
+INSERT INTO USERS
+SELECT UUID_TO_BIN(UUID(), TRUE), 'moses', '123', 1, profileID
+FROM USER_PROFILES
+WHERE profileName = 'Moses';
+
+INSERT INTO USERS
+SELECT UUID_TO_BIN(UUID(), TRUE), 'amy', '123', 2, profileID
+FROM USER_PROFILES
+WHERE profileName = 'Amy';
+
+INSERT INTO USERS
+SELECT UUID_TO_BIN(UUID(), TRUE), 'joe', '123', 3, profileID
+FROM USER_PROFILES
+WHERE profileName = 'Joe';
 
 /* See all records */
-SELECT userID, username, userPassword, R.roleID, roleName, P.profileID, profileName
+SELECT BIN_TO_UUID(userID), username, userPassword, R.roleID, roleName, BIN_TO_UUID(P.profileID), profileName
 FROM USERS U JOIN ROLES R ON U.roleID = R.roleID
 			 JOIN USER_PROFILES P ON U.profileID = P.profileID;
