@@ -38,6 +38,7 @@ CREATE TABLE USERS (
     roleID			INTEGER			NOT NULL,
     profileID		INTEGER			NOT NULL,
     PRIMARY KEY (userID),
+    UNIQUE (username),
     FOREIGN KEY (roleID) REFERENCES ROLES (roleID),
     FOREIGN KEY (profileID) REFERENCES USER_PROFILES (profileID)
 );
