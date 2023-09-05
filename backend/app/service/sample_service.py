@@ -1,5 +1,5 @@
-from app.service.another_sample_service import AnotherSampleService
-from app.datasource.sample_gateway import SampleGateway
+from service.another_sample_service import AnotherSampleService
+from datasource.sample_gateway import SampleGateway
 
 # import service class needed
 # import gateway class needed
