@@ -5,7 +5,7 @@ from common.user_model import User
 
 router = APIRouter()
 
-@router.post("/user")
+@router.post("/register_user")
 def register_user_account(user: User):
     result = RegisterUserController.register_user(user)
     return result

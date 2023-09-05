@@ -5,7 +5,7 @@ from common.user_model import User
 
 router = APIRouter()
 
-@router.post("/user")
+@router.post("/login_user")
 def login_user_account(user: User):
     result = LoginUserController.login_user(user)
     return user
