@@ -103,7 +103,7 @@ export default function RegisterVendor() {
             </Stack>
             <Stack pt={6}>
               <Text align={"center"}>
-                Already a user? <Link color={"blue.400"}>Login</Link>
+                Already a user? <Link color={"blue.400"} href="/vendor/login">Login</Link>
               </Text>
             </Stack>
           </Stack>
