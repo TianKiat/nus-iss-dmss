@@ -19,7 +19,7 @@ import {
 import { useState } from "react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 
-export default function Register() {
+export default function RegisterVendor() {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
@@ -35,7 +35,7 @@ export default function Register() {
             Sign up
           </Heading>
           <Text fontSize={"lg"} color={"gray.600"}>
-            To start ordering food
+            To start selling
           </Text>
         </Stack>
         <Box
@@ -45,7 +45,16 @@ export default function Register() {
           p={8}
         >
           <Stack spacing={4}>
-            <HStack>
+            <Box>
+              <FormControl id="stallName" isRequired>
+                <FormLabel>Stall Name</FormLabel>
+                <Input type="text" />
+              </FormControl>
+            </Box>
+            <Heading fontSize={"1md"} textAlign={"left"} marginTop={"0.2rem"} paddingBlock={"0"}>
+              Stall Owner
+            </Heading>
+            <HStack paddingTop={"0.1rem"}>
               <Box>
                 <FormControl id="firstName" isRequired>
                   <FormLabel>First Name</FormLabel>
