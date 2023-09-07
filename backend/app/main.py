@@ -1,11 +1,12 @@
 from fastapi import FastAPI
 import uvicorn
 
-from route import sample_router
+from route import sample_router, register_user_router
 
 app = FastAPI()
 
 app.include_router(sample_router.router)
+app.include_router(register_user_router.router)
 
 @app.get("/")
 async def root():
