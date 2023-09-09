@@ -1,10 +1,8 @@
 import mysql.connector
 import uuid
-import os
+from app.common.constants import DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE
 
-from common.constants import db_host, db_user, db_password, db_name
-
-sqldb = mysql.connector.connect(host = db_host, user = db_user, password = db_password, database = db_name)
+sqldb = mysql.connector.connect(host = DB_HOST, user = DB_USERNAME, password = DB_PASSWORD, database = DB_DATABASE)
 
 class UserGateway():
     def __init__(self):

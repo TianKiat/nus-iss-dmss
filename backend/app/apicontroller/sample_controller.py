@@ -1,4 +1,4 @@
-from service.sample_service import SampleService
+from app.service.sample_service import SampleService
 
 # import service class needed
 

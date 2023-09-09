@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from apicontroller.sample_controller import SampleController
+from app.apicontroller.sample_controller import SampleController
 
 router = APIRouter()
 

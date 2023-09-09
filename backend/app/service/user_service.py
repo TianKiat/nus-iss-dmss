@@ -1,4 +1,4 @@
-from datasource.user_gateway import UserGateway
+from app.datasource.user_gateway import UserGateway
 
 # import service class needed
 # import gateway class needed
@@ -16,4 +16,4 @@ class UserService():
         return result
     
     def login_user(user_data):
-        pass
+        return True

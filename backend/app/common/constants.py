@@ -1,12 +1,12 @@
-import os
-
 from dotenv import load_dotenv
-from pathlib import Path
+from os import getenv
 
-environment_variable_path = Path('secrets.env')
-load_dotenv(dotenv_path = environment_variable_path)
+load_dotenv()
 
-db_host = str(os.getenv('DB_HOST'))
-db_user = str(os.getenv('DB_USER'))
-db_password = str(os.getenv('PASSWORD'))
-db_name = str(os.getenv("DB_NAME"))
+DB_DIALECT = getenv('DB_DIALECT')
+DB_DRIVER = getenv('DB_DRIVER')
+DB_USERNAME = getenv('DB_USERNAME')
+DB_PASSWORD = getenv('DB_PASSWORD')
+DB_HOST = getenv('DB_HOST')
+DB_PORT = getenv('DB_PORT')
+DB_DATABASE = getenv('DB_DATABASE')
