@@ -69,13 +69,19 @@ rm -r <your environment name>
    ```
    <your environment name>\Scripts\activate
    ```
-3. Go to the backend app folder
+3. Create .env to store connection string and paste this in .env
    ```
-   cd app
+   DB_DIALECT=mysql
+   DB_DRIVER=mysqlconnector
+   DB_USERNAME=your_username
+   DB_PASSWORD=your_password
+   DB_HOST=localhost
+   DB_PORT=3306
+   DB_DATABASE=food_ordering
    ```
-4. Start fastapi
+4. Start fastapi and run migration scripts
    ```
-   python main.py
+   python run.py
    ```
 5. Stop fastapi
    ```
