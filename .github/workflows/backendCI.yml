@@ -32,6 +32,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -69,54 +71,7 @@ jobs:
         run: |
           pytest app/test/
 
-#       - name: Run pytest for unit testing and generate JSON report
-#         run: |
-#           pytest path/to/backend/tests --junitxml=reports/backend/pytest-results.xml
-#           # Convert the JUnit XML to JSON
-#           python -m junit2json.junit2json reports/backend/pytest-results.xml > reports/backend/pytest-results.json
-
-#       - name: Upload pytest results as artifact
-#         if: always() # Upload the artifact even if previous steps fail
-#         uses: actions/upload-artifact@v2
-#         with:
-#           name: pytest-results
-#           path: reports/backend/pytest-results.json
-
-#       - name: Run pylint for linting and generate JSON report
-#         run: |
-#           pylint backend/ --output-format=json > reports/backend/pylint-report.json
-
-#       - name: Upload pylint report as artifact
-#         if: always() # Upload the artifact even if previous steps fail
-#         uses: actions/upload-artifact@v2
-#         with:
-#           name: pylint-report
-#           path: reports/backend/pylint-report.json
-
-#       - name: Run Bandit for SAST and generate JSON report
-#         run: |
-#           bandit -r backend/ -f json -o reports/backend/bandit-report.json
-
-#       - name: Upload Bandit report as artifact
-#         if: always() # Upload the artifact even if previous steps fail
-#         uses: actions/upload-artifact@v2
-#         with:
-#           name: bandit-report
-#           path: reports/backend/bandit-report.json
-
-#       - name: Run OWASP ZAP for DAST
-#         run: |
-#           # Download and install OWASP ZAP (as shown previously)
-#           # Perform your DAST scan (as shown previously)
-
-#           # Generate the ZAP report
-#           ./zap-cli.py report -o reports/backend/zap-report.json -f json
-
-#           # Stop OWASP ZAP (as shown previously)
-
-#       - name: Upload ZAP Report as Artifact
-#         if: always() # Upload the artifact even if previous steps fail
-#         uses: actions/upload-artifact@v2
-#         with:
-#           name: zap-report
-#           path: reports/backend/zap-report.json
+      - name: Run pylint for linting
+        run: |
+          cd ..
+          git diff --name-only HEAD~1 -- '*.py' | xargs -r pylint

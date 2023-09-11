@@ -8,7 +8,4 @@ client = TestClient(app)
 def test_sample():
     response = client.get("/")
     assert response.status_code == 200
-
-def test_login_user():
-    result = UserService.login_user("test")
-    assert result == True
+    

@@ -1,0 +1,7 @@
+[MASTER]
+ignore = alembic.ini
+ignore-paths = ^app/alembic/.*$, ^app/common/.*$, ^app/models/.*$, ^app/test/.*$,
+
+fail-under = 7
+
+disable = C0114, C0115, C0116

@@ -7,13 +7,13 @@ class UserService():
     def __init__(self):
         pass
 
-    def register_user(user_data):
+    def register_user(self, user_data):
         new_user = {}
         new_user["username"] = user_data.username
         new_user["password"] = user_data.password
         new_user["role"] = user_data.role
         result = UserGateway.insert_user_data(new_user)
         return result
-    
-    def login_user(user_data):
+
+    def login_user(self, user_data):
         return True
