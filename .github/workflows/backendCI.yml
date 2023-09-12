@@ -75,3 +75,8 @@ jobs:
         run: |
           cd ..
           git diff --name-only HEAD~1 -- '*.py' | xargs -r pylint
+      
+      - name: Run Bandit for SAST
+        run: |
+          cd ..
+          git diff --name-only HEAD~1 -- '*.py' | xargs -r bandit -c bandit.yaml -r
