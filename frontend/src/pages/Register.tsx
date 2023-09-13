@@ -370,7 +370,7 @@ export default function Register() {
     shopName: "",
     shopDesc: "",
   }
-  const [, setSelectedTab] = useState<number>(0);
+  const [selectedTab, setSelectedTab] = useState<number>(0);
 
   const [customerData, setCustomerData] = useState(initialCustomerFormData);
 
@@ -554,10 +554,10 @@ export default function Register() {
       <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6}>
         <Stack align={"center"}>
           <Heading fontSize={"4xl"} textAlign={"center"}>
-            Sign up
+            {selectedTab === 0 ? "Sign up as a Customer" : "Sign up as a Vendor"}
           </Heading>
-          <Text fontSize={"lg"} color={"gray.600"}>
-            To start ordering food
+          <Text fontSize={"lg"} color={"red.200"}>
+            {selectedTab === 0 ? "Discover a world of flavors at your fingertips" : "Share your signature dishes with a hungry audience"}
           </Text>
         </Stack>
         <Box
