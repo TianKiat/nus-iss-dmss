@@ -22,7 +22,7 @@ import {
   TabPanels,
   FormErrorMessage,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 
 interface ICustomerData {
@@ -85,9 +85,10 @@ function NameFields({ firstName, lastName, firstNameError, onChange }: {
   )
 }
 
-function EmailField({ email, emailError, onChangeEmail }: {
+function EmailField({ email, emailError, emailValid, onChangeEmail }: {
   email: string;
   emailError: boolean;
+  emailValid: boolean;
   onChangeEmail: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
@@ -95,7 +96,7 @@ function EmailField({ email, emailError, onChangeEmail }: {
       <FormControl
         id="email"
         isRequired
-        isInvalid={emailError}
+        isInvalid={emailError || !emailValid}
       >
         <FormLabel>Email address</FormLabel>
         <Input
@@ -106,6 +107,7 @@ function EmailField({ email, emailError, onChangeEmail }: {
         />
         {/* Display error message */}
         {emailError ? (<FormErrorMessage>Required</FormErrorMessage>) : ("")}
+        {(!emailValid && !emailError && email !== "") ? (<FormErrorMessage>Invalid email address</FormErrorMessage>) : ""}
       </FormControl>
     </>
   )
@@ -176,7 +178,7 @@ function PasswordsField({ password, reEnterPassword, passwordError, reEnterPassw
         {reEnterPasswordError ? (<FormErrorMessage>Required</FormErrorMessage>) : ("")}
       </FormControl>
       {isPasswordMatch ? null : (
-        <Text color="red.500">Passwords do not match.</Text>
+        <Text color="red.300">Passwords do not match.</Text>
       )}
     </>)
 }
@@ -250,6 +252,7 @@ function CustomerSignUp({ formData, error, handleChange, isPasswordMatch, handle
         <EmailField
           email={formData.email}
           emailError={error.email}
+          emailValid={error.emailValid}
           onChangeEmail={handleChange}
         />
         <PasswordsField
@@ -312,6 +315,7 @@ function VendorSignUp({ formData, error, handleChange, isPasswordMatch, handleSu
         <EmailField
           email={formData.email}
           emailError={error.email}
+          emailValid={error.emailValid}
           onChangeEmail={handleChange}
         />
         <PasswordsField
@@ -382,6 +386,7 @@ export default function Register() {
   const [customerErrors, setCustomerErrors] = useState<Record<string, boolean>>({
     firstName: false,
     email: false,
+    emailValid: true,
     password: false,
     reEnterPassword: false,
   });
@@ -414,14 +419,16 @@ export default function Register() {
     setCustomerErrors({
       firstName: false,
       email: false,
+      emailValid: true,
       password: false,
       reEnterPassword: false,
     });
     setVendorErrors({
       firstName: false,
       email: false,
+      emailValid: true,
       password: false,
-      reEnterPassword: false,
+      reEnterPassword: false,      
       shopName: false,
       shopDesc: false,
     });
@@ -437,16 +444,17 @@ export default function Register() {
     setCustomerErrors({
       firstName: false,
       email: false,
+      emailValid: true,
       password: false,
       reEnterPassword: false,
     });
 
-    // Check if passwords match and update isPasswordMatch state
-    if (name === "password" || name === "reEnterPassword") {
-      const newPassword = name === "password" ? value : customerData.password;
-      const reEnterPassword = name === "reEnterPassword" ? value : customerData.reEnterPassword;
-      setIsPasswordMatch(newPassword === reEnterPassword);
-    }
+    // // Check if passwords match and update isPasswordMatch state
+    // if (name === "password" || name === "reEnterPassword") {
+    //   const newPassword = name === "password" ? value : customerData.password;
+    //   const reEnterPassword = name === "reEnterPassword" ? value : customerData.reEnterPassword;
+    //   setIsPasswordMatch(newPassword === reEnterPassword);
+    // }
   };
 
   const handleVendorChange = (e: { target: { name: any; value: any; }; }) => {
@@ -460,6 +468,7 @@ export default function Register() {
     setVendorErrors({
       firstName: false,
       email: false,
+      emailValid: true,
       password: false,
       reEnterPassword: false,
       shopName: false,
@@ -478,6 +487,8 @@ export default function Register() {
     // Initialize an array to collect empty field names
     const emptyFields: string[] = [];
 
+
+
     // Check for empty required fields
     requiredCustomerFields.forEach((fieldName) => {
       if (customerData[fieldName as keyof ICustomerData].trim().length === 0) {
@@ -493,6 +504,21 @@ export default function Register() {
         return acc;
       }, {} as Record<string, boolean>),
     }));
+
+    // check email regex
+    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerData.email);
+    setCustomerErrors((prevErrors) => ({
+      ...prevErrors,
+      emailValid: isEmailValid,
+    }));
+
+    // Check if passwords match and update isPasswordMatch state
+    setIsPasswordMatch(customerData.password === customerData.reEnterPassword);
+
+    if (!customerErrors.emailValid) {
+      console.log("Invalid email address.");
+      return; // Prevent signup when email is invalid
+    }
 
     if (emptyFields.length > 0) {
       // Display an error message or perform some action to inform the user
@@ -528,6 +554,18 @@ export default function Register() {
         return acc;
       }, {} as Record<string, boolean>),
     }));
+
+    // check email regex
+    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(vendorData.email);
+    setVendorErrors((prevErrors) => ({
+      ...prevErrors,
+      emailValid: isEmailValid,
+    }));
+
+    if (!vendorErrors.emailValid) {
+      console.log("Invalid email address.");
+      return; // Prevent signup when email is invalid
+    }
 
     if (emptyFields.length > 0) {
       // Display an error message or perform some action to inform the user
