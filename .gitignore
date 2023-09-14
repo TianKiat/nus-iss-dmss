@@ -1,4 +1,4 @@
 
 *.pyc
 backend/app/secrets.env
-.env
+backend/.env
