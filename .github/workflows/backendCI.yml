@@ -1,79 +1,94 @@
 # name: Backend CI/CD 
 
- on: [push]
+on: [push]
 
- jobs:
-   build:
-     runs-on: ubuntu-latest
-     defaults:
+env:
+  DATABASE_URL: mysql+mysqlconnector://root:password@127.0.0.1:3306/food_ordering
+  DB_DIALECT: mysql
+  DB_DRIVER: mysqlconnector
+  DB_USERNAME: root
+  DB_PASSWORD: password
+  DB_HOST: 127.0.0.1
+  DB_PORT: 3306
+  DB_DATABASE: food_ordering
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+     mysql:
+      image: mysql:8.0
+      env: 
+        MYSQL_DATABASE: food_ordering
+        MYSQL_ROOT_PASSWORD: password
+      ports:
+        - 3306:3306
+      options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    defaults:
       run:
-       working-directory: 'backend'
+        working-directory: 'backend'
 
-     steps:
-       - name: Checkout code
-         uses: actions/checkout@v2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
-       - name: Set up Python
-         uses: actions/setup-python@v2
-         with:
-           python-version: 3.8
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
 
-       - name: Install dependencies
-         run: |
-           pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
 
-       - name: Run pytest for unit testing
-         run: |
-           pytest app/test/pytest_sample.py
+      - name: Apply database migrations
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          DB_DIALECT: ${{ env.DB_DIALECT }}
+          DB_DRIVER: ${{ env.DB_DRIVER }}
+          DB_USERNAME: ${{ env.DB_USERNAME }}
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+          DB_HOST: ${{ env.DB_HOST }}
+          DB_PORT: ${{ env.DB_PORT }}
+          DB_DATABASE: ${{ env.DB_DATABASE }}
+        run: |
+          # Add commands here to apply database migrations if applicable
+          alembic -x database_url=$DATABASE_URL upgrade head
 
-#       - name: Run pytest for unit testing and generate JSON report
-#         run: |
-#           pytest path/to/backend/tests --junitxml=reports/backend/pytest-results.xml
-#           # Convert the JUnit XML to JSON
-#           python -m junit2json.junit2json reports/backend/pytest-results.xml > reports/backend/pytest-results.json
+      - name: Run pytest for unit testing
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          DB_DIALECT: ${{ env.DB_DIALECT }}
+          DB_DRIVER: ${{ env.DB_DRIVER }}
+          DB_USERNAME: ${{ env.DB_USERNAME }}
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+          DB_HOST: ${{ env.DB_HOST }}
+          DB_PORT: ${{ env.DB_PORT }}
+          DB_DATABASE: ${{ env.DB_DATABASE }}
+        run: |
+          pytest app/test/
 
-#       - name: Upload pytest results as artifact
-#         if: always() # Upload the artifact even if previous steps fail
-#         uses: actions/upload-artifact@v2
-#         with:
-#           name: pytest-results
-#           path: reports/backend/pytest-results.json
+      - name: Get changed Python files
+        id: changed-files
+        run: |
+          CHANGED_FILES=$(git diff --name-only origin/dev...HEAD -- '*.py')
+          echo "::set-output name=changed_files::$CHANGED_FILES"
 
-#       - name: Run pylint for linting and generate JSON report
-#         run: |
-#           pylint backend/ --output-format=json > reports/backend/pylint-report.json
-
-#       - name: Upload pylint report as artifact
-#         if: always() # Upload the artifact even if previous steps fail
-#         uses: actions/upload-artifact@v2
-#         with:
-#           name: pylint-report
-#           path: reports/backend/pylint-report.json
-
-#       - name: Run Bandit for SAST and generate JSON report
-#         run: |
-#           bandit -r backend/ -f json -o reports/backend/bandit-report.json
-
-#       - name: Upload Bandit report as artifact
-#         if: always() # Upload the artifact even if previous steps fail
-#         uses: actions/upload-artifact@v2
-#         with:
-#           name: bandit-report
-#           path: reports/backend/bandit-report.json
-
-#       - name: Run OWASP ZAP for DAST
-#         run: |
-#           # Download and install OWASP ZAP (as shown previously)
-#           # Perform your DAST scan (as shown previously)
-
-#           # Generate the ZAP report
-#           ./zap-cli.py report -o reports/backend/zap-report.json -f json
-
-#           # Stop OWASP ZAP (as shown previously)
-
-#       - name: Upload ZAP Report as Artifact
-#         if: always() # Upload the artifact even if previous steps fail
-#         uses: actions/upload-artifact@v2
-#         with:
-#           name: zap-report
-#           path: reports/backend/zap-report.json
+      - name: Run pylint for linting
+        run: |
+          cd ..
+          CHANGED_FILES="${{ steps.changed-files.outputs.changed_files }}"
+          if [ -n "$CHANGED_FILES" ]; then
+            echo "$CHANGED_FILES" | xargs pylint
+          fi
+      
+      - name: Run Bandit for SAST
+        run: |
+          cd ..
+          CHANGED_FILES="${{ steps.changed-files.outputs.changed_files }}"
+          if [ -n "$CHANGED_FILES" ]; then
+            echo "$CHANGED_FILES" | xargs bandit -c bandit.yaml -r
+          fi
