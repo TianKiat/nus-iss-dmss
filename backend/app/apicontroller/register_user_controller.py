@@ -9,6 +9,7 @@ class RegisterUserController():
 
     def register_customer(self, db, customer: Customer):
         return UserService().register_customer(db, customer)
-    
+
     def register_vendor(self, db, vendor: Vendor):
         return UserService().register_vendor(db, vendor)
+    

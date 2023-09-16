@@ -21,7 +21,7 @@ def register_customer_account(customer: Customer, db: Session = Depends(get_db))
     try:
         return RegisterUserController().register_customer(db, customer)
     except Exception as ex:
-        raise HTTPException(status_code=500, detail=str(ex))
+        raise HTTPException(status_code=500, detail=str(ex)) from ex
 
 @router.post(
         "/register_vendor",
@@ -31,4 +31,4 @@ def register_vendor_account(vendor: Vendor, db: Session = Depends(get_db)):
     try:
         return RegisterUserController().register_vendor(db, vendor)
     except Exception as ex:
-        raise HTTPException(status_code=500, detail=str(ex))
+        raise HTTPException(status_code=500, detail=str(ex)) from ex

@@ -1,4 +1,3 @@
-from mysql.connector import Error
 from sqlalchemy.orm import Session
 from app.common.user_model import Customer, Vendor
 from app.models import user, user_profile, vendor_profile
@@ -6,7 +5,7 @@ from app.models import user, user_profile, vendor_profile
 class UserGateway():
     def __init__(self):
         pass
-    
+
     def insert_customer_data(self, db: Session, customer: Customer):
         try:
             user_data = {
@@ -19,9 +18,10 @@ class UserGateway():
             db.commit()
 
             user_id_object = db.query(user.User).filter(user.User.username == customer.username).first()
-            
+
             if user_id_object:
                 user_id = user_id_object.userID
+
             user_profile_data = {
                 'profileName': customer.name,
                 'email': customer.email,
@@ -33,11 +33,11 @@ class UserGateway():
             db.commit()
 
             return {"id" : user_id}
-        
+
         except Exception as e:
             print(f"Error: {e}")
-    
-    def insert_vendor_data(self, db: Session, vendor: Vendor):  
+
+    def insert_vendor_data(self, db: Session, vendor: Vendor):
         try:
             user_data = {
                 'username': vendor.username,
@@ -65,7 +65,7 @@ class UserGateway():
             db.commit()
 
             return {"id" : user_id}
-        
+
         except Exception as e:
-            print(f"Error: {e}")      
+            print(f"Error: {e}") 
         

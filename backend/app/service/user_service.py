@@ -11,7 +11,7 @@ class UserService():
     def register_customer(self, db, customer: Customer):
         # validate customer data
         return UserGateway().insert_customer_data(db, customer)
-    
+
     def register_vendor(self, db, vendor: Vendor):
         #validate vendor data
         return UserGateway().insert_vendor_data(db, vendor)

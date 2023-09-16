@@ -1,7 +1,5 @@
 from fastapi.testclient import TestClient
-
 from app.main import app
-from app.service.user_service import UserService
 
 client = TestClient(app)
 
