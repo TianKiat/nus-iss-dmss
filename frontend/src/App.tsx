@@ -21,7 +21,7 @@ function App() {
             <Route path="login" element={<LoginCustomer />} />
             <Route path="vendor/login" element={<LoginVendor />} />
             <Route path="register" element={<Register />} />
-            <Route path="vendor/register" element={<RegisterVendor />} />
+            {/* <Route path="vendor/register" element={<RegisterVendor />} /> */}
             <Route path="*" element={<Error />} />
           </Route>
         </Routes>

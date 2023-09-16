@@ -33,7 +33,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -71,12 +71,24 @@ jobs:
         run: |
           pytest app/test/
 
+      - name: Get changed Python files
+        id: changed-files
+        run: |
+          CHANGED_FILES=$(git diff --name-only origin/dev...HEAD -- '*.py')
+          echo "::set-output name=changed_files::$CHANGED_FILES"
+
       - name: Run pylint for linting
         run: |
           cd ..
-          git diff --name-only HEAD~1 -- '*.py' | xargs -r pylint
+          CHANGED_FILES="${{ steps.changed-files.outputs.changed_files }}"
+          if [ -n "$CHANGED_FILES" ]; then
+            echo "$CHANGED_FILES" | xargs pylint
+          fi
       
       - name: Run Bandit for SAST
         run: |
           cd ..
-          git diff --name-only HEAD~1 -- '*.py' | xargs -r bandit -c bandit.yaml -r
+          CHANGED_FILES="${{ steps.changed-files.outputs.changed_files }}"
+          if [ -n "$CHANGED_FILES" ]; then
+            echo "$CHANGED_FILES" | xargs bandit -c bandit.yaml -r
+          fi

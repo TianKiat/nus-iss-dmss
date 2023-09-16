@@ -7,7 +7,6 @@ import {
   FormLabel,
   Input,
   InputGroup,
-  HStack,
   InputRightElement,
   Stack,
   Button,
@@ -21,18 +20,22 @@ import {
   TabPanel,
   TabPanels,
   FormErrorMessage,
+  Alert,
+  AlertIcon,
+  AlertDescription,
+  AlertTitle,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 
 interface ICustomerData {
-  clientType: string,
-  firstName: string,
-  lastName: string,
-  email: string,
+  name: string,
+  username: string,
   password: string,
+  email: string,
+  phone: string,
   reEnterPassword: string,
-
+  role: string,
 };
 
 interface IVendorData extends ICustomerData {
@@ -40,47 +43,56 @@ interface IVendorData extends ICustomerData {
   shopDesc: string,
 }
 
-function NameFields({ firstName, lastName, firstNameError, onChange }: {
-  firstName: string;
-  firstNameError: boolean;
-  lastName: string;
+function NameField({ name, nameError, onChange }: {
+  name: string;
+  nameError: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
 
   return (
     <>
-      <HStack>
-        <Box>
-          <FormControl
-            id="firstName"
-            isRequired
-            isInvalid={firstNameError}
-          >
-            <FormLabel>First Name</FormLabel>
-            <Input
-              type="text"
-              value={firstName}
-              onChange={onChange}
-              name="firstName"
-            />
-            {/* Display error message */}
-            {firstNameError ? (<FormErrorMessage>Required</FormErrorMessage>) : ("")}
-          </FormControl>
-        </Box>
-        <Box>
-          <FormControl
-            id="lastName"
-          >
-            <FormLabel>Last Name</FormLabel>
-            <Input
-              type="text"
-              value={lastName}
-              onChange={onChange}
-              name="lastName"
-            />
-          </FormControl>
-        </Box>
-      </HStack>
+      <FormControl
+        id="name"
+        isRequired
+        isInvalid={nameError}
+      >
+        <FormLabel>Name</FormLabel>
+        <Input
+          type="text"
+          value={name}
+          onChange={onChange}
+          name="name"
+        />
+        {/* Display error message */}
+        {nameError ? (<FormErrorMessage>Required</FormErrorMessage>) : ("")}
+      </FormControl>
+    </>
+  )
+}
+
+function UsernameField({ username, usernameError, onChange }: {
+  username: string;
+  usernameError: boolean;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}) {
+
+  return (
+    <>
+      <FormControl
+        id="username"
+        isRequired
+        isInvalid={usernameError}
+      >
+        <FormLabel>Username</FormLabel>
+        <Input
+          type="text"
+          value={username}
+          onChange={onChange}
+          name="username"
+        />
+        {/* Display error message */}
+        {usernameError ? (<FormErrorMessage>Required</FormErrorMessage>) : ("")}
+      </FormControl>
     </>
   )
 }
@@ -108,6 +120,32 @@ function EmailField({ email, emailError, emailValid, onChangeEmail }: {
         {/* Display error message */}
         {emailError ? (<FormErrorMessage>Required</FormErrorMessage>) : ("")}
         {(!emailValid && !emailError && email !== "") ? (<FormErrorMessage>Invalid email address</FormErrorMessage>) : ""}
+      </FormControl>
+    </>
+  )
+}
+
+function PhoneField({ phone, phoneError, onChange }: {
+  phone: string;
+  phoneError: boolean;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}) {
+  return (
+    <>
+      <FormControl
+        id="phone"
+        isRequired
+        isInvalid={phoneError}
+      >
+        <FormLabel>HP No.</FormLabel>
+        <Input
+          type="phone"
+          value={phone}
+          onChange={onChange}
+          name="phone"
+        />
+        {/* Display error message */}
+        {phoneError ? (<FormErrorMessage>Required</FormErrorMessage>) : ("")}
       </FormControl>
     </>
   )
@@ -243,10 +281,14 @@ function CustomerSignUp({ formData, error, handleChange, isPasswordMatch, handle
   return (
     <>
       <Stack spacing={4}>
-        <NameFields
-          firstName={formData.firstName}
-          lastName={formData.lastName}
-          firstNameError={error.firstName}
+        <NameField
+          name={formData.name}
+          nameError={error.name}
+          onChange={handleChange}
+        />
+        <UsernameField
+          username={formData.username}
+          usernameError={error.username}
           onChange={handleChange}
         />
         <EmailField
@@ -254,6 +296,11 @@ function CustomerSignUp({ formData, error, handleChange, isPasswordMatch, handle
           emailError={error.email}
           emailValid={error.emailValid}
           onChangeEmail={handleChange}
+        />
+        <PhoneField
+          phone={formData.phone}
+          phoneError={error.phone}
+          onChange={handleChange}
         />
         <PasswordsField
           password={formData.password}
@@ -306,10 +353,14 @@ function VendorSignUp({ formData, error, handleChange, isPasswordMatch, handleSu
   return (
     <>
       <Stack spacing={4}>
-        <NameFields
-          firstName={formData.firstName}
-          lastName={formData.lastName}
-          firstNameError={error.firstName}
+        <NameField
+          name={formData.name}
+          nameError={error.name}
+          onChange={handleChange}
+        />
+        <UsernameField
+          username={formData.username}
+          usernameError={error.username}
           onChange={handleChange}
         />
         <EmailField
@@ -317,6 +368,11 @@ function VendorSignUp({ formData, error, handleChange, isPasswordMatch, handleSu
           emailError={error.email}
           emailValid={error.emailValid}
           onChangeEmail={handleChange}
+        />
+        <PhoneField
+          phone={formData.phone}
+          phoneError={error.phone}
+          onChange={handleChange}
         />
         <PasswordsField
           password={formData.password}
@@ -361,10 +417,11 @@ function VendorSignUp({ formData, error, handleChange, isPasswordMatch, handleSu
 
 export default function Register() {
   const initialCustomerFormData = {
-    clientType: "0", // Initialize clientType with a default value
-    firstName: "",
-    lastName: "",
+    role: "0", // Initialize role with a default value
+    name: "",
+    username: "",
     email: "",
+    phone: "",
     password: "",
     reEnterPassword: "",
   };
@@ -374,6 +431,8 @@ export default function Register() {
     shopName: "",
     shopDesc: "",
   }
+  const [showAlert, setShowAlert] = useState(false);
+
   const [selectedTab, setSelectedTab] = useState<number>(0);
 
   const [customerData, setCustomerData] = useState(initialCustomerFormData);
@@ -384,9 +443,11 @@ export default function Register() {
   const [isPasswordMatch, setIsPasswordMatch] = useState(true);
 
   const [customerErrors, setCustomerErrors] = useState<Record<string, boolean>>({
-    firstName: false,
+    name: false,
+    username: false,
     email: false,
     emailValid: true,
+    phone: false,
     password: false,
     reEnterPassword: false,
   });
@@ -398,8 +459,10 @@ export default function Register() {
   });
 
   const requiredCustomerFields = [
-    "firstName",
+    "name",
+    "username",
     "email",
+    "phone",
     "password",
     "reEnterPassword",
   ];
@@ -417,18 +480,22 @@ export default function Register() {
     setIsPasswordMatch(true); // Reset the password match status
     // Reset errors
     setCustomerErrors({
-      firstName: false,
+      name: false,
+      username: false,
       email: false,
       emailValid: true,
+      phone: false,
       password: false,
       reEnterPassword: false,
     });
     setVendorErrors({
-      firstName: false,
+      name: false,
+      username: false,
       email: false,
       emailValid: true,
+      phone: false,
       password: false,
-      reEnterPassword: false,      
+      reEnterPassword: false,
       shopName: false,
       shopDesc: false,
     });
@@ -442,19 +509,21 @@ export default function Register() {
     });
 
     setCustomerErrors({
-      firstName: false,
+      name: false,
+      username: false,
       email: false,
       emailValid: true,
+      phone: false,
       password: false,
       reEnterPassword: false,
     });
 
     // // Check if passwords match and update isPasswordMatch state
-    // if (name === "password" || name === "reEnterPassword") {
-    //   const newPassword = name === "password" ? value : customerData.password;
-    //   const reEnterPassword = name === "reEnterPassword" ? value : customerData.reEnterPassword;
-    //   setIsPasswordMatch(newPassword === reEnterPassword);
-    // }
+    if (name === "password" || name === "reEnterPassword") {
+      const newPassword = name === "password" ? value : customerData.password;
+      const reEnterPassword = name === "reEnterPassword" ? value : customerData.reEnterPassword;
+      setIsPasswordMatch(newPassword === reEnterPassword);
+    }
   };
 
   const handleVendorChange = (e: { target: { name: any; value: any; }; }) => {
@@ -466,9 +535,11 @@ export default function Register() {
 
     // Reset errors
     setVendorErrors({
-      firstName: false,
+      name: false,
+      username: false,
       email: false,
       emailValid: true,
+      phone: false,
       password: false,
       reEnterPassword: false,
       shopName: false,
@@ -483,11 +554,9 @@ export default function Register() {
     }
   };
 
-  const handleCustomerSubmit = () => {
+  const handleCustomerSubmit = async () => {
     // Initialize an array to collect empty field names
     const emptyFields: string[] = [];
-
-
 
     // Check for empty required fields
     requiredCustomerFields.forEach((fieldName) => {
@@ -503,7 +572,7 @@ export default function Register() {
         acc[fieldName] = true;
         return acc;
       }, {} as Record<string, boolean>),
-    }));
+    }));// Add this line
 
     // check email regex
     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerData.email);
@@ -515,7 +584,7 @@ export default function Register() {
     // Check if passwords match and update isPasswordMatch state
     setIsPasswordMatch(customerData.password === customerData.reEnterPassword);
 
-    if (!customerErrors.emailValid) {
+    if (!isEmailValid) {
       console.log("Invalid email address.");
       return; // Prevent signup when email is invalid
     }
@@ -533,9 +602,43 @@ export default function Register() {
     }
     // Log the formData before sending it to the backend
     console.log('CustomerData to be sent to the backend:', customerData);
+
+    try {
+      const apiURL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${apiURL}/register_customer`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(customerData),
+      });
+
+      if (response.status === 200) {
+        // Registration successful, handle accordingly (e.g., show a success message)
+        const customerID = await response.json();
+        if (customerID != null) {
+          console.log("Customer in DB")
+          // alert('Registration successful!');
+          resetFormFields()
+          setShowAlert(true);
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 3000);
+        }
+        else {
+          console.log("Failed Registration")
+        }
+      } else {
+        // Registration failed, handle accordingly (e.g., show an error message)
+        console.error('Error:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle network errors or other exceptions
+    }
   }
 
-  const handleVendorSubmit = () => {
+  const handleVendorSubmit = async () => {
     // Initialize an array to collect empty field names
     const emptyFields: string[] = [];
 
@@ -580,66 +683,121 @@ export default function Register() {
     }
     // Log the formData before sending it to the backend
     console.log('VendorData to be sent to the backend:', vendorData);
+
+    try {
+      const apiURL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${apiURL}/register_vendor`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(vendorData),
+      });
+
+      if (response.status === 200) {
+        // Registration successful, handle accordingly (e.g., show a success message)
+        const vendorID = await response.json();
+        if (vendorID != null) {
+          console.log("Vendor in DB")
+          // alert('Registration successful!');
+          resetFormFields()
+          setShowAlert(true);
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 3000);
+        }
+        else {
+          console.log("Failed Registration")
+        }
+      } else {
+        // Registration failed, handle accordingly (e.g., show an error message)
+        console.error('Error:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle network errors or other exceptions
+    }
   }
 
   return (
-    <Flex
-      minH={"100vh"}
-      align={"center"}
-      justify={"center"}
-      bg={useColorModeValue("gray.50", "gray.800")}
-    >
-      <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6}>
-        <Stack align={"center"}>
-          <Heading fontSize={"4xl"} textAlign={"center"}>
-            {selectedTab === 0 ? "Sign up as a Customer" : "Sign up as a Vendor"}
-          </Heading>
-          <Text fontSize={"lg"} color={"red.200"}>
-            {selectedTab === 0 ? "Discover a world of flavors at your fingertips" : "Share your signature dishes with a hungry audience"}
-          </Text>
-        </Stack>
-        <Box
-          rounded={"lg"}
-          bg={useColorModeValue("white", "gray.700")}
-          boxShadow={"lg"}
-          p={8}
+    <>
+      {showAlert && (
+        <Alert
+          status='success'
+          variant='subtle'
+          flexDirection='column'
+          alignItems='center'
+          justifyContent='center'
+          textAlign='center'
+          height='200px'
         >
-          <Tabs isFitted variant="enclosed" colorScheme="blue" onChange={(selectedTab) => {
-            setSelectedTab(selectedTab);
-            resetFormFields(); // Reset form fields when tab changes
-            selectedTab === 0 ? setCustomerData((prevData) => ({
-              ...prevData,
-              clientType: "0"
-            })) : setVendorData((prevData) => ({
-              ...prevData,
-              clientType: "1"
-            }))
-          }}>
-            <TabList>
-              <Tab value="0">Customer</Tab>
-              <Tab value="1">Vendor</Tab>
-            </TabList>
-            <TabPanels>
-              <TabPanel>
-                <CustomerSignUp
-                  formData={customerData}
-                  error={customerErrors}
-                  handleChange={handleCustomerChange}
-                  isPasswordMatch={isPasswordMatch}
-                  handleSubmit={handleCustomerSubmit} />
-              </TabPanel>
-              <TabPanel>
-                <VendorSignUp
-                  formData={vendorData}
-                  error={vendorErrors}
-                  handleChange={handleVendorChange}
-                  isPasswordMatch={isPasswordMatch}
-                  handleSubmit={handleVendorSubmit} />
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
-        </Box>
-      </Stack>
-    </Flex>
+          <AlertIcon boxSize='40px' mr={0} />
+          <AlertTitle mt={4} mb={4} fontSize='lg'>
+            Registration successful!
+          </AlertTitle>
+          <AlertDescription maxWidth='sm'>
+            Directing you to the login page.
+          </AlertDescription>
+        </Alert>
+      )}
+      <Flex
+        minH={"100vh"}
+        align={"center"}
+        justify={"center"}
+        bg={useColorModeValue("gray.50", "gray.800")}
+      >
+        <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6}>
+          <Stack align={"center"}>
+            <Heading fontSize={"4xl"} textAlign={"center"}>
+              {selectedTab === 0 ? "Sign up as a Customer" : "Sign up as a Vendor"}
+            </Heading>
+            <Text fontSize={"lg"} color={"red.200"}>
+              {selectedTab === 0 ? "Discover a world of flavors at your fingertips" : "Share your signature dishes with a hungry audience"}
+            </Text>
+          </Stack>
+          <Box
+            rounded={"lg"}
+            bg={useColorModeValue("white", "gray.700")}
+            boxShadow={"lg"}
+            p={8}
+          >
+            <Tabs isFitted variant="enclosed" colorScheme="blue" onChange={(selectedTab) => {
+              setSelectedTab(selectedTab);
+              resetFormFields(); // Reset form fields when tab changes
+              selectedTab === 0 ? setCustomerData((prevData) => ({
+                ...prevData,
+                role: "0"
+              })) : setVendorData((prevData) => ({
+                ...prevData,
+                role: "1"
+              }))
+            }}>
+              <TabList>
+                <Tab value="0">Customer</Tab>
+                <Tab value="1">Vendor</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel>
+                  <CustomerSignUp
+                    formData={customerData}
+                    error={customerErrors}
+                    handleChange={handleCustomerChange}
+                    isPasswordMatch={isPasswordMatch}
+                    handleSubmit={handleCustomerSubmit} />
+                </TabPanel>
+                <TabPanel>
+                  <VendorSignUp
+                    formData={vendorData}
+                    error={vendorErrors}
+                    handleChange={handleVendorChange}
+                    isPasswordMatch={isPasswordMatch}
+                    handleSubmit={handleVendorSubmit} />
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          </Box>
+        </Stack>
+      </Flex>
+    </>
   );
 }
