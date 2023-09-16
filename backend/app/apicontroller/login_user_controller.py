@@ -1,4 +1,4 @@
-from service.user_service import UserService
+from app.service.user_service import UserService
 
 # import service class needed
 
@@ -7,5 +7,4 @@ class LoginUserController():
         pass
 
     def login_user(user_data):
-        result = UserService.login_user(user_data)
-        return result
+        return UserService.login_user(user_data)

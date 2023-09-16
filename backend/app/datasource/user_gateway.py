@@ -40,3 +40,21 @@ class UserGateway():
         #    print(row)
 
         return {"message":"Insert user data called"}
+    
+    # login authentication
+    def auth(user):
+        try:
+            dbcursor = sqldb.cursor(dictionary=True)
+            sql_statement = ("SELECT userID, roleID FROM USER WHERE username = (%s) AND userPassword = (%s)")
+            value = (user.username, user.password)
+            dbcursor.execute(sql_statement, value)
+            result = dbcursor.fetchone()
+            # result =  {"auth" : True} if result else {"auth" : False} 
+            if result: 
+                print ("Logged In UserID:", result.get("userID")) 
+            else: 
+                print ("Logged In failed")      
+            return result
+        except:
+            print ("An exception occurred")
+            return 0

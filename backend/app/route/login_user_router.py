@@ -1,7 +1,7 @@
 from fastapi import APIRouter
-from apicontroller.login_user_controller import LoginUserController
+from app.apicontroller.login_user_controller import LoginUserController
 
-from common.user_model import User
+from app.common.user_model import User
 
 router = APIRouter()
 
@@ -9,4 +9,3 @@ router = APIRouter()
 def login_user_account(user: User):
     result = LoginUserController.login_user(user)
     return user
-

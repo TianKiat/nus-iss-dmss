@@ -15,5 +15,5 @@ class UserService():
         result = UserGateway.insert_user_data(new_user)
         return result
 
-    def login_user(self, user_data):
-        return True
+    def login_user(user_data):
+        return UserGateway.auth(user_data)
