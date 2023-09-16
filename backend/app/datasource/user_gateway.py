@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.common.user_model import Customer, Vendor
+from app.common.user_model import User, Vendor
 from app.models import user, user_profile, vendor_profile
 import mysql.connector
 import uuid
@@ -11,7 +11,7 @@ class UserGateway():
     def __init__(self):
         pass
 
-    def insert_customer_data(self, db: Session, customer: Customer):
+    def insert_customer_data(self, db: Session, customer: User):
         try:
             user_data = {
                 'username': customer.username,

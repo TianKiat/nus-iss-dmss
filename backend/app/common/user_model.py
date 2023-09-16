@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-class Customer(BaseModel):
+class User(BaseModel):
     name: str
     username: str
     password: str
@@ -8,7 +8,7 @@ class Customer(BaseModel):
     phone: str
     role: int
 
-class Vendor(Customer):
+class Vendor(User):
     address: str
     status: int
     # shopName: str

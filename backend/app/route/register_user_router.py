@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from app.apicontroller.register_user_controller import RegisterUserController
-from app.common.user_model import Customer, Vendor
+from app.common.user_model import User, Vendor
 from run import SessionLocal
 
 router = APIRouter()
@@ -17,7 +17,7 @@ def get_db():
         "/register_customer",
         description="User registration",
 )
-def register_customer_account(customer: Customer, db: Session = Depends(get_db)):
+def register_customer_account(customer: User, db: Session = Depends(get_db)):
     try:
         return RegisterUserController().register_customer(db, customer)
     except Exception as ex:
