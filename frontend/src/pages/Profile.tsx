@@ -16,9 +16,9 @@ import {
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react';
 interface UserData {
-  firstName: string;
-  lastName: string;
-  userName: string;
+  name: string;
+  phone: string;
+  username: string;
   email: string;
 }
 export default function Profile() {
@@ -26,9 +26,10 @@ export default function Profile() {
 
   useEffect(() => {
     // Make a GET request to your backend API using Python (e.g., Flask)
-    fetch('/api/user-profile') // Replace with your actual API endpoint
+    fetch('http://127.0.0.1:8000/user_profile') // Replace with your actual API endpoint
       .then((response) => response.json())
       .then((data) => {
+        console.log(data)
         // Update state with the fetched user data
         setUserData(data);
       })
@@ -49,30 +50,28 @@ export default function Profile() {
         <CardBody>
           {userData && (
             <Stack divider={<StackDivider />} spacing='4'>
-              <HStack spacing='100px'>
                 <Box>
                   <Heading size='xs' textTransform='uppercase'>
                     First Name
                   </Heading>
                   <Text pt='2' fontSize='sm'>
-                    {userData.firstName}
+                    {userData.name}
                   </Text>
                 </Box>
                 <Box>
                   <Heading size='xs' textTransform='uppercase'>
-                    Last Name
+                    Username
                   </Heading>
                   <Text pt='2' fontSize='sm'>
-                    {userData.lastName}
+                    {userData.username}
                   </Text>
                 </Box>
-              </HStack>
               <Box>
                 <Heading size='xs' textTransform='uppercase'>
-                  Username
+                  Phone Number
                 </Heading>
                 <Text pt='2' fontSize='sm'>
-                  {userData.userName}
+                  {userData.phone}
                 </Text>
               </Box>
               <Box>
