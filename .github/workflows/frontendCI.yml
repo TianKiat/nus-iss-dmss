@@ -3,7 +3,7 @@ name: Frontend CI/CD on Pull Request
 on:
   pull_request:
     paths:
-      - 'frontend/**' # Specify the path to your frontend code
+      - 'frontend/**'
 
 jobs:
   build:
@@ -16,11 +16,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 18 # Use the version of Node.js you need
+          node-version: 18
 
       - name: Install dependencies using pnpm
         run: |
@@ -37,13 +39,20 @@ jobs:
         id: changed-files
         run: |
           CHANGED_FILES=$(git diff --name-only origin/dev...HEAD -- '*.tsx')
+          echo "Changed TSX files:"
+          echo "$CHANGED_FILES"
           echo "::set-output name=changed_files::$CHANGED_FILES"
 
       - name: Lint frontend code
-        run: |
+        run: |  
           CHANGED_FILES="${{ steps.changed-files.outputs.changed_files }}"
           if [ -n "$CHANGED_FILES" ]; then
-          echo "$CHANGED_FILES" | xargs pnpm run lint 
+            url=$(cd ..; pwd)
+            echo "$url"
+            echo "$CHANGED_FILES" | while IFS= read -r line; do
+              full_path="$url/$line"
+              echo "$full_path"
+            done | xargs pnpm eslint 
           fi
 
       - name: Run npm audit
@@ -53,22 +62,28 @@ jobs:
           echo "$CHANGED_FILES" | xargs pnpm audit
           fi
 
-      - name: Install Java
-        uses: actions/setup-java@v2
+      - name: Start your Frontend App
+        run: |
+          # Add commands here to start your frontend application if it's not already running
+          pnpm run dev &
+          sleep 5
+
+      - name: Expose Application with localtunnel
+        run: |
+          npm install -g localtunnel
+          lt --subdomain food-ordering-app-frontend-127-0-0-3 --port 5173 &
+          sleep 10 # Allow localtunnel some time to start
+
+      - name: Install Arachni and Run Arachni Scan
+        run: |
+          wget https://github.com/Arachni/arachni/releases/download/v1.5.1/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz
+          tar xzf arachni-1.5.1-0.5.12-linux-x86_64.tar.gz
+          cd arachni-1.5.1-0.5.12/bin
+          ./arachni "https://food-ordering-app-frontend-127-0-0-3.loca.lt"
+
+      - name: Upload Arachni Report
+        uses: actions/upload-artifact@v2
         with:
-          java-version: 11 # Use the version of Java required by OWASP ZAP
-
-      - name: Install and Run OWASP ZAP
-        run: |
-          # Download and install OWASP ZAP (replace with the actual download URL)
-          wget -q https://github.com/zaproxy/zaproxy/releases/download/v2.11.0/ZAP_2.11.0_Linux.tar.gz -O frontend/zap.tar.gz
-          tar -xzf frontend/zap.tar.gz
-          cd frontend/ZAP_2.11.0
-          ./zap.sh -daemon -port 8080
-
-      - name: Run OWASP ZAP Scan
-        run: |
-          # Start your Vite.js application or server
-          # Perform any necessary setup for your application (e.g., starting it on a specific port)
-          # Run the ZAP spider and active scan
-          ./zap-cli.py quick-scan -o reports/frontend/zap-report.html -l Medium --spider -r 'http://localhost:5173'  # Adjust the target URL and scan options
+          name: arachni-report
+          path: |
+            ./arachni_report.afr
