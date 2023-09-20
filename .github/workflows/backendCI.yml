@@ -1,6 +1,9 @@
-# name: Backend CI/CD 
+name: Backend CI/CD on Pull Request
 
-on: [push]
+on:
+  pull_request:
+    paths:
+      -'backend/**'
 
 env:
   DATABASE_URL: mysql+mysqlconnector://root:password@127.0.0.1:3306/food_ordering

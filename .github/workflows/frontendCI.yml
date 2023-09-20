@@ -20,7 +20,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 14 # Use the version of Node.js you need
+          node-version: 18 # Use the version of Node.js you need
 
       - name: Install dependencies using pnpm
         run: |
@@ -36,14 +36,25 @@ jobs:
           # Run unit tests
           pnpm run test
 
+      - name: Get changed tsx files
+        id: changed-files
+        run: |
+          CHANGED_FILES=$(git diff --name-only origin/dev...HEAD -- '*.tsx')
+          echo "::set-output name=changed_files::$CHANGED_FILES"
+
       - name: Lint frontend code
         run: |
-          # Run linting
-          pnpm run lint 
+          CHANGED_FILES="${{ steps.changed-files.outputs.changed_files }}"
+          if [ -n "$CHANGED_FILES" ]; then
+          echo "$CHANGED_FILES" | xargs pnpm run lint 
+          fi
 
       - name: Run npm audit
         run: |
-          pnpm audit
+          CHANGED_FILES="${{ steps.changed-files.outputs.changed_files }}"
+          if [ -n "$CHANGED_FILES" ]; then
+          echo "$CHANGED_FILES" | xargs pnpm audit
+          fi
 
       - name: Install Java
         uses: actions/setup-java@v2
@@ -63,4 +74,4 @@ jobs:
           # Start your Vite.js application or server
           # Perform any necessary setup for your application (e.g., starting it on a specific port)
           # Run the ZAP spider and active scan
-          ./zap-cli.py quick-scan -o reports/frontend/zap-report.html -l Medium --spider -r 'http://localhost:3000'  # Adjust the target URL and scan options
+          ./zap-cli.py quick-scan -o reports/frontend/zap-report.html -l Medium --spider -r 'http://localhost:5173'  # Adjust the target URL and scan options
