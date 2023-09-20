@@ -25,7 +25,7 @@ import {
   AlertDescription,
   AlertTitle,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 
 interface ICustomerData {
@@ -36,7 +36,7 @@ interface ICustomerData {
   phone: string,
   reEnterPassword: string,
   role: string,
-};
+}
 
 interface IVendorData extends ICustomerData {
   shopName: string,
@@ -501,7 +501,7 @@ export default function Register() {
     });
   };
 
-  const handleCustomerChange = (e: { target: { name: any; value: any; }; }) => {
+  const handleCustomerChange = (e: { target: { name: string; value: boolean; }; }) => {
     const { name, value } = e.target;
     setCustomerData({
       ...customerData,
@@ -526,7 +526,7 @@ export default function Register() {
     }
   };
 
-  const handleVendorChange = (e: { target: { name: any; value: any; }; }) => {
+  const handleVendorChange = (e: { target: { name: string; value: boolean; }; }) => {
     const { name, value } = e.target;
     setVendorData({
       ...vendorData,
@@ -604,7 +604,7 @@ export default function Register() {
     console.log('CustomerData to be sent to the backend:', customerData);
 
     try {
-      const apiURL = import.meta.env.VITE_API_BASE_URL;
+      const apiURL = process.env.VITE_API_BASE_URL;
       const response = await fetch(`${apiURL}/register_customer`, {
         method: 'POST',
         headers: {
@@ -618,7 +618,6 @@ export default function Register() {
         const customerID = await response.json();
         if (customerID != null) {
           console.log("Customer in DB")
-          // alert('Registration successful!');
           resetFormFields()
           setShowAlert(true);
           setTimeout(() => {
@@ -685,7 +684,7 @@ export default function Register() {
     console.log('VendorData to be sent to the backend:', vendorData);
 
     try {
-      const apiURL = import.meta.env.VITE_API_BASE_URL;
+      const apiURL = process.env.VITE_API_BASE_URL;
       const response = await fetch(`${apiURL}/register_vendor`, {
         method: 'POST',
         headers: {
