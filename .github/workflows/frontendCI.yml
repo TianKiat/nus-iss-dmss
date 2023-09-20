@@ -28,9 +28,6 @@ jobs:
           pnpm install
         working-directory: frontend
 
-      - name: Build frontend
-        run: pnpm run build # Adjust the build command to match your Vite.js setup
-
       - name: Run Unit Tests
         run: |
           # Run unit tests

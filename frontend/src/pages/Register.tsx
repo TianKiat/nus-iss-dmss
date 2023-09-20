@@ -501,7 +501,7 @@ export default function Register() {
     });
   };
 
-  const handleCustomerChange = (e: { target: { name: string; value: boolean; }; }) => {
+  const handleCustomerChange = (e: { target: { name: string; value: string; }; }) => {
     const { name, value } = e.target;
     setCustomerData({
       ...customerData,
@@ -526,7 +526,7 @@ export default function Register() {
     }
   };
 
-  const handleVendorChange = (e: { target: { name: string; value: boolean; }; }) => {
+  const handleVendorChange = (e: { target: { name: string; value: string; }; }) => {
     const { name, value } = e.target;
     setVendorData({
       ...vendorData,
