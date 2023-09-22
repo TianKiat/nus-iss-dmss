@@ -1,97 +1,82 @@
-# name: Frontend CI/CD on Pull Request
+name: Frontend CI/CD on Pull Request
 
-# on:
-#   pull_request:
-#     paths:
-#       - 'frontend/**' # Specify the path to your frontend code
+on:
+  pull_request:
+    paths:
+      - 'frontend/**'
 
-# jobs:
-#   build:
-#     runs-on: ubuntu-latest
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v2
+    defaults:
+      run:
+        working-directory: 'frontend'
 
-#       - name: Set up Node.js
-#         uses: actions/setup-node@v2
-#         with:
-#           node-version: 14 # Use the version of Node.js you need
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
-#       - name: Install dependencies using pnpm
-#         run: |
-#           npm install -g pnpm # Install pnpm globally
-#           pnpm install
-#         working-directory: frontend
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18
 
-#       - name: Build frontend
-#         run: pnpm run build # Adjust the build command to match your Vite.js setup
-#         working-directory: frontend
+      - name: Install dependencies using pnpm
+        run: |
+          npm install -g pnpm # Install pnpm globally
+          pnpm install
+        working-directory: frontend
 
-#       - name: Upload build artifacts
-#         if: success() # Upload the artifacts only if the build succeeds
-#         uses: actions/upload-artifact@v2
-#         with:
-#           name: frontend-reports
-#           path: reports/frontend/dist # Adjust the path to the build output directory
+      - name: Run Unit Tests
+        run: |
+          # Run unit tests
+          pnpm run test
 
-#       - name: Run Unit Tests and Generate Report
-#         run: |
-#           # Run unit tests and generate a JUnit XML report
-#           pnpm run test -- --reporters=default jest-junit
-#         working-directory: frontend
+      - name: Get changed tsx files
+        id: changed-files
+        run: |
+          CHANGED_FILES=$(git diff --name-only origin/dev...HEAD -- '*.tsx')
+          echo "Changed TSX files:"
+          echo "$CHANGED_FILES"
+          echo "::set-output name=changed_files::$CHANGED_FILES"
 
-#       - name: Upload Unit Test Report as Artifact
-#         if: always() # Upload the artifact even if previous steps fail
-#         uses: actions/upload-artifact@v2
-#         with:
-#           name: frontend-reports
-#           path: reports/frontend/unit-test-report.xml
+      - name: Lint frontend code
+        run: |  
+          CHANGED_FILES="${{ steps.changed-files.outputs.changed_files }}"
+          if [ -n "$CHANGED_FILES" ]; then
+            url=$(cd ..; pwd)
+            echo "$url"
+            echo "$CHANGED_FILES" | while IFS= read -r line; do
+              full_path="$url/$line"
+              echo "$full_path"
+            done | xargs pnpm eslint 
+          fi
 
-#       - name: Lint frontend code and Generate Report
-#         run: |
-#           # Run linting and generate an HTML report
-#           pnpm run lint -- --format=html --output-file=reports/frontend/lint-report.html
-#         working-directory: frontend
+      - name: Run npm audit
+        run: |
+          CHANGED_FILES="${{ steps.changed-files.outputs.changed_files }}"
+          if [ -n "$CHANGED_FILES" ]; then
+          echo "$CHANGED_FILES" | xargs pnpm audit
+          fi
 
-#       - name: Upload Linting Report as Artifact
-#         if: always() # Upload the artifact even if previous steps fail
-#         uses: actions/upload-artifact@v2
-#         with:
-#           name: frontend-reports
-#           path: reports/frontend/lint-report.html
+      - name: Start your Frontend App
+        run: |
+          # Add commands here to start your frontend application if it's not already running
+          pnpm run dev &
+          sleep 5
 
-#       - name: Run npm audit
-#         run: |
-#           pnpm audit --json > reports/frontend/npm-audit-report.json
-#           cat reports/frontend/npm-audit-report.json
-#         working-directory: frontend
+      - name: Expose Application with localtunnel
+        run: |
+          npm install -g localtunnel
+          lt --subdomain food-ordering-app-frontend-127-0-0-3 --port 5173 &
+          sleep 10 # Allow localtunnel some time to start
 
-#       - name: Install Java
-#         uses: actions/setup-java@v2
-#         with:
-#           java-version: 11 # Use the version of Java required by OWASP ZAP
-
-#       - name: Install and Run OWASP ZAP
-#         run: |
-#           # Download and install OWASP ZAP (replace with the actual download URL)
-#           wget -q https://github.com/zaproxy/zaproxy/releases/download/v2.11.0/ZAP_2.11.0_Linux.tar.gz -O frontend/zap.tar.gz
-#           tar -xzf frontend/zap.tar.gz
-#           cd frontend/ZAP_2.11.0
-#           ./zap.sh -daemon -port 8080
-#         working-directory: frontend
-
-#       - name: Run OWASP ZAP Scan
-#         run: |
-#           # Start your Vite.js application or server
-#           # Perform any necessary setup for your application (e.g., starting it on a specific port)
-#           # Run the ZAP spider and active scan
-#           ./zap-cli.py quick-scan -o reports/frontend/zap-report.html -l Medium --spider -r 'http://localhost:3000'  # Adjust the target URL and scan options
-#         working-directory: frontend
-
-#       - name: Upload OWASP ZAP Report as Artifact
-#         if: success() # Upload the artifact only if the scan succeeds
-#         uses: actions/upload-artifact@v2
-#         with:
-#           name: frontend-reports
-#           path: reports/frontend/zap-report.html
+      - name: Install Arachni and Run Arachni Scan
+        run: |
+          wget https://github.com/Arachni/arachni/releases/download/v1.5.1/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz
+          tar xzf arachni-1.5.1-0.5.12-linux-x86_64.tar.gz
+          cd arachni-1.5.1-0.5.12/bin
+          ./arachni "https://food-ordering-app-frontend-127-0-0-3.loca.lt"
