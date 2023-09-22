@@ -102,33 +102,17 @@ jobs:
         run: |
           # Start the frontend application (adjust the command as per your package.json scripts)
           py run.py &
-          echo "Backend started successfully"
-          sleep 10 # Wait for frontend to start (adjust as needed)
+          sleep 10 
 
-      - name: Run OWASP ZAP for DAST
+      - name: Expose Application with localtunnel
         run: |
-          # Download and install OWASP ZAP
-          wget https://github.com/zaproxy/zaproxy/releases/download/v2.13.0/ZAP_2.13.0_Linux.tar.gz
-          tar -xvf ZAP_2.13.0_Linux.tar.gz
-          cd ZAP_2.13.0
+          npm install -g localtunnel
+          lt --subdomain food-ordering-app-backend-127-0-0-3 --port 8000 &
+          sleep 10 # Allow localtunnel some time to start
 
-          # Start ZAP in daemon mode
-          ./zap.sh -daemon -port 8090 -host 0.0.0.0 &
-
-          # Wait for ZAP to start (adjust sleep duration as needed)
-          sleep 30
-
-          cd docker
-
-          echo "Start scanning"
-          # Perform your DAST scan (replace <target_url> with the URL of your application)
-          ./zap-api-scan.py -t -t http://127.0.0.1:8000/
-
-          # Stop OWASP ZAP
-          ./zap.sh -shutdown
-
-          # Clean up downloaded files (optional)
-          cd ..
-          rm -rf ZAP_2.13.0*
-
-          pkill -f "py run.py"
+      - name: Install Arachni and Run Arachni Scan
+        run: |
+          wget https://github.com/Arachni/arachni/releases/download/v1.5.1/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz
+          tar xzf arachni-1.5.1-0.5.12-linux-x86_64.tar.gz
+          cd arachni-1.5.1-0.5.12/bin
+          ./arachni "https://food-ordering-app-backend-127-0-0-3.loca.lt"

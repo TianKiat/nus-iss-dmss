@@ -80,10 +80,3 @@ jobs:
           tar xzf arachni-1.5.1-0.5.12-linux-x86_64.tar.gz
           cd arachni-1.5.1-0.5.12/bin
           ./arachni "https://food-ordering-app-frontend-127-0-0-3.loca.lt"
-
-      - name: Upload Arachni Report
-        uses: actions/upload-artifact@v2
-        with:
-          name: arachni-report
-          path: |
-            ./arachni_report.afr
