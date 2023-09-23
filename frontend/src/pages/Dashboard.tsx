@@ -24,6 +24,8 @@ import {
 import { ReactElement } from 'react'
 import { FaBowlRice, FaStar } from 'react-icons/fa6'
 import { FaRegStar } from 'react-icons/fa'
+import VendorDashboard from './VendorDashboard'
+import { useEffect, useState } from "react"
 
 function menuitems_dict_to_list(menuitems: any): string[] {
     var array = []
@@ -120,56 +122,83 @@ const Card = ({ heading, icon, link }: CardProps) => {
     )
 }
 
-export default function Dashboard() {
-    return (
+interface CommonDashboardProps {
+    
+}
+ 
+const CommonDashboard = (props : CommonDashboardProps) => {
+    return ( 
         <Box p={4}>
-            <Container maxW={'5xl'} mt={12}>
-                <Heading fontSize={{ base: '2xl', sm: '4xl' }} fontWeight={'bold'}>
-                    Dashboard
-                </Heading>
-                <br/>
-                <Flex flexWrap="wrap" gridGap={6}>
-                    <Card
-                        heading={'Order Food'}
-                        icon={<Icon as={FaBowlRice} w={10} h={10} color={'black'}/>}
-                        link={'#'}
-                    />
-                </Flex>
-                <br/>
-                <Tabs>
-                    <TabList>
-                        <Tab>Favorite Order</Tab>
-                        <Tab>Order History</Tab>
-                    </TabList>
-                    <TabPanels>
-                        <TabPanel>
-                            <LongCard
-                                isFavorite={favorite_icon(true)}
-                                vendorName={'ABC Food'}
-                                date={'12 Sept 2023'}
-                                menuitems={menuitems_dict_to_list({'Veggie': 1, 'Meat': 2})}
-                                price={12.5}
-                            />
-                        </TabPanel>
-                        <TabPanel>
-                            <LongCard
-                                isFavorite={favorite_icon(true)}
-                                vendorName={'ABC Food'}
-                                date={'12 Sept 2023'}
-                                menuitems={menuitems_dict_to_list({'Veggie': 1, 'Meat': 2})}
-                                price={12.5}
-                            />
-                            <LongCard
-                                isFavorite={favorite_icon(false)}
-                                vendorName={'XYZ Food'}
-                                date={'10 Sept 2023'}
-                                menuitems={menuitems_dict_to_list({'Veggie': 1, 'Meat': 2, 'Egg': 1})}
-                                price={10}
-                            />
-                        </TabPanel>
-                    </TabPanels>
-                </Tabs>
-            </Container>
-        </Box>
-    )
+        <Container maxW={'5xl'} mt={12}>
+            <Heading fontSize={{ base: '2xl', sm: '4xl' }} fontWeight={'bold'}>
+                Dashboard
+            </Heading>
+            <br/>
+            <Flex flexWrap="wrap" gridGap={6}>
+                <Card
+                    heading={'Order Food'}
+                    icon={<Icon as={FaBowlRice} w={10} h={10} color={'black'}/>}
+                    link={'#'}
+                />
+            </Flex>
+            <br/>
+            <Tabs>
+                <TabList>
+                    <Tab>Favorite Order</Tab>
+                    <Tab>Order History</Tab>
+                </TabList>
+                <TabPanels>
+                    <TabPanel>
+                        <LongCard
+                            isFavorite={favorite_icon(true)}
+                            vendorName={'ABC Food'}
+                            date={'12 Sept 2023'}
+                            menuitems={menuitems_dict_to_list({'Veggie': 1, 'Meat': 2})}
+                            price={12.5}
+                        />
+                    </TabPanel>
+                    <TabPanel>
+                        <LongCard
+                            isFavorite={favorite_icon(true)}
+                            vendorName={'ABC Food'}
+                            date={'12 Sept 2023'}
+                            menuitems={menuitems_dict_to_list({'Veggie': 1, 'Meat': 2})}
+                            price={12.5}
+                        />
+                        <LongCard
+                            isFavorite={favorite_icon(false)}
+                            vendorName={'XYZ Food'}
+                            date={'10 Sept 2023'}
+                            menuitems={menuitems_dict_to_list({'Veggie': 1, 'Meat': 2, 'Egg': 1})}
+                            price={10}
+                        />
+                    </TabPanel>
+                </TabPanels>
+            </Tabs>
+        </Container>
+    </Box>  
+     )
+}
+
+interface DashboardProps {
+    userRole : string
+}
+
+export default function Dashboard(props : DashboardProps) {
+    const [role, setRole] = useState(props.userRole);
+
+    // useEffect(() => {
+    //   const fetchAccess =async () => {
+    //     const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/login_user`);
+    //     const result = await response.json();
+    //     setRole(result.role);
+    //   }
+    
+    //   fetchAccess();
+    // }, [props.userRole])
+    
+    return (
+
+            role !== 'vendor' ? <CommonDashboard></CommonDashboard> : <VendorDashboard></VendorDashboard> // for now until login and session is done
+    );
 }
