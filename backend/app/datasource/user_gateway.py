@@ -110,7 +110,7 @@ class UserGateway():
                 user_session_data['userID'] = user_object.userID
                 user_session_data['roleID'] = user_object.roleID
                 user_session_data['profileName'] = user_profile_object.profileName
-                user_session_data['token'] = '' # not used for no
+                # user_session_data['token'] = '' # not used for no
                 print ('Logged In UserID: {0} | roleID: {1}'.format(user_session_data['userID'], user_session_data['roleID']))
 
             return user_session_data
