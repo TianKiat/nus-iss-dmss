@@ -70,9 +70,10 @@ function NameField({ name, nameError, onChange }: {
   )
 }
 
-function UsernameField({ username, usernameError, onChange }: {
+function UsernameField({ username, usernameError, usernameDup, onChange }: {
   username: string;
   usernameError: boolean;
+  usernameDup: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
 
@@ -81,7 +82,7 @@ function UsernameField({ username, usernameError, onChange }: {
       <FormControl
         id="username"
         isRequired
-        isInvalid={usernameError}
+        isInvalid={usernameError || usernameDup}
       >
         <FormLabel>Username</FormLabel>
         <Input
@@ -92,15 +93,17 @@ function UsernameField({ username, usernameError, onChange }: {
         />
         {/* Display error message */}
         {usernameError ? (<FormErrorMessage>Required</FormErrorMessage>) : ("")}
+        {usernameDup ? (<FormErrorMessage>Username already exists</FormErrorMessage>) : ("")}
       </FormControl>
     </>
   )
 }
 
-function EmailField({ email, emailError, emailValid, onChangeEmail }: {
+function EmailField({ email, emailError, emailValid, emailDup, onChangeEmail }: {
   email: string;
   emailError: boolean;
   emailValid: boolean;
+  emailDup: boolean;
   onChangeEmail: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
@@ -108,7 +111,7 @@ function EmailField({ email, emailError, emailValid, onChangeEmail }: {
       <FormControl
         id="email"
         isRequired
-        isInvalid={emailError || !emailValid}
+        isInvalid={emailError || !emailValid || emailDup}
       >
         <FormLabel>Email address</FormLabel>
         <Input
@@ -120,6 +123,8 @@ function EmailField({ email, emailError, emailValid, onChangeEmail }: {
         {/* Display error message */}
         {emailError ? (<FormErrorMessage>Required</FormErrorMessage>) : ("")}
         {(!emailValid && !emailError && email !== "") ? (<FormErrorMessage>Invalid email address</FormErrorMessage>) : ""}
+        {emailDup ? (<FormErrorMessage>Email already exists</FormErrorMessage>) : ("")}
+
       </FormControl>
     </>
   )
@@ -264,9 +269,10 @@ function ShopFields({ shopName, shopDesc, shopNameError, shopDescError, onChange
   )
 }
 
-function CustomerSignUp({ formData, error, handleChange, isPasswordMatch, handleSubmit }: {
+function CustomerSignUp({ formData, error, dupError, handleChange, isPasswordMatch, handleSubmit }: {
   formData: ICustomerData;
   error: Record<string, boolean>;
+  dupError: Record<string, boolean>;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   isPasswordMatch: boolean;
   handleSubmit: () => void;
@@ -289,12 +295,14 @@ function CustomerSignUp({ formData, error, handleChange, isPasswordMatch, handle
         <UsernameField
           username={formData.username}
           usernameError={error.username}
+          usernameDup ={dupError.username}
           onChange={handleChange}
         />
         <EmailField
           email={formData.email}
           emailError={error.email}
           emailValid={error.emailValid}
+          emailDup ={dupError.email}
           onChangeEmail={handleChange}
         />
         <PhoneField
@@ -336,9 +344,10 @@ function CustomerSignUp({ formData, error, handleChange, isPasswordMatch, handle
   );
 }
 
-function VendorSignUp({ formData, error, handleChange, isPasswordMatch, handleSubmit }: {
+function VendorSignUp({ formData, error, dupError, handleChange, isPasswordMatch, handleSubmit }: {
   formData: IVendorData;
   error: Record<string, boolean>;
+  dupError: Record<string, boolean>;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   isPasswordMatch: boolean;
   handleSubmit: () => void;
@@ -361,12 +370,14 @@ function VendorSignUp({ formData, error, handleChange, isPasswordMatch, handleSu
         <UsernameField
           username={formData.username}
           usernameError={error.username}
+          usernameDup ={dupError.username}
           onChange={handleChange}
         />
         <EmailField
           email={formData.email}
           emailError={error.email}
           emailValid={error.emailValid}
+          emailDup ={dupError.email}
           onChangeEmail={handleChange}
         />
         <PhoneField
@@ -452,10 +463,20 @@ export default function Register() {
     reEnterPassword: false,
   });
 
+  const [customersDupErrors, setCustomerDupErrors] = useState<Record<string, boolean>>({
+    username: false,
+    email: false,
+  });
+
   const [vendorErrors, setVendorErrors] = useState<Record<string, boolean>>({
     ...customerErrors,
     shopName: false,
     shopDesc: false,
+  });
+
+  const [vendorsDupErrors, setVendorDupErrors] = useState<Record<string, boolean>>({
+    username: false,
+    email: false,
   });
 
   const requiredCustomerFields = [
@@ -517,6 +538,11 @@ export default function Register() {
       password: false,
       reEnterPassword: false,
     });
+    
+    setCustomerDupErrors({
+      username: false,
+      email: false,
+    });
 
     // // Check if passwords match and update isPasswordMatch state
     if (name === "password" || name === "reEnterPassword") {
@@ -544,6 +570,11 @@ export default function Register() {
       reEnterPassword: false,
       shopName: false,
       shopDesc: false,
+    });
+
+    setVendorDupErrors({
+      username: false,
+      email: false,
     });
 
     // Check if passwords match and update isPasswordMatch state
@@ -616,7 +647,7 @@ export default function Register() {
       if (response.status === 200) {
         // Registration successful, handle accordingly (e.g., show a success message)
         const customerID = await response.json();
-        if (customerID != null) {
+        if (customerID.id !== 0) {
           console.log("Customer in DB")
           resetFormFields()
           setShowAlert(true);
@@ -625,7 +656,18 @@ export default function Register() {
           }, 3000);
         }
         else {
-          console.log("Failed Registration")
+          if (customerID.username !== 0) {
+            setCustomerDupErrors(prevErrors => ({
+              ...prevErrors,
+              username: true
+            }));
+          }
+          if (customerID.email !== 0) {
+            setCustomerDupErrors(prevErrors => ({
+              ...prevErrors,
+              email: true
+            }));
+          }         
         }
       } else {
         // Registration failed, handle accordingly (e.g., show an error message)
@@ -780,6 +822,7 @@ export default function Register() {
                   <CustomerSignUp
                     formData={customerData}
                     error={customerErrors}
+                    dupError={customersDupErrors}
                     handleChange={handleCustomerChange}
                     isPasswordMatch={isPasswordMatch}
                     handleSubmit={handleCustomerSubmit} />
@@ -788,6 +831,7 @@ export default function Register() {
                   <VendorSignUp
                     formData={vendorData}
                     error={vendorErrors}
+                    dupError={vendorsDupErrors}
                     handleChange={handleVendorChange}
                     isPasswordMatch={isPasswordMatch}
                     handleSubmit={handleVendorSubmit} />
