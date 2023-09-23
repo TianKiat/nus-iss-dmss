@@ -23,7 +23,7 @@ function App() {
             <Route path="vendor/login" element={<LoginVendor />} />
             <Route path="register" element={<Register />} />
             {/* <Route path="vendor/register" element={<RegisterVendor />} /> */}
-            <Route path="customer/dashboard" element={<Dashboard userRole="vendor"/>} />
+            <Route path="customer/dashboard" element={<Dashboard userRole="customer"/>} />
             <Route path="*" element={<Error />} />
           </Route>
         </Routes>
