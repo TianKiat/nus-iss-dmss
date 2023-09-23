@@ -3,6 +3,7 @@
 import {
   Box,
   Flex,
+  Heading,
   Text,
   IconButton,
   Button,
@@ -24,10 +25,46 @@ import {
 } from "@chakra-ui/icons";
 
 import {
-  FaHamburger
+  FaHamburger, FaUserCircle
 } from 'react-icons/fa'
 
 import { Link } from "react-router-dom";
+
+function haveLogin() {
+  return true;
+}
+
+function navButtons() {
+  if (haveLogin()) {
+    return (
+      <Stack flex={{ base: 1, md: 0 }} justify={"flex-end"} direction={"row"} spacing={6}>
+        <Button as={"a"} p={2} fontSize={"sm"} fontWeight={400} variant={"link"}>
+          <Icon as={FaUserCircle} w={5} h={5} marginRight={2}/>
+          <Heading size={'sm'} alignSelf={'center'} whiteSpace={'nowrap'}>
+            username
+          </Heading>
+        </Button>
+        <Button as={"a"} display={{ base: "none", md: "inline-flex" }} fontSize={"sm"}
+                fontWeight={600} color={"white"} bg={"blue.400"} href={"/login"}
+                _hover={{ bg: "blue.300" }}>
+          Sign Out
+        </Button>
+      </Stack>);
+  } else {
+    return (
+      <Stack flex={{ base: 1, md: 0 }} justify={"flex-end"} direction={"row"} spacing={6}>
+        <Button as={"a"} fontSize={"sm"} fontWeight={400} variant={"link"} href={"/login"}>
+          Sign In
+        </Button>
+        <Button as={"a"} display={{ base: "none", md: "inline-flex" }} fontSize={"sm"}
+                fontWeight={600} color={"white"} bg={"blue.400"} href={"register"}
+                _hover={{ bg: "blue.300" }}>
+          Sign Up
+        </Button>
+      </Stack>
+    )
+  }
+}
 
 export default function Nav() {
   const { isOpen, onToggle } = useDisclosure();
@@ -73,36 +110,7 @@ export default function Nav() {
           </Flex>
         </Flex>
 
-        <Stack
-          flex={{ base: 1, md: 0 }}
-          justify={"flex-end"}
-          direction={"row"}
-          spacing={6}
-        >
-          <Button
-            as={"a"}
-            fontSize={"sm"}
-            fontWeight={400}
-            variant={"link"}
-            href={"/login"}
-          >
-            Sign In
-          </Button>
-          <Button
-            as={"a"}
-            display={{ base: "none", md: "inline-flex" }}
-            fontSize={"sm"}
-            fontWeight={600}
-            color={"white"}
-            bg={"blue.400"}
-            href={"register"}
-            _hover={{
-              bg: "blue.300",
-            }}
-          >
-            Sign Up
-          </Button>
-        </Stack>
+        {navButtons()}
       </Flex>
 
       <Collapse in={isOpen} animateOpacity>

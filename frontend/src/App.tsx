@@ -10,6 +10,7 @@ import LoginVendor from "./pages/LoginVendor";
 import Register from "./pages/Register";
 import RegisterVendor from "./pages/RegisterVendor";
 import Error from "./pages/Error";
+import Dashboard from "./pages/Dashboard";
 function App() {
 
   return (
@@ -22,6 +23,7 @@ function App() {
             <Route path="vendor/login" element={<LoginVendor />} />
             <Route path="register" element={<Register />} />
             {/* <Route path="vendor/register" element={<RegisterVendor />} /> */}
+            <Route path="customer/dashboard" element={<Dashboard/>} />
             <Route path="*" element={<Error />} />
           </Route>
         </Routes>
