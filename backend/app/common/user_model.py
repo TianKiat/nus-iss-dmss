@@ -13,3 +13,7 @@ class Vendor(User):
     status: int
     # shopName: str
     # shopDesc: str
+
+class Login(BaseModel):
+    username: str
+    password: str

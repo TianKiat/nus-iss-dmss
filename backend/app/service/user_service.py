@@ -1,5 +1,5 @@
 from app.datasource.user_gateway import UserGateway
-from app.common.user_model import User, Vendor
+from app.common.user_model import User, Vendor, Login
 
 # import service class needed
 # import gateway class needed
@@ -16,5 +16,5 @@ class UserService():
         #validate vendor data
         return UserGateway().insert_vendor_data(db, vendor)
 
-    def login_user(user_data):
-        return UserGateway.auth(user_data)
+    def login_user(self, db, user: Login):
+        return UserGateway().auth(db, user)
