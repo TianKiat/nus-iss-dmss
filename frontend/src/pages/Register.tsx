@@ -428,7 +428,7 @@ function VendorSignUp({ formData, error, dupError, handleChange, isPasswordMatch
 
 export default function Register() {
   const initialCustomerFormData = {
-    role: "0", // Initialize role with a default value
+    role: "3", // Initialize role with a default value
     name: "",
     username: "",
     email: "",
@@ -439,6 +439,7 @@ export default function Register() {
 
   const initialVendorFormData = {
     ...initialCustomerFormData,
+    role: "2",
     shopName: "",
     shopDesc: "",
   }
@@ -807,10 +808,10 @@ export default function Register() {
               resetFormFields(); // Reset form fields when tab changes
               selectedTab === 0 ? setCustomerData((prevData) => ({
                 ...prevData,
-                role: "0"
+                role: "3"
               })) : setVendorData((prevData) => ({
                 ...prevData,
-                role: "1"
+                role: "2"
               }))
             }}>
               <TabList>
