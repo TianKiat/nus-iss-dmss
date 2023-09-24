@@ -1,8 +1,8 @@
-from sqlalchemy.orm import Session
-from app.common.user_model import User, Vendor
-from app.models import user, user_profile, vendor_profile
-import mysql.connector
 import uuid
+import mysql.connector
+from sqlalchemy.orm import Session
+from app.common.user_model import User, Vendor, Login
+from app.models import user, user_profile, vendor_profile
 from app.common.constants import DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE
 
 sqldb = mysql.connector.connect(host = DB_HOST, user = DB_USERNAME, password = DB_PASSWORD, database = DB_DATABASE)
@@ -10,6 +10,24 @@ sqldb = mysql.connector.connect(host = DB_HOST, user = DB_USERNAME, password = D
 class UserGateway():
     def __init__(self):
         pass
+
+    def retrieve_user_data(self, db: Session):
+        try:
+            return db.query(user.User).all()
+        except Exception as e:
+            print(f"Error: {e}")
+
+    def retrieve_customer_data(self, db: Session):
+        try:
+            return db.query(user_profile.UserProfile).all()
+        except Exception as e:
+            print(f"Error: {e}")
+
+    def retrieve_vendor_data(self, db: Session):
+        try:
+            return db.query(vendor_profile.VendorProfile).all()
+        except Exception as e:
+            print(f"Error: {e}")
 
     def insert_customer_data(self, db: Session, customer: User):
         try:
@@ -37,7 +55,7 @@ class UserGateway():
             db.add(user_profile_table)
             db.commit()
 
-            return {"id" : user_id}
+            return user_id
 
         except Exception as e:
             print(f"Error: {e}")
@@ -69,26 +87,33 @@ class UserGateway():
             db.add(vendor_profile_table)
             db.commit()
 
-            return {"id" : user_id}
+            return user_id
 
         except Exception as e:
-            print(f"Error: {e}") 
-        
-    
+            print(f"Error: {e}")
+
     # login authentication
-    def auth(user):
+    def auth(self, db: Session, login: Login):
         try:
-            dbcursor = sqldb.cursor(dictionary=True)
-            sql_statement = ("SELECT userID, roleID FROM USER WHERE username = (%s) AND userPassword = (%s)")
-            value = (user.username, user.password)
-            dbcursor.execute(sql_statement, value)
-            result = dbcursor.fetchone()
-            # result =  {"auth" : True} if result else {"auth" : False} 
-            if result: 
-                print ("Logged In UserID:", result.get("userID")) 
-            else: 
-                print ("Logged In failed")      
-            return result
-        except:
-            print ("An exception occurred")
-            return 0
+            user_session_data = {
+                'userID': '',
+                'roleID': '',
+                'profileName': '',
+                'token': '' # not used for now
+            }
+
+            user_object = db.query(user.User).filter(user.User.username == login.username)\
+                                             .filter(user.User.userPassword == login.password).first()
+            if user_object:
+                user_profile_object = db.query(user_profile.UserProfile).filter(user_profile.UserProfile.userID == user_object.userID).first()
+
+                user_session_data['userID'] = user_object.userID
+                user_session_data['roleID'] = user_object.roleID
+                user_session_data['profileName'] = user_profile_object.profileName
+                # user_session_data['token'] = '' # not used for no
+                print ('Logged In UserID: {0} | roleID: {1}'.format(user_session_data['userID'], user_session_data['roleID']))
+
+            return user_session_data
+
+        except Exception as e:
+            print(f"Error: {e}")
