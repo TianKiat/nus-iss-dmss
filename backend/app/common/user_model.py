@@ -8,11 +8,17 @@ class User(BaseModel):
     phone: str
     role: int
 
-class Vendor(User):
-    address: str
+class Vendor(BaseModel):
+    username: str
+    password: str
+    email: str
+    phone: str
+    role: int
+    shopAddr: str
+    shopName: str
+    shopDesc: str
     status: int
-    # shopName: str
-    # shopDesc: str
+
 
 class Login(BaseModel):
     username: str

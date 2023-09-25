@@ -76,12 +76,13 @@ class UserGateway():
                 user_id = user_id_object.userID
 
             vendor_profile_data = {
-                'profileName': vendor.name,
-                'address': vendor.address,
+                'profileName': vendor.shopName,
+                'address': vendor.shopAddr,
                 'email': vendor.email,
                 'phone': vendor.phone,
                 'status': vendor.status,
-                'userID': user_id
+                'userID': user_id,
+                'shopDesc':vendor.shopDesc
             }
             vendor_profile_table = vendor_profile.VendorProfile(**vendor_profile_data)
             db.add(vendor_profile_table)

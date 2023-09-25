@@ -38,7 +38,8 @@ interface ICustomerData {
   role: string,
 }
 
-interface IVendorData extends ICustomerData {
+interface IVendorData extends Omit<ICustomerData, 'name'> {
+  shopAddr: string
   shopName: string,
   shopDesc: string,
 }
@@ -226,11 +227,14 @@ function PasswordsField({ password, reEnterPassword, passwordError, reEnterPassw
     </>)
 }
 
-function ShopFields({ shopName, shopDesc, shopNameError, shopDescError, onChangeShop }: {
+function ShopFields({ shopName, shopAddr, shopDesc, shopNameError, shopAddrError, shopDescError, shopDupError, onChangeShop }: {
   shopName: string,
+  shopAddr: string,
   shopDesc: string,
   shopNameError: boolean;
+  shopAddrError: boolean;
   shopDescError: boolean;
+  shopDupError: boolean;
   onChangeShop: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
@@ -249,12 +253,22 @@ function ShopFields({ shopName, shopDesc, shopNameError, shopDescError, onChange
         />
         {/* Display error message */}
         {shopNameError ? (<FormErrorMessage>Required</FormErrorMessage>) : ("")}
+        {shopDupError ? (<FormErrorMessage>Shop Name already exists</FormErrorMessage>) : ("")}
       </FormControl>
       <FormControl
-        id="ShopDesc"
+        id="ShopAddr"
         isRequired
-        isInvalid={shopDescError}
+        isInvalid={shopAddrError}
       >
+        <FormLabel>Shop Address</FormLabel>
+        <Input
+          type="text"
+          value={shopAddr}
+          onChange={onChangeShop}
+          name="shopAddr"
+        />
+        {/* Display error message */}
+        {shopAddrError ? (<FormErrorMessage>Required</FormErrorMessage>) : ("")}
         <FormLabel>Shop Description</FormLabel>
         <Input
           type="text"
@@ -295,14 +309,14 @@ function CustomerSignUp({ formData, error, dupError, handleChange, isPasswordMat
         <UsernameField
           username={formData.username}
           usernameError={error.username}
-          usernameDup ={dupError.username}
+          usernameDup={dupError.username}
           onChange={handleChange}
         />
         <EmailField
           email={formData.email}
           emailError={error.email}
           emailValid={error.emailValid}
-          emailDup ={dupError.email}
+          emailDup={dupError.email}
           onChangeEmail={handleChange}
         />
         <PhoneField
@@ -362,22 +376,17 @@ function VendorSignUp({ formData, error, dupError, handleChange, isPasswordMatch
   return (
     <>
       <Stack spacing={4}>
-        <NameField
-          name={formData.name}
-          nameError={error.name}
-          onChange={handleChange}
-        />
         <UsernameField
           username={formData.username}
           usernameError={error.username}
-          usernameDup ={dupError.username}
+          usernameDup={dupError.username}
           onChange={handleChange}
         />
         <EmailField
           email={formData.email}
           emailError={error.email}
           emailValid={error.emailValid}
-          emailDup ={dupError.email}
+          emailDup={dupError.email}
           onChangeEmail={handleChange}
         />
         <PhoneField
@@ -397,9 +406,12 @@ function VendorSignUp({ formData, error, dupError, handleChange, isPasswordMatch
         />
         <ShopFields
           shopName={formData.shopName}
+          shopAddr={formData.shopAddr}
           shopDesc={formData.shopDesc}
           shopNameError={error.shopName}
+          shopAddrError={error.shopAddrError}
           shopDescError={error.shopDesc}
+          shopDupError={dupError.shopName}
           onChangeShop={handleChange}
         />
         <Stack spacing={10} pt={2}>
@@ -437,12 +449,19 @@ export default function Register() {
     reEnterPassword: "",
   };
 
-  const initialVendorFormData = {
-    ...initialCustomerFormData,
+  const initialVendorFormData  = {
     role: "2",
+    username: "",
+    email: "",
+    phone: "",
+    password: "",
+    reEnterPassword: "",
     shopName: "",
     shopDesc: "",
-  }
+    shopAddr: "",
+    status: 0
+  };
+
   const [showAlert, setShowAlert] = useState(false);
 
   const [selectedTab, setSelectedTab] = useState<number>(0);
@@ -470,14 +489,20 @@ export default function Register() {
   });
 
   const [vendorErrors, setVendorErrors] = useState<Record<string, boolean>>({
-    ...customerErrors,
+    username: false,
+    email: false,
+    emailValid: true,
+    phone: false,
+    password: false,
+    reEnterPassword: false,
     shopName: false,
     shopDesc: false,
+    shopAddr: false,
   });
 
   const [vendorsDupErrors, setVendorDupErrors] = useState<Record<string, boolean>>({
-    username: false,
-    email: false,
+    ...customersDupErrors,
+    shopName: false,
   });
 
   const requiredCustomerFields = [
@@ -490,9 +515,14 @@ export default function Register() {
   ];
 
   const requiredVendorFields = [
-    ...requiredCustomerFields,
+    "username",
+    "email",
+    "phone",
+    "password",
+    "reEnterPassword",
     "shopName",
     "shopDesc",
+    "shopAddr",
   ];
 
   // Function to reset form fields
@@ -511,7 +541,6 @@ export default function Register() {
       reEnterPassword: false,
     });
     setVendorErrors({
-      name: false,
       username: false,
       email: false,
       emailValid: true,
@@ -520,6 +549,7 @@ export default function Register() {
       reEnterPassword: false,
       shopName: false,
       shopDesc: false,
+      shopAddr:false,
     });
   };
 
@@ -539,7 +569,7 @@ export default function Register() {
       password: false,
       reEnterPassword: false,
     });
-    
+
     setCustomerDupErrors({
       username: false,
       email: false,
@@ -562,7 +592,6 @@ export default function Register() {
 
     // Reset errors
     setVendorErrors({
-      name: false,
       username: false,
       email: false,
       emailValid: true,
@@ -571,11 +600,13 @@ export default function Register() {
       reEnterPassword: false,
       shopName: false,
       shopDesc: false,
+      shopAddr:false,
     });
 
     setVendorDupErrors({
       username: false,
       email: false,
+      shopName: false,
     });
 
     // Check if passwords match and update isPasswordMatch state
@@ -668,7 +699,7 @@ export default function Register() {
               ...prevErrors,
               email: true
             }));
-          }         
+          }
         }
       } else {
         // Registration failed, handle accordingly (e.g., show an error message)
@@ -707,7 +738,7 @@ export default function Register() {
       emailValid: isEmailValid,
     }));
 
-    if (!vendorErrors.emailValid) {
+    if (!isEmailValid) {
       console.log("Invalid email address.");
       return; // Prevent signup when email is invalid
     }
@@ -739,9 +770,8 @@ export default function Register() {
       if (response.status === 200) {
         // Registration successful, handle accordingly (e.g., show a success message)
         const vendorID = await response.json();
-        if (vendorID != null) {
+        if (vendorID.id !== 0) {
           console.log("Vendor in DB")
-          // alert('Registration successful!');
           resetFormFields()
           setShowAlert(true);
           setTimeout(() => {
@@ -749,7 +779,24 @@ export default function Register() {
           }, 3000);
         }
         else {
-          console.log("Failed Registration")
+          if (vendorID.username !== 0) {
+            setVendorDupErrors(prevErrors => ({
+              ...prevErrors,
+              username: true
+            }));
+          }
+          if (vendorID.email !== 0) {
+            setVendorDupErrors(prevErrors => ({
+              ...prevErrors,
+              email: true
+            }));
+          }
+          if (vendorID.shopName !== 0) {
+            setVendorDupErrors(prevErrors => ({
+              ...prevErrors,
+              shopName: true
+            }));
+          }
         }
       } else {
         // Registration failed, handle accordingly (e.g., show an error message)
