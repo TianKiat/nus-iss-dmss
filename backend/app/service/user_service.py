@@ -40,7 +40,7 @@ class CustomerRegister(Register):
             # hash password
             hashed_password = bcrypt.hashpw(customer.password.encode('utf-8'), bcrypt.gensalt())
             customer.password = hashed_password
-            user_id = UserGateway().insert_customer_data(db, customer)
+            user_id = UserGateway().register_customer_data(db, customer)
             response_dict['id'] = user_id
 
         return response_dict
@@ -76,7 +76,7 @@ class VendorRegister(Register):
             hashed_password = bcrypt.hashpw(vendor.password.encode('utf-8'), bcrypt.gensalt())
             vendor.password = hashed_password
 
-            user_id = UserGateway().insert_vendor_data(db, vendor)
+            user_id = UserGateway().register_vendor_data(db, vendor)
             response_dict['id'] = user_id
 
         return response_dict

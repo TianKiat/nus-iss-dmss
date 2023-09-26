@@ -29,7 +29,7 @@ class UserGateway():
         except Exception as e:
             print(f"Error: {e}")
 
-    def insert_customer_data(self, db: Session, customer: User):
+    def register_customer_data(self, db: Session, customer: User):
         try:
             user_data = {
                 'username': customer.username,
@@ -60,7 +60,7 @@ class UserGateway():
         except Exception as e:
             print(f"Error: {e}")
 
-    def insert_vendor_data(self, db: Session, vendor: Vendor):
+    def register_vendor_data(self, db: Session, vendor: Vendor):
         try:
             user_data = {
                 'username': vendor.username,
