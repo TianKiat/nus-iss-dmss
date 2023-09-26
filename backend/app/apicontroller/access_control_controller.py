@@ -8,6 +8,6 @@ class AccessControlContoller:
     def get_access_control(db, roleID):
         accessControl = AccessControlService.get_access_control(db, roleID)
         if (accessControl is None):
-            return []
+            return None
         access = AccessService.get_access(db, accessControl.accessID)
         return access

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.apicontroller.access_control_controller import AccessControlContoller
 from run import SessionLocal
@@ -14,4 +14,7 @@ def get_db():
 
 @router.post("/access_control_user")
 def access_control_user(roleID: int, db: Session = Depends(get_db)):
-    return AccessControlContoller.get_access_control(db, roleID)
+    try:
+        return AccessControlContoller.get_access_control(db, roleID)
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail=str(ex)) from ex
