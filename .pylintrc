@@ -1,6 +1,6 @@
 [MASTER]
 ignore = alembic.ini
-ignore-paths = ^app/alembic/.*$, ^app/common/.*$, ^app/models/.*$, ^app/test/.*$,
+ignore-paths = ^app/alembic/.*$, ^app/common/.*$, ^app/models/.*$, ^app/test/.*$, ^app/helper/.*$
 
 fail-under = 7
 

@@ -4,6 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from app.common.user_model import User, Vendor
 from app.models import base, user, user_profile, vendor_profile
 from app.apicontroller.register_user_controller import RegisterUserController
+from app.helper import test_fixtures
 import bcrypt
 
 class TestRegisterController(unittest.TestCase):
@@ -16,6 +17,9 @@ class TestRegisterController(unittest.TestCase):
 
         # Create the tables
         base.Base.metadata.create_all(bind=self.engine)
+
+        # Set up fixtures for common tables
+        test_fixtures.setup_test_fixtures(self.session)
 
     def tearDown(self):
         # Clean up resources
