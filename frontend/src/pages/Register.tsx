@@ -131,9 +131,10 @@ function EmailField({ email, emailError, emailValid, emailDup, onChangeEmail }: 
   )
 }
 
-function PhoneField({ phone, phoneError, onChange }: {
+function PhoneField({ phone, phoneError, phoneValid, onChange }: {
   phone: string;
   phoneError: boolean;
+  phoneValid: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
@@ -141,7 +142,7 @@ function PhoneField({ phone, phoneError, onChange }: {
       <FormControl
         id="phone"
         isRequired
-        isInvalid={phoneError}
+        isInvalid={phoneError || !phoneValid}
       >
         <FormLabel>HP No.</FormLabel>
         <Input
@@ -152,6 +153,8 @@ function PhoneField({ phone, phoneError, onChange }: {
         />
         {/* Display error message */}
         {phoneError ? (<FormErrorMessage>Required</FormErrorMessage>) : ("")}
+        {(!phoneValid && !phoneError && phone !== "") ? (<FormErrorMessage>Invalid phone number - Only 8 digits</FormErrorMessage>) : ""}
+
       </FormControl>
     </>
   )
@@ -322,6 +325,7 @@ function CustomerSignUp({ formData, error, dupError, handleChange, isPasswordMat
         <PhoneField
           phone={formData.phone}
           phoneError={error.phone}
+          phoneValid={error.phoneValid}
           onChange={handleChange}
         />
         <PasswordsField
@@ -392,6 +396,7 @@ function VendorSignUp({ formData, error, dupError, handleChange, isPasswordMatch
         <PhoneField
           phone={formData.phone}
           phoneError={error.phone}
+          phoneValid={error.phoneValid}
           onChange={handleChange}
         />
         <PasswordsField
@@ -479,6 +484,7 @@ export default function Register() {
     email: false,
     emailValid: true,
     phone: false,
+    phoneValid: true,
     password: false,
     reEnterPassword: false,
   });
@@ -493,6 +499,7 @@ export default function Register() {
     email: false,
     emailValid: true,
     phone: false,
+    phoneValid: true,
     password: false,
     reEnterPassword: false,
     shopName: false,
@@ -537,6 +544,7 @@ export default function Register() {
       email: false,
       emailValid: true,
       phone: false,
+      phoneValid:true,
       password: false,
       reEnterPassword: false,
     });
@@ -545,6 +553,7 @@ export default function Register() {
       email: false,
       emailValid: true,
       phone: false,
+      phoneValid:true,
       password: false,
       reEnterPassword: false,
       shopName: false,
@@ -574,6 +583,7 @@ export default function Register() {
       username: false,
       email: false,
       emailValid: true,
+      phoneValid:true,
       phone: false,
       password: false,
       reEnterPassword: false,
@@ -605,6 +615,7 @@ export default function Register() {
       email: false,
       emailValid: true,
       phone: false,
+      phoneValid:true,
       password: false,
       reEnterPassword: false,
       shopName: false,
@@ -653,12 +664,23 @@ export default function Register() {
       emailValid: isEmailValid,
     }));
 
+    const isPhoneValid = /^\d{1,8}$/.test(customerData.phone);
+    setCustomerErrors((prevErrors) => ({
+      ...prevErrors,
+      phoneValid: isPhoneValid,
+    }));
+
     // Check if passwords match and update isPasswordMatch state
     setIsPasswordMatch(customerData.password === customerData.reEnterPassword);
 
     if (!isEmailValid) {
       console.log("Invalid email address.");
       return; // Prevent signup when email is invalid
+    }
+
+    if (!isPhoneValid) {
+      console.log("Invalid phone number.");
+      return; // Prevent signup when phone is invalid
     }
 
     if (emptyFields.length > 0) {
@@ -747,9 +769,20 @@ export default function Register() {
       emailValid: isEmailValid,
     }));
 
+    const isPhoneValid = /^\d{1,8}$/.test(vendorData.phone);
+    setVendorErrors((prevErrors) => ({
+      ...prevErrors,
+      phoneValid: isPhoneValid,
+    }));
+
     if (!isEmailValid) {
       console.log("Invalid email address.");
       return; // Prevent signup when email is invalid
+    }
+
+    if (!isPhoneValid) {
+      console.log("Invalid phone number.");
+      return; // Prevent signup when phone is invalid
     }
 
     if (emptyFields.length > 0) {
