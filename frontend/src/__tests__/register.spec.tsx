@@ -31,7 +31,7 @@ describe('Register Component', () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        role: '0',
+        role: '3',
         name: 'J',
         username: 'J',
         email: 'J@J.J',
