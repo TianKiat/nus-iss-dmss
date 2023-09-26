@@ -19,7 +19,7 @@ def get_db():
 )
 def register_customer_account(customer: User, db: Session = Depends(get_db)):
     try:
-        return RegisterUserController().register_customer(db, customer)
+        return RegisterUserController().register(db, customer)
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex
 
@@ -29,6 +29,6 @@ def register_customer_account(customer: User, db: Session = Depends(get_db)):
 )
 def register_vendor_account(vendor: Vendor, db: Session = Depends(get_db)):
     try:
-        return RegisterUserController().register_vendor(db, vendor)
+        return RegisterUserController().register(db, vendor)
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex
