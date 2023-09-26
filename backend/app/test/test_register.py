@@ -40,7 +40,7 @@ class TestRegisterController(unittest.TestCase):
         result = RegisterUserController.register(self, self.session, mock_customer)
 
         # Assert that the result is as expected
-        self.assertEqual(result, {"id": 1, 'username': 0, 'email': 0})
+        self.assertEqual(result, {'id': 1, 'username': 0, 'email': 0, 'phone': 0})
 
         # Query the database to check if the records were inserted correctly
         user_query = self.session.query(user.User).filter(user.User.username == 'testuser').first()
@@ -77,7 +77,7 @@ class TestRegisterController(unittest.TestCase):
         result = RegisterUserController.register(self, self.session, mock_vendor)
 
         # Assert that the result is as expected
-        self.assertEqual(result, {"id": 1, 'username': 0, 'email': 0, 'shopName': 0})
+        self.assertEqual(result, {'id': 1, 'username': 0, 'email': 0, 'phone': 0, 'shopName': 0, 'shopAddr': 0})
 
         # Query the database to check if the records were inserted correctly
         user_query = self.session.query(user.User).filter(user.User.username == 'testvendor').first()

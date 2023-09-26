@@ -9,7 +9,7 @@ describe('Register Component', () => {
     fireEvent.change(screen.getAllByLabelText(/Name/i)[0], { target: { value: 'J' } });
     fireEvent.change(screen.getByLabelText(/Username/i), { target: { value: 'J' } });
     fireEvent.change(screen.getByLabelText(/Email address/i), { target: { value: 'J@J.J' }, });
-    fireEvent.change(screen.getByLabelText(/HP No./i), { target: { value: 'J' } });
+    fireEvent.change(screen.getByLabelText(/HP No./i), { target: { value: '12345678' } });
     fireEvent.change(screen.getAllByLabelText(/Password/i)[0], { target: { value: 'J' }, });
     fireEvent.change(screen.getByLabelText(/Re-enter Password/i), { target: { value: 'J' }, });
 
@@ -35,7 +35,7 @@ describe('Register Component', () => {
         name: 'J',
         username: 'J',
         email: 'J@J.J',
-        phone: 'J',
+        phone: '12345678',
         password: 'J',
         reEnterPassword: 'J'
       }),

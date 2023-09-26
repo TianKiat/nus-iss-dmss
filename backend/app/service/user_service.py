@@ -23,20 +23,26 @@ class CustomerRegister(Register):
         response_dict = {
             'id': 0,
             'username': 0,
-            'email': 0
+            'email': 0,
+            'phone': 0 
         }
         # check for duplicate username
         users_data = UserGateway().retrieve_user_data(db)
-        filtered_users = list(filter(lambda x: x.username == customer.username, users_data))
+        filtered_users = list(filter(lambda x: x.username.lower() == customer.username.lower(), users_data))
         if len(filtered_users) != 0:
             response_dict['username'] = 1
         # check for duplicate email
         customers_data = UserGateway().retrieve_customer_data(db)
-        filtered_customers = list(filter(lambda x: x.email == customer.email, customers_data))
+        filtered_customers = list(filter(lambda x: x.email.lower() == customer.email.lower(), customers_data))
         if len(filtered_customers) != 0:
             response_dict['email'] = 1
+        
+        #check for duplicate phone
+        filtered_phone = list(filter(lambda x: x.phone == customer.phone, customers_data))
+        if len(filtered_phone) != 0:
+            response_dict['phone'] = 1
 
-        if len(filtered_users) == 0 and len(filtered_customers) == 0:
+        if len(filtered_users) == 0 and len(filtered_customers) == 0 and len(filtered_phone) == 0:
             # hash password
             hashed_password = bcrypt.hashpw(customer.password.encode('utf-8'), bcrypt.gensalt())
             customer.password = hashed_password
@@ -52,26 +58,39 @@ class VendorRegister(Register):
             'id': 0,
             'username': 0,
             'email': 0,
-            'shopName': 0
+            'phone': 0,
+            'shopName': 0,
+            'shopAddr': 0
         }
         # check for duplicate username
         users_data = UserGateway().retrieve_user_data(db)
-        filtered_users = list(filter(lambda x: x.username == vendor.username, users_data))
+        filtered_users = list(filter(lambda x: x.username.lower() == vendor.username.lower(), users_data))
         if len(filtered_users) != 0:
             response_dict['username'] = 1
 
         # check for duplicate email
         vendor_data = UserGateway().retrieve_vendor_data(db)
-        filtered_vendor_email = list(filter(lambda x: x.email == vendor.email, vendor_data))
+        filtered_vendor_email = list(filter(lambda x: x.email.lower() == vendor.email.lower(), vendor_data))
         if len(filtered_vendor_email) != 0:
             response_dict['email'] = 1
 
+        #check for duplicate phone
+        filtered_phone = list(filter(lambda x: x.phone == vendor.phone, vendor_data))
+        if len(filtered_phone) != 0:
+            response_dict['phone'] = 1
+
         # check for duplicate shop name
-        filtered_vendor_shop_name = list(filter(lambda x: x.profileName == vendor.shopName, vendor_data))
+        filtered_vendor_shop_name = list(filter(lambda x: x.profileName.lower() == vendor.shopName.lower(), vendor_data))
         if len(filtered_vendor_shop_name) != 0:
             response_dict['shopName'] = 1
 
-        if len(filtered_users) == 0 and len(filtered_vendor_email) == 0 and len(filtered_vendor_shop_name) == 0:
+        filtered_vendor_shop_addr = list(filter(lambda x: x.address.lower() == vendor.shopAddr.lower(), vendor_data))
+        if len(filtered_vendor_shop_addr) != 0:
+            response_dict['shopAddr'] = 1
+
+        if len(filtered_users) == 0 and len(filtered_vendor_email) == 0 and len(filtered_phone) == 0 \
+            and len(filtered_vendor_shop_name) == 0 and len(filtered_vendor_shop_addr) == 0:
+            
             # hash password
             hashed_password = bcrypt.hashpw(vendor.password.encode('utf-8'), bcrypt.gensalt())
             vendor.password = hashed_password
@@ -83,9 +102,9 @@ class VendorRegister(Register):
 
 class RegisterFactory:
     def create_register(self, role):
-        match role:
-            case 2: # vendor
-                return VendorRegister()
-            case 3: # customer
-                return CustomerRegister()
-            
+        if role == 2: # vendor
+            return VendorRegister()
+        elif role == 3: # customer
+            return CustomerRegister()
+        else:
+            pass

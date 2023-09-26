@@ -131,10 +131,11 @@ function EmailField({ email, emailError, emailValid, emailDup, onChangeEmail }: 
   )
 }
 
-function PhoneField({ phone, phoneError, phoneValid, onChange }: {
+function PhoneField({ phone, phoneError, phoneValid, phoneDupError, onChange }: {
   phone: string;
   phoneError: boolean;
   phoneValid: boolean;
+  phoneDupError: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
@@ -142,7 +143,7 @@ function PhoneField({ phone, phoneError, phoneValid, onChange }: {
       <FormControl
         id="phone"
         isRequired
-        isInvalid={phoneError || !phoneValid}
+        isInvalid={phoneError || !phoneValid || phoneDupError}
       >
         <FormLabel>HP No.</FormLabel>
         <Input
@@ -154,7 +155,7 @@ function PhoneField({ phone, phoneError, phoneValid, onChange }: {
         {/* Display error message */}
         {phoneError ? (<FormErrorMessage>Required</FormErrorMessage>) : ("")}
         {(!phoneValid && !phoneError && phone !== "") ? (<FormErrorMessage>Invalid phone number - Only 8 digits</FormErrorMessage>) : ""}
-
+        {phoneDupError ? (<FormErrorMessage>HP No. already exists</FormErrorMessage>) : ("")}
       </FormControl>
     </>
   )
@@ -230,14 +231,15 @@ function PasswordsField({ password, reEnterPassword, passwordError, reEnterPassw
     </>)
 }
 
-function ShopFields({ shopName, shopAddr, shopDesc, shopNameError, shopAddrError, shopDescError, shopDupError, onChangeShop }: {
+function ShopFields({ shopName, shopAddr, shopDesc, shopNameError, shopAddrError, shopDescError, shopNameDupError, shopAddrDupError, onChangeShop }: {
   shopName: string,
   shopAddr: string,
   shopDesc: string,
   shopNameError: boolean;
   shopAddrError: boolean;
   shopDescError: boolean;
-  shopDupError: boolean;
+  shopNameDupError: boolean;
+  shopAddrDupError: boolean;
   onChangeShop: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
@@ -245,7 +247,7 @@ function ShopFields({ shopName, shopAddr, shopDesc, shopNameError, shopAddrError
       <FormControl
         id="ShopName"
         isRequired
-        isInvalid={shopNameError}
+        isInvalid={shopNameError || shopNameDupError}
       >
         <FormLabel>Shop Name</FormLabel>
         <Input
@@ -256,12 +258,12 @@ function ShopFields({ shopName, shopAddr, shopDesc, shopNameError, shopAddrError
         />
         {/* Display error message */}
         {shopNameError ? (<FormErrorMessage>Required</FormErrorMessage>) : ("")}
-        {shopDupError ? (<FormErrorMessage>Shop Name already exists</FormErrorMessage>) : ("")}
+        {shopNameDupError ? (<FormErrorMessage>Shop Name already exists</FormErrorMessage>) : ("")}
       </FormControl>
       <FormControl
         id="ShopAddr"
         isRequired
-        isInvalid={shopAddrError}
+        isInvalid={shopAddrError || shopAddrDupError}
       >
         <FormLabel>Shop Address</FormLabel>
         <Input
@@ -272,6 +274,13 @@ function ShopFields({ shopName, shopAddr, shopDesc, shopNameError, shopAddrError
         />
         {/* Display error message */}
         {shopAddrError ? (<FormErrorMessage>Required</FormErrorMessage>) : ("")}
+        {shopAddrDupError ? (<FormErrorMessage>Shop Address already exists</FormErrorMessage>) : ("")}
+      </FormControl>
+      <FormControl
+        id="ShopDesc"
+        isRequired
+        isInvalid={shopDescError}
+      >
         <FormLabel>Shop Description</FormLabel>
         <Input
           type="text"
@@ -281,7 +290,7 @@ function ShopFields({ shopName, shopAddr, shopDesc, shopNameError, shopAddrError
         />
         {/* Display error message */}
         {shopDescError ? (<FormErrorMessage>Required</FormErrorMessage>) : ("")}
-      </FormControl>
+      </FormControl >
     </>
   )
 }
@@ -326,6 +335,7 @@ function CustomerSignUp({ formData, error, dupError, handleChange, isPasswordMat
           phone={formData.phone}
           phoneError={error.phone}
           phoneValid={error.phoneValid}
+          phoneDupError={dupError.phone}
           onChange={handleChange}
         />
         <PasswordsField
@@ -397,6 +407,7 @@ function VendorSignUp({ formData, error, dupError, handleChange, isPasswordMatch
           phone={formData.phone}
           phoneError={error.phone}
           phoneValid={error.phoneValid}
+          phoneDupError={dupError.phone}
           onChange={handleChange}
         />
         <PasswordsField
@@ -416,7 +427,8 @@ function VendorSignUp({ formData, error, dupError, handleChange, isPasswordMatch
           shopNameError={error.shopName}
           shopAddrError={error.shopAddrError}
           shopDescError={error.shopDesc}
-          shopDupError={dupError.shopName}
+          shopNameDupError={dupError.shopName}
+          shopAddrDupError={dupError.shopAddr}
           onChangeShop={handleChange}
         />
         <Stack spacing={10} pt={2}>
@@ -492,6 +504,7 @@ export default function Register() {
   const [customersDupErrors, setCustomerDupErrors] = useState<Record<string, boolean>>({
     username: false,
     email: false,
+    phone: false,
   });
 
   const [vendorErrors, setVendorErrors] = useState<Record<string, boolean>>({
@@ -510,6 +523,7 @@ export default function Register() {
   const [vendorsDupErrors, setVendorDupErrors] = useState<Record<string, boolean>>({
     ...customersDupErrors,
     shopName: false,
+    shopAddr: false,
   });
 
   const requiredCustomerFields = [
@@ -544,7 +558,7 @@ export default function Register() {
       email: false,
       emailValid: true,
       phone: false,
-      phoneValid:true,
+      phoneValid: true,
       password: false,
       reEnterPassword: false,
     });
@@ -553,7 +567,7 @@ export default function Register() {
       email: false,
       emailValid: true,
       phone: false,
-      phoneValid:true,
+      phoneValid: true,
       password: false,
       reEnterPassword: false,
       shopName: false,
@@ -563,11 +577,14 @@ export default function Register() {
     setCustomerDupErrors({
       username: false,
       email: false,
+      phone: false,
     });
     setVendorDupErrors({
       username: false,
       email: false,
+      phone: false,
       shopName: false,
+      shopAddr: false,
     });
   };
 
@@ -583,7 +600,7 @@ export default function Register() {
       username: false,
       email: false,
       emailValid: true,
-      phoneValid:true,
+      phoneValid: true,
       phone: false,
       password: false,
       reEnterPassword: false,
@@ -592,6 +609,7 @@ export default function Register() {
     setCustomerDupErrors({
       username: false,
       email: false,
+      phone: false,
     });
 
     // // Check if passwords match and update isPasswordMatch state
@@ -615,7 +633,7 @@ export default function Register() {
       email: false,
       emailValid: true,
       phone: false,
-      phoneValid:true,
+      phoneValid: true,
       password: false,
       reEnterPassword: false,
       shopName: false,
@@ -627,6 +645,7 @@ export default function Register() {
       username: false,
       email: false,
       shopName: false,
+      shopAddr: false,
     });
 
     // Check if passwords match and update isPasswordMatch state
@@ -664,7 +683,7 @@ export default function Register() {
       emailValid: isEmailValid,
     }));
 
-    const isPhoneValid = /^\d{1,8}$/.test(customerData.phone);
+    const isPhoneValid = /^\d{8}$/.test(customerData.phone);
     setCustomerErrors((prevErrors) => ({
       ...prevErrors,
       phoneValid: isPhoneValid,
@@ -731,6 +750,12 @@ export default function Register() {
               email: true
             }));
           }
+          if (customerID.phone !== 0) {
+            setCustomerDupErrors(prevErrors => ({
+              ...prevErrors,
+              phone: true
+            }));
+          }
         }
       } else {
         // Registration failed, handle accordingly (e.g., show an error message)
@@ -769,7 +794,7 @@ export default function Register() {
       emailValid: isEmailValid,
     }));
 
-    const isPhoneValid = /^\d{1,8}$/.test(vendorData.phone);
+    const isPhoneValid = /^\d{8}$/.test(vendorData.phone);
     setVendorErrors((prevErrors) => ({
       ...prevErrors,
       phoneValid: isPhoneValid,
@@ -833,10 +858,22 @@ export default function Register() {
               email: true
             }));
           }
+          if (vendorID.phone !== 0) {
+            setVendorDupErrors(prevErrors => ({
+              ...prevErrors,
+              phone: true
+            }));
+          }
           if (vendorID.shopName !== 0) {
             setVendorDupErrors(prevErrors => ({
               ...prevErrors,
               shopName: true
+            }));
+          }
+          if (vendorID.shopAddr !== 0) {
+            setVendorDupErrors(prevErrors => ({
+              ...prevErrors,
+              shopAddr: true
             }));
           }
         }

@@ -36,7 +36,7 @@ class UserGateway():
             db.add(user_table)
             db.commit()
 
-            user_id_object = db.query(user.User).filter(user.User.username == customer.username).first()
+            user_id_object = db.query(user.User).filter(user.User.username == user_data['username']).first()
 
             if user_id_object:
                 user_id = user_id_object.userID
@@ -67,7 +67,7 @@ class UserGateway():
             db.add(user_table)
             db.commit()
 
-            user_id_object = db.query(user.User).filter(user.User.username == vendor.username).first()
+            user_id_object = db.query(user.User).filter(user.User.username == user_data['username']).first()
             if user_id_object:
                 user_id = user_id_object.userID
 
