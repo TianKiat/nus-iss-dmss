@@ -1,11 +1,7 @@
 import uuid
-import mysql.connector
 from sqlalchemy.orm import Session
 from app.common.user_model import User, Vendor, Login
 from app.models import user, user_profile, vendor_profile
-from app.common.constants import DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE
-
-sqldb = mysql.connector.connect(host = DB_HOST, user = DB_USERNAME, password = DB_PASSWORD, database = DB_DATABASE)
 
 class UserGateway():
     def __init__(self):
