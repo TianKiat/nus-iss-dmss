@@ -30,12 +30,8 @@ import {
 
 import { Link } from "react-router-dom";
 
-function haveLogin() {
-  return true;
-}
-
-function navButtons() {
-  if (haveLogin()) {
+function navButtons(isLogin: boolean) {
+  if (isLogin) {
     return (
       <Stack flex={{ base: 1, md: 0 }} justify={"flex-end"} direction={"row"} spacing={6}>
         <Button as={"a"} p={2} fontSize={"sm"} fontWeight={400} variant={"link"}>
@@ -68,6 +64,7 @@ function navButtons() {
 
 export default function Nav() {
   const { isOpen, onToggle } = useDisclosure();
+  const isLogin = false;
 
   return (
     <Box>
@@ -110,7 +107,7 @@ export default function Nav() {
           </Flex>
         </Flex>
 
-        {navButtons()}
+        {navButtons(isLogin)}
       </Flex>
 
       <Collapse in={isOpen} animateOpacity>
