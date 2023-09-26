@@ -1,11 +1,7 @@
 import uuid
-import mysql.connector
 from sqlalchemy.orm import Session
 from app.common.user_model import User, Vendor, Login
 from app.models import user, user_profile, vendor_profile
-from app.common.constants import DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE
-
-sqldb = mysql.connector.connect(host = DB_HOST, user = DB_USERNAME, password = DB_PASSWORD, database = DB_DATABASE)
 
 class UserGateway():
     def __init__(self):
@@ -29,7 +25,7 @@ class UserGateway():
         except Exception as e:
             print(f"Error: {e}")
 
-    def insert_customer_data(self, db: Session, customer: User):
+    def register_customer_data(self, db: Session, customer: User):
         try:
             user_data = {
                 'username': customer.username,
@@ -40,7 +36,7 @@ class UserGateway():
             db.add(user_table)
             db.commit()
 
-            user_id_object = db.query(user.User).filter(user.User.username == customer.username).first()
+            user_id_object = db.query(user.User).filter(user.User.username == user_data['username']).first()
 
             if user_id_object:
                 user_id = user_id_object.userID
@@ -60,7 +56,7 @@ class UserGateway():
         except Exception as e:
             print(f"Error: {e}")
 
-    def insert_vendor_data(self, db: Session, vendor: Vendor):
+    def register_vendor_data(self, db: Session, vendor: Vendor):
         try:
             user_data = {
                 'username': vendor.username,
@@ -71,17 +67,18 @@ class UserGateway():
             db.add(user_table)
             db.commit()
 
-            user_id_object = db.query(user.User).filter(user.User.username == vendor.username).first()
+            user_id_object = db.query(user.User).filter(user.User.username == user_data['username']).first()
             if user_id_object:
                 user_id = user_id_object.userID
 
             vendor_profile_data = {
-                'profileName': vendor.name,
-                'address': vendor.address,
+                'profileName': vendor.shopName,
+                'address': vendor.shopAddr,
                 'email': vendor.email,
                 'phone': vendor.phone,
                 'status': vendor.status,
-                'userID': user_id
+                'userID': user_id,
+                'shopDesc':vendor.shopDesc
             }
             vendor_profile_table = vendor_profile.VendorProfile(**vendor_profile_data)
             db.add(vendor_profile_table)
