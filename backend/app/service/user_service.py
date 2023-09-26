@@ -1,3 +1,4 @@
+from typing_extensions import override
 from app.datasource.user_gateway import UserGateway
 from app.common.user_model import User, Vendor, Login
 import bcrypt
@@ -9,7 +10,16 @@ class UserService():
     def __init__(self):
         pass
 
-    def register_customer(self, db, customer: User):
+    def login_user(self, db, user: Login):
+        return UserGateway().auth(db, user)
+
+class Register:
+    def register(self):
+        pass
+
+class CustomerRegister(Register):
+    @override
+    def register(self, db, customer: User):
         response_dict = {
             'id': 0,
             'username': 0,
@@ -35,7 +45,9 @@ class UserService():
 
         return response_dict
 
-    def register_vendor(self, db, vendor: Vendor):
+class VendorRegister(Register):
+    @override
+    def register(self, db, vendor: Vendor):
         response_dict = {
             'id': 0,
             'username': 0,
@@ -47,13 +59,13 @@ class UserService():
         filtered_users = list(filter(lambda x: x.username == vendor.username, users_data))
         if len(filtered_users) != 0:
             response_dict['username'] = 1
-        
+
         # check for duplicate email
         vendor_data = UserGateway().retrieve_vendor_data(db)
         filtered_vendor_email = list(filter(lambda x: x.email == vendor.email, vendor_data))
         if len(filtered_vendor_email) != 0:
             response_dict['email'] = 1
-        
+
         # check for duplicate shop name
         filtered_vendor_shop_name = list(filter(lambda x: x.profileName == vendor.shopName, vendor_data))
         if len(filtered_vendor_shop_name) != 0:
@@ -69,6 +81,11 @@ class UserService():
 
         return response_dict
 
-
-    def login_user(self, db, user: Login):
-        return UserGateway().auth(db, user)
+class RegisterFactory:
+    def create_register(self, role):
+        match role:
+            case 2: # vendor
+                return VendorRegister()
+            case 3: # customer
+                return CustomerRegister()
+            

@@ -1,15 +1,10 @@
-from app.service.user_service import UserService
-from app.common.user_model import User, Vendor
-
-# import service class needed
+from app.service.user_service import RegisterFactory
 
 class RegisterUserController():
     def __init__(self):
         pass
 
-    def register_customer(self, db, customer: User):
-        return UserService().register_customer(db, customer)
-
-    def register_vendor(self, db, vendor: Vendor):
-        return UserService().register_vendor(db, vendor)
+    def register(self, db, user):
+        service = RegisterFactory().create_register(user.role)
+        return service.register(db, user)
     

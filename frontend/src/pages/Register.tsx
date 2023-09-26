@@ -449,7 +449,7 @@ export default function Register() {
     reEnterPassword: "",
   };
 
-  const initialVendorFormData  = {
+  const initialVendorFormData = {
     role: "2",
     username: "",
     email: "",
@@ -549,7 +549,16 @@ export default function Register() {
       reEnterPassword: false,
       shopName: false,
       shopDesc: false,
-      shopAddr:false,
+      shopAddr: false,
+    });
+    setCustomerDupErrors({
+      username: false,
+      email: false,
+    });
+    setVendorDupErrors({
+      username: false,
+      email: false,
+      shopName: false,
     });
   };
 
@@ -600,7 +609,7 @@ export default function Register() {
       reEnterPassword: false,
       shopName: false,
       shopDesc: false,
-      shopAddr:false,
+      shopAddr: false,
     });
 
     setVendorDupErrors({
