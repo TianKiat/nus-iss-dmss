@@ -16,17 +16,18 @@ import {
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react';
 interface UserData {
-  name: string;
+  profileName: string;
   phone: string;
   username: string;
   email: string;
 }
 export default function Profile() {
   const [userData, setUserData] = useState<UserData | null>(null); // Provide type annotation
-
+  const userId = '4';
+  const apiUrl = `http://127.0.0.1:8000/user_profile/${userId}`;
   useEffect(() => {
     // Make a GET request to your backend API using Python (e.g., Flask)
-    fetch('http://127.0.0.1:8000/user_profile') // Replace with your actual API endpoint
+    fetch(apiUrl) // Replace with your actual API endpoint
       .then((response) => response.json())
       .then((data) => {
         console.log(data)
@@ -55,7 +56,7 @@ export default function Profile() {
                     First Name
                   </Heading>
                   <Text pt='2' fontSize='sm'>
-                    {userData.name}
+                    {userData.profileName}
                   </Text>
                 </Box>
                 <Box>

@@ -8,7 +8,7 @@ class UserProfileService():
     def __init__(self):
         pass
 
-    def retrive_profile():
+    def retrive_profile(db, id):
         # retrive customer data
-        return UserProfileGateway().retrive_profile()
+        return UserProfileGateway().retrive_profile(db, id)
 
