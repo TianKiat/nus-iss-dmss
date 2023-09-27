@@ -8,6 +8,7 @@ from app.models.menuitem import MenuItem
 from app.models.invoice import Invoice
 from app.models.order import Order
 from app.models.promotion import Promotion
+from app.models.otp import Otp
 import app.models as models
 
 Base = models.Base
