@@ -6,4 +6,7 @@ class AccessControlGateway():
         pass
 
     def get_access_control(db: Session, roleID: int):
-        return db.query(AccessControl).filter(AccessControl.roleID == roleID).first()
+        try:
+            return db.query(AccessControl).filter(AccessControl.roleID == roleID).all()
+        except Exception as e:
+            print(f"Error: {e}")
