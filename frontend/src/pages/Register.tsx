@@ -1013,14 +1013,10 @@ export default function Register() {
         if (otp.otp === 1) {
           resetFormFields()
           setCustomerOpenClose(false)
-          useEffect(() => {
-            if (!isCustomerOpen) {
-              setShowAlert(true);
-              setTimeout(() => {
-                window.location.href = '/login';
-              }, 3000);
-            }
-          }, [isCustomerOpen]);
+          setShowAlert(true);
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 3000);
         }
         else {
           setCustomerErrors((prevErrors) => ({
@@ -1207,14 +1203,10 @@ export default function Register() {
         if (otp.otp === 1) {
           resetFormFields()
           setVendorOpenClose(false)
-          useEffect(() => {
-            if (!isVendorOpen) {
-              setShowAlert(true);
-              setTimeout(() => {
-                window.location.href = '/login';
-              }, 3000);
-            }
-          }, [isVendorOpen]);
+          setShowAlert(true);
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 3000);
         }
         else {
           setVendorErrors((prevErrors) => ({
