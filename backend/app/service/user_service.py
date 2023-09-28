@@ -1,12 +1,13 @@
-from typing_extensions import override
-from app.datasource.user_gateway import UserGateway
-from app.common.user_model import User, Vendor, Login, Otp
-import bcrypt
 import smtplib
 import random
 import string
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import bcrypt
+from typing_extensions import override
+from app.datasource.user_gateway import UserGateway
+from app.common.user_model import User, Vendor, Login
+
 
 
 # import service class needed
@@ -15,7 +16,7 @@ from email.mime.multipart import MIMEMultipart
 class UserService():
     def __init__(self):
         pass
-    
+
     def generate_otp(self, length):
         characters = string.digits
         otp = ''.join(random.choice(characters) for _ in range(length))
@@ -56,18 +57,18 @@ class UserService():
             UserGateway().modify_otp_data(db, hashed_otp, email)
             return {"otp": 1}
         return {"otp": 0}
-    
+
     def verify_otp(self, db, otp, email):
-        # retrieve 
+        # retrieve
         otps_data = UserGateway().retrieve_otp_data(db)
         filtered_otp = next(filter(lambda x: x.email.lower() == email.lower(), otps_data))
         valid_otp = bcrypt.checkpw(otp.encode('utf-8'), filtered_otp.otp.encode("utf-8"))
         if valid_otp:
             return {"otp": 1}
         return {"otp": 0}
-    
-    def delete_record(self, db, id):
-        UserGateway().delete_record(db, id)
+
+    def delete_record(self, db, del_id):
+        UserGateway().delete_record(db, del_id)
 
     def login_user(self, db, user: Login):
         return UserGateway().auth(db, user)
@@ -95,7 +96,7 @@ class CustomerRegister(Register):
         filtered_customers = list(filter(lambda x: x.email.lower() == customer.email.lower(), customers_data))
         if len(filtered_customers) != 0:
             response_dict['email'] = 1
-        
+
         #check for duplicate phone
         filtered_phone = list(filter(lambda x: x.phone == customer.phone, customers_data))
         if len(filtered_phone) != 0:
@@ -149,7 +150,7 @@ class VendorRegister(Register):
 
         if len(filtered_users) == 0 and len(filtered_vendor_email) == 0 and len(filtered_phone) == 0 \
             and len(filtered_vendor_shop_name) == 0 and len(filtered_vendor_shop_addr) == 0:
-            
+
             # hash password
             hashed_password = bcrypt.hashpw(vendor.password.encode('utf-8'), bcrypt.gensalt())
             vendor.password = hashed_password
@@ -163,7 +164,6 @@ class RegisterFactory:
     def create_register(self, role):
         if role == 2: # vendor
             return VendorRegister()
-        elif role == 3: # customer
+        if role == 3: # customer
             return CustomerRegister()
-        else:
-            pass
+

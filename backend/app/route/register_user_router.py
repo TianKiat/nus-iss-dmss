@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from app.apicontroller.register_user_controller import RegisterUserController
-from app.common.user_model import User, Vendor, Otp
+from app.common.user_model import User, Vendor
 from run import SessionLocal
 
 router = APIRouter()
@@ -32,12 +32,12 @@ def register_vendor_account(vendor: Vendor, db: Session = Depends(get_db)):
         return RegisterUserController().register(db, vendor)
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex
-    
+
 @router.post(
         "/register_otp",
         description="Generate OTP",
 )
-def register_vendor_account(email: str, db: Session = Depends(get_db)):
+def register_otp(email: str, db: Session = Depends(get_db)):
     try:
         return RegisterUserController().generate_otp(db, email)
     except Exception as ex:
@@ -47,18 +47,18 @@ def register_vendor_account(email: str, db: Session = Depends(get_db)):
         "/verify_otp",
         description="Generate OTP",
 )
-def register_vendor_account(otp: str, email: str, db: Session = Depends(get_db)):
+def verify_otp(otp: str, email: str, db: Session = Depends(get_db)):
     try:
         return RegisterUserController().verify_otp(db, otp, email)
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex
-    
+
 @router.post(
         "/delete_record",
         description="Delete record",
 )
-def delete_record(id: int, db: Session = Depends(get_db)):
+def delete_record(del_id: int, db: Session = Depends(get_db)):
     try:
-        return RegisterUserController().delete_record(db, id)
+        return RegisterUserController().delete_record(db, del_id)
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex

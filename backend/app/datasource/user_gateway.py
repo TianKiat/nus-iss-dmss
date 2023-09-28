@@ -111,18 +111,18 @@ class UserGateway():
         except Exception as e:
             print(f"Error: {e}")
 
-    def delete_record(self, db: Session, id):
-        user_profile_to_delete = db.query(user_profile.UserProfile).filter(user_profile.UserProfile.userID == id).first()
+    def delete_record(self, db: Session, del_id):
+        user_profile_to_delete = db.query(user_profile.UserProfile).filter(user_profile.UserProfile.userID == del_id).first()
         if user_profile_to_delete:
             db.delete(user_profile_to_delete)
             db.commit()
 
-        vendor_profile_to_delete = db.query(vendor_profile.VendorProfile).filter(vendor_profile.VendorProfile.userID == id).first()
+        vendor_profile_to_delete = db.query(vendor_profile.VendorProfile).filter(vendor_profile.VendorProfile.userID == del_id).first()
         if vendor_profile_to_delete:
             db.delete(vendor_profile_to_delete)
             db.commit()
 
-        user_to_delete = db.query(user.User).filter(user.User.userID == id).first()
+        user_to_delete = db.query(user.User).filter(user.User.userID == del_id).first()
         if user_to_delete:
             db.delete(user_to_delete)
             db.commit()

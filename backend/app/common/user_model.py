@@ -19,9 +19,6 @@ class Vendor(BaseModel):
     shopDesc: str
     status: int
 
-class Otp(BaseModel):
-    email: str
-
 class Login(BaseModel):
     username: str
     password: str
