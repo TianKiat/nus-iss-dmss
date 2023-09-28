@@ -32,7 +32,7 @@ import {
   ModalBody,
   ModalCloseButton,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import React from "react";
 
@@ -324,7 +324,7 @@ function CustomerSignUp({ formData, error, dupError, handleChange, isPasswordMat
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
-  const initialRef = React.useRef(null)
+  const initialRef = useRef(null)
 
   const [countdown, setCountdown] = useState(60);
 
@@ -497,7 +497,7 @@ function VendorSignUp({ formData, error, dupError, handleChange, isPasswordMatch
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
-  const initialRef = React.useRef(null)
+  const initialRef = useRef(null)
 
   const [countdown, setCountdown] = useState(60);
 
