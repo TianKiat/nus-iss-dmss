@@ -46,3 +46,9 @@ class Login(BaseModel):
     username: str
     password: str
     
+class UserID(BaseModel):
+    userID: int
+
+class IsFavorite(BaseModel):
+    invoiceID: int
+    isFavorite: bool

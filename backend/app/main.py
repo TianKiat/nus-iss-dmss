@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
-from app.route import sample_router, register_user_router, login_user_router, dashboard_user_router
+from app.route import sample_router, register_user_router, login_user_router, dashboard_user_router, customer_user_router
 
 app = FastAPI()
 
@@ -18,6 +18,7 @@ app.include_router(sample_router.router)
 app.include_router(register_user_router.router)
 app.include_router(login_user_router.router)
 app.include_router(dashboard_user_router.router)
+app.include_router(customer_user_router.router)
 
 @app.get("/")
 async def root():
