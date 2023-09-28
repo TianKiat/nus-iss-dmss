@@ -37,7 +37,8 @@ describe('Register Component', () => {
         email: 'J@J.J',
         phone: '12345678',
         password: 'J',
-        reEnterPassword: 'J'
+        reEnterPassword: 'J',
+        otp: ''
       }),
     }));
 

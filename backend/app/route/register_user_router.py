@@ -32,3 +32,33 @@ def register_vendor_account(vendor: Vendor, db: Session = Depends(get_db)):
         return RegisterUserController().register(db, vendor)
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex
+
+@router.post(
+        "/register_otp",
+        description="Generate OTP",
+)
+def register_otp(email: str, db: Session = Depends(get_db)):
+    try:
+        return RegisterUserController().generate_otp(db, email)
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail=str(ex)) from ex
+
+@router.post(
+        "/verify_otp",
+        description="Generate OTP",
+)
+def verify_otp(otp: str, email: str, db: Session = Depends(get_db)):
+    try:
+        return RegisterUserController().verify_otp(db, otp, email)
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail=str(ex)) from ex
+
+@router.post(
+        "/delete_record",
+        description="Delete record",
+)
+def delete_record(del_id: int, db: Session = Depends(get_db)):
+    try:
+        return RegisterUserController().delete_record(db, del_id)
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail=str(ex)) from ex

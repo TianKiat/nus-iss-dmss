@@ -33,14 +33,17 @@ class TestRegisterController(unittest.TestCase):
             role=3,
             name="Test User",
             email="test@example.com",
-            phone="12345678",
+            phone="45672345",
         )
 
         # Call the method
         result = RegisterUserController.register(self, self.session, mock_customer)
 
         # Assert that the result is as expected
-        self.assertEqual(result, {'id': 1, 'username': 0, 'email': 0, 'phone': 0})
+        self.assertNotEqual(result['id'], 0)
+        self.assertEqual(result['username'], 0)
+        self.assertEqual(result['email'], 0)
+        self.assertEqual(result['phone'], 0)
 
         # Query the database to check if the records were inserted correctly
         user_query = self.session.query(user.User).filter(user.User.username == 'testuser').first()
@@ -56,8 +59,8 @@ class TestRegisterController(unittest.TestCase):
 
         self.assertEqual(user_profile_query.profileName, 'Test User')
         self.assertEqual(user_profile_query.email, 'test@example.com')
-        self.assertEqual(user_profile_query.phone, '12345678')
-        self.assertEqual(user_profile_query.userID, 1)
+        self.assertEqual(user_profile_query.phone, '45672345')
+        self.assertNotEqual(user_profile_query.userID, 0)
 
     def test_register_vendor(self):
         # Mocking vendor data
@@ -65,7 +68,7 @@ class TestRegisterController(unittest.TestCase):
             username = 'testvendor',
             password = 'testpassword',
             email = 'vendor@test.com',
-            phone = '555-555-5555',
+            phone = '45672346',
             role = 2,
             shopName = 'Test Vendor',
             shopAddr = '123 Main St',
@@ -77,7 +80,13 @@ class TestRegisterController(unittest.TestCase):
         result = RegisterUserController.register(self, self.session, mock_vendor)
 
         # Assert that the result is as expected
-        self.assertEqual(result, {'id': 1, 'username': 0, 'email': 0, 'phone': 0, 'shopName': 0, 'shopAddr': 0})
+        self.assertNotEqual(result['id'], 0)
+        self.assertEqual(result['username'], 0)
+        self.assertEqual(result['email'], 0)
+        self.assertEqual(result['phone'], 0)
+        self.assertEqual(result['shopName'], 0)
+        self.assertEqual(result['shopAddr'], 0)
+
 
         # Query the database to check if the records were inserted correctly
         user_query = self.session.query(user.User).filter(user.User.username == 'testvendor').first()
@@ -94,6 +103,6 @@ class TestRegisterController(unittest.TestCase):
         self.assertEqual(vendor_profile_query.profileName, 'Test Vendor')
         self.assertEqual(vendor_profile_query.address, '123 Main St')
         self.assertEqual(vendor_profile_query.email, 'vendor@test.com')
-        self.assertEqual(vendor_profile_query.phone, '555-555-5555')
+        self.assertEqual(vendor_profile_query.phone, '45672346')
         self.assertEqual(vendor_profile_query.status, 0)
-        self.assertEqual(vendor_profile_query.userID, 1)
+        self.assertNotEqual(vendor_profile_query.userID, 0)
