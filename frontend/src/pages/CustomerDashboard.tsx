@@ -189,7 +189,7 @@ export default function (props : CustomerDashboardProps) {
         }
 
         fetchAccess();
-    }, [updateOrderHistoryTrigger]);
+    }, [props.userID, updateOrderHistoryTrigger]);
 
     return ( 
         <Box p={4}>
