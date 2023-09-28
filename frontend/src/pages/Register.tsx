@@ -24,9 +24,17 @@ import {
   AlertIcon,
   AlertDescription,
   AlertTitle,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import React from "react";
 
 interface ICustomerData {
   name: string,
@@ -36,6 +44,7 @@ interface ICustomerData {
   phone: string,
   reEnterPassword: string,
   role: string,
+  otp: string,
 }
 
 interface IVendorData extends Omit<ICustomerData, 'name'> {
@@ -295,13 +304,18 @@ function ShopFields({ shopName, shopAddr, shopDesc, shopNameError, shopAddrError
   )
 }
 
-function CustomerSignUp({ formData, error, dupError, handleChange, isPasswordMatch, handleSubmit }: {
+function CustomerSignUp({ formData, error, dupError, handleChange, isPasswordMatch, isOpen, handleSubmit, handleOtpSubmit, handleCloseModal, setData, setError }: {
   formData: ICustomerData;
   error: Record<string, boolean>;
   dupError: Record<string, boolean>;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   isPasswordMatch: boolean;
+  isOpen: boolean;
   handleSubmit: () => void;
+  handleOtpSubmit: () => void;
+  handleCloseModal: () => void;
+  setData: (formData: Record<string, string>) => void;
+  setError: (error: Record<string, boolean>) => void;
 }) {
 
   const [showPassword, setShowPassword] = useState(false);
@@ -310,8 +324,99 @@ function CustomerSignUp({ formData, error, dupError, handleChange, isPasswordMat
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
+  const initialRef = useRef(null)
+
+  const [countdown, setCountdown] = useState(60);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isOpen && countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown(prevCountdown => prevCountdown - 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [isOpen, countdown]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setCountdown(60); // Reset countdown when modal closes
+    }
+  }, [isOpen]);
+
+  const handleResendClick = async () => {
+    try {
+      const apiURL = process.env.VITE_API_BASE_URL;
+      await fetch(`${apiURL}/register_otp?email=${formData.email}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle network errors or other exceptions
+    }
+    setData({
+      ...formData,
+      otp: ""
+    })
+    setError({
+      ...error,
+      otp: false
+    })
+    setCountdown(60);
+  };
+
   return (
     <>
+      <Modal
+        closeOnOverlayClick={false}
+        closeOnEsc={false}
+        initialFocusRef={initialRef}
+        isOpen={isOpen}
+        onClose={handleCloseModal}
+        isCentered
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader textAlign="center" mb={5}>An email with a OTP has been sent to your email address</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <FormControl
+              id="otp"
+              isRequired
+              isInvalid={error.otp}
+            >
+              <FormLabel>One-Time Pasword</FormLabel>
+              <Input
+                ref={initialRef}
+                type="otp"
+                value={formData.otp}
+                onChange={handleChange}
+                name="otp"
+              />
+              {error.otp ? (<FormErrorMessage>Please enter the correct OTP - 6 digits only</FormErrorMessage>) : ("")}
+
+            </FormControl>
+            {countdown > 0 ? (
+              <Box mt={4}>
+                Resend OTP in {countdown} seconds
+              </Box>
+            ) : (
+              <Box mt={4} color="blue.400" cursor="pointer" onClick={handleResendClick}>
+                Resend OTP
+              </Box>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={handleOtpSubmit} colorScheme='blue' mr={3}>
+              Verify
+            </Button>
+            <Button onClick={handleCloseModal}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
       <Stack spacing={4}>
         <NameField
           name={formData.name}
@@ -372,13 +477,18 @@ function CustomerSignUp({ formData, error, dupError, handleChange, isPasswordMat
   );
 }
 
-function VendorSignUp({ formData, error, dupError, handleChange, isPasswordMatch, handleSubmit }: {
+function VendorSignUp({ formData, error, dupError, handleChange, isPasswordMatch, isOpen, handleSubmit, handleOtpSubmit, handleCloseModal, setData, setError }: {
   formData: IVendorData;
   error: Record<string, boolean>;
   dupError: Record<string, boolean>;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   isPasswordMatch: boolean;
+  isOpen: boolean;
   handleSubmit: () => void;
+  handleOtpSubmit: () => void;
+  handleCloseModal: () => void;
+  setData: (formData: Record<string, string>) => void;
+  setError: (error: Record<string, boolean>) => void;
 }) {
 
   const [showPassword, setShowPassword] = useState(false);
@@ -387,8 +497,96 @@ function VendorSignUp({ formData, error, dupError, handleChange, isPasswordMatch
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
+  const initialRef = useRef(null)
+
+  const [countdown, setCountdown] = useState(60);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isOpen && countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown(prevCountdown => prevCountdown - 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [isOpen, countdown]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setCountdown(60); // Reset countdown when modal closes
+    }
+  }, [isOpen]);
+
+  const handleResendClick = async () => {
+    try {
+      const apiURL = process.env.VITE_API_BASE_URL;
+      await fetch(`${apiURL}/register_otp?email=${formData.email}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle network errors or other exceptions
+    }
+    setData({
+      ...formData,
+      otp: ""
+    })
+    setError({
+      ...error,
+      otp: false
+    })
+    setCountdown(60);
+  };
+
   return (
     <>
+      <Modal
+        initialFocusRef={initialRef}
+        isOpen={isOpen}
+        onClose={handleCloseModal}
+        isCentered
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader textAlign="center" mb={5}>An email with a OTP has been sent to your email address</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <FormControl
+              id="otp"
+              isRequired
+              isInvalid={error.otp}
+            >
+              <FormLabel>One-Time Password</FormLabel>
+              <Input
+                ref={initialRef}
+                type="otp"
+                value={formData.otp}
+                onChange={handleChange}
+                name="otp"
+              />
+              {error.otp ? (<FormErrorMessage>Please enter the correct OTP - 6 digits only</FormErrorMessage>) : ("")}
+            </FormControl>
+            {countdown > 0 ? (
+              <Box mt={4}>
+                Resend OTP in {countdown} seconds
+              </Box>
+            ) : (
+              <Box mt={4} color="blue.400" cursor="pointer" onClick={handleResendClick}>
+                Resend OTP
+              </Box>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={handleOtpSubmit} colorScheme='blue' mr={3}>
+              Verify
+            </Button>
+            <Button onClick={handleCloseModal}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
       <Stack spacing={4}>
         <UsernameField
           username={formData.username}
@@ -456,6 +654,7 @@ function VendorSignUp({ formData, error, dupError, handleChange, isPasswordMatch
 }
 
 export default function Register() {
+  const apiURL = process.env.VITE_API_BASE_URL;
   const initialCustomerFormData = {
     role: "3", // Initialize role with a default value
     name: "",
@@ -464,6 +663,7 @@ export default function Register() {
     phone: "",
     password: "",
     reEnterPassword: "",
+    otp: "",
   };
 
   const initialVendorFormData = {
@@ -476,8 +676,10 @@ export default function Register() {
     shopName: "",
     shopDesc: "",
     shopAddr: "",
-    status: 0
+    status: 0,
+    otp: "",
   };
+  const [userId, setUserId] = useState(0);
 
   const [showAlert, setShowAlert] = useState(false);
 
@@ -486,6 +688,10 @@ export default function Register() {
   const [customerData, setCustomerData] = useState(initialCustomerFormData);
 
   const [vendorData, setVendorData] = useState(initialVendorFormData);
+
+  const [isCustomerOpen, setCustomerOpenClose] = useState(false);
+
+  const [isVendorOpen, setVendorOpenClose] = useState(false);
 
   // Initialize isPasswordMatch to true
   const [isPasswordMatch, setIsPasswordMatch] = useState(true);
@@ -499,6 +705,7 @@ export default function Register() {
     phoneValid: true,
     password: false,
     reEnterPassword: false,
+    otp: false,
   });
 
   const [customersDupErrors, setCustomerDupErrors] = useState<Record<string, boolean>>({
@@ -518,6 +725,7 @@ export default function Register() {
     shopName: false,
     shopDesc: false,
     shopAddr: false,
+    otp: false,
   });
 
   const [vendorsDupErrors, setVendorDupErrors] = useState<Record<string, boolean>>({
@@ -561,6 +769,7 @@ export default function Register() {
       phoneValid: true,
       password: false,
       reEnterPassword: false,
+      opt: false,
     });
     setVendorErrors({
       username: false,
@@ -573,6 +782,7 @@ export default function Register() {
       shopName: false,
       shopDesc: false,
       shopAddr: false,
+      opt: false,
     });
     setCustomerDupErrors({
       username: false,
@@ -586,6 +796,7 @@ export default function Register() {
       shopName: false,
       shopAddr: false,
     });
+    setUserId(0);
   };
 
   const handleCustomerChange = (e: { target: { name: string; value: string; }; }) => {
@@ -604,6 +815,7 @@ export default function Register() {
       phone: false,
       password: false,
       reEnterPassword: false,
+      opt: false,
     });
 
     setCustomerDupErrors({
@@ -639,6 +851,7 @@ export default function Register() {
       shopName: false,
       shopDesc: false,
       shopAddr: false,
+      opt: false,
     });
 
     setVendorDupErrors({
@@ -713,11 +926,11 @@ export default function Register() {
       console.log("Passwords do not match.");
       return; // Prevent signup when passwords don't match
     }
+
     // Log the formData before sending it to the backend
     console.log('CustomerData to be sent to the backend:', customerData);
 
     try {
-      const apiURL = process.env.VITE_API_BASE_URL;
       const response = await fetch(`${apiURL}/register_customer`, {
         method: 'POST',
         headers: {
@@ -730,12 +943,30 @@ export default function Register() {
         // Registration successful, handle accordingly (e.g., show a success message)
         const customerID = await response.json();
         if (customerID.id !== 0) {
+          setUserId(customerID.id)
           console.log("Customer in DB")
-          resetFormFields()
-          setShowAlert(true);
-          setTimeout(() => {
-            window.location.href = '/login';
-          }, 3000);
+          try {
+            const otpResponse = await fetch(`${apiURL}/register_otp?email=${customerData.email}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            });
+
+            if (otpResponse.status === 200) {
+              // Registration successful, handle accordingly (e.g., show a success message)
+              const customerOtp = await otpResponse.json();
+              if (customerOtp.otp !== 0) {
+                setCustomerOpenClose(true);
+              }
+            } else {
+              // Registration failed, handle accordingly (e.g., show an error message)
+              console.error('Error:', otpResponse.statusText);
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            // Handle network errors or other exceptions
+          }
         }
         else {
           if (customerID.username !== 0) {
@@ -761,6 +992,60 @@ export default function Register() {
         // Registration failed, handle accordingly (e.g., show an error message)
         console.error('Error:', response.statusText);
       }
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle network errors or other exceptions
+    }
+  }
+
+  const handleCustomerOtpSubmit = async () => {
+    try {
+      const otpResponse = await
+        fetch(`${apiURL}/verify_otp?otp=${customerData.otp}&email=${customerData.email}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+      if (otpResponse.status === 200) {
+        const otp = await otpResponse.json();
+        if (otp.otp === 1) {
+          resetFormFields()
+          setCustomerOpenClose(false)
+          setShowAlert(true);
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 3000);
+        }
+        else {
+          setCustomerErrors((prevErrors) => ({
+            ...prevErrors,
+            otp: true,
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle network errors or other exceptions
+    }
+  }
+
+  const closeCustomerModal = async () => {
+    setCustomerOpenClose(false)
+    setCustomerData((prevErrors) => ({
+      ...prevErrors,
+      otp: "",
+    }));
+
+    try {
+      await
+        fetch(`${apiURL}/delete_record?id=${userId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
     } catch (error) {
       console.error('Error:', error);
       // Handle network errors or other exceptions
@@ -821,11 +1106,11 @@ export default function Register() {
       console.log("Passwords do not match.");
       return; // Prevent signup when passwords don't match
     }
+
     // Log the formData before sending it to the backend
     console.log('VendorData to be sent to the backend:', vendorData);
 
     try {
-      const apiURL = process.env.VITE_API_BASE_URL;
       const response = await fetch(`${apiURL}/register_vendor`, {
         method: 'POST',
         headers: {
@@ -839,11 +1124,28 @@ export default function Register() {
         const vendorID = await response.json();
         if (vendorID.id !== 0) {
           console.log("Vendor in DB")
-          resetFormFields()
-          setShowAlert(true);
-          setTimeout(() => {
-            window.location.href = '/login';
-          }, 3000);
+          try {
+            const response = await fetch(`${apiURL}/register_otp?email=${vendorData.email}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            });
+
+            if (response.status === 200) {
+              // Registration successful, handle accordingly (e.g., show a success message)
+              const vendorOtp = await response.json();
+              if (vendorOtp.otp !== 0) {
+                setVendorOpenClose(true);
+              }
+            } else {
+              // Registration failed, handle accordingly (e.g., show an error message)
+              console.error('Error:', response.statusText);
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            // Handle network errors or other exceptions
+          }
         }
         else {
           if (vendorID.username !== 0) {
@@ -881,6 +1183,59 @@ export default function Register() {
         // Registration failed, handle accordingly (e.g., show an error message)
         console.error('Error:', response.statusText);
       }
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle network errors or other exceptions
+    }
+  }
+
+  const handleVendorOtpSubmit = async () => {
+    try {
+      const otpResponse = await fetch(`${apiURL}/verify_otp?otp=${vendorData.otp}&email=${vendorData.email}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (otpResponse.status === 200) {
+        const otp = await otpResponse.json();
+        if (otp.otp === 1) {
+          resetFormFields()
+          setVendorOpenClose(false)
+          setShowAlert(true);
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 3000);
+        }
+        else {
+          setVendorErrors((prevErrors) => ({
+            ...prevErrors,
+            otp: true,
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle network errors or other exceptions
+    }
+  }
+
+  const closeVendorModal = async () => {
+    setVendorOpenClose(false)
+    setVendorData((prevErrors) => ({
+      ...prevErrors,
+      otp: "",
+    }));
+
+    try {
+      await
+        fetch(`${apiURL}/delete_record?id=${userId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
     } catch (error) {
       console.error('Error:', error);
       // Handle network errors or other exceptions
@@ -952,7 +1307,13 @@ export default function Register() {
                     dupError={customersDupErrors}
                     handleChange={handleCustomerChange}
                     isPasswordMatch={isPasswordMatch}
-                    handleSubmit={handleCustomerSubmit} />
+                    isOpen={isCustomerOpen}
+                    handleSubmit={handleCustomerSubmit}
+                    handleOtpSubmit={handleCustomerOtpSubmit}
+                    handleCloseModal={closeCustomerModal}
+                    setData={(data) => setCustomerData({ ...customerData, ...data })}
+                    setError={(error) => setCustomerErrors(error)}
+                  />
                 </TabPanel>
                 <TabPanel>
                   <VendorSignUp
@@ -961,7 +1322,13 @@ export default function Register() {
                     dupError={vendorsDupErrors}
                     handleChange={handleVendorChange}
                     isPasswordMatch={isPasswordMatch}
-                    handleSubmit={handleVendorSubmit} />
+                    isOpen={isVendorOpen}
+                    handleSubmit={handleVendorSubmit}
+                    handleOtpSubmit={handleVendorOtpSubmit}
+                    handleCloseModal={closeVendorModal}
+                    setData={(data) => setVendorData({ ...vendorData, ...data })}
+                    setError={(error) => setVendorErrors(error)}
+                  />
                 </TabPanel>
               </TabPanels>
             </Tabs>
