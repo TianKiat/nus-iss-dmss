@@ -9,8 +9,8 @@ class UserProfileGateway():
     def __init__(self):
         pass
 
-    def retrive_profile(self, db: Session, id):
+    def retrive_profile(self, db: Session, userId):
         try:
-            return db.query(UserProfile).filter(UserProfile.userID == id).first()
+            return db.query(UserProfile).filter(UserProfile.userID == userId).first()
         except Exception as e:
             print(f"Error: {e}")

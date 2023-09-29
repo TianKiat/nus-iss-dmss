@@ -26,9 +26,9 @@ class TestRegisterController(unittest.TestCase):
 
     def test_user_profile(self):
         # Mocking customer data
-        mock_id = '1'
+        mock_id = "1"
         # Call the method
-        result = UserProfileController.get_user_profile(self.session, mock_id)
+        result = UserProfileController.get_user_profile(self, self.session, mock_id)
         # Assert that the result is as expected
         self.assertEqual(result.profileName, 'Moses')
         self.assertEqual(result.email, 'moses@example.com')

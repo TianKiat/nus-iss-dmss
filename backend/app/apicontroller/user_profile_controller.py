@@ -6,5 +6,5 @@ class UserProfileController():
     def __init__(self):
         pass
 
-    def get_user_profile(db, id):
-        return UserProfileService.retrive_profile(db, id)
+    def get_user_profile(self, db, userId: str):
+        return UserProfileService.retrive_profile(self, db, userId)

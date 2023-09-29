@@ -13,7 +13,6 @@ def get_db():
     finally:
         db.close()
 
-@router.get("/user_profile/{id}")
-def get_user_profile(id:str, db: Session = Depends(get_db)):
-    result = UserProfileController.get_user_profile(db, id)
-    return result
+@router.get("/user_profile/{userId}")
+def get_user_profile(userId:str, db: Session = Depends(get_db)):
+    return UserProfileController.get_user_profile(db, userId)
