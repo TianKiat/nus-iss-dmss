@@ -1,6 +1,5 @@
 from app.apicontroller.user_profile_controller import UserProfileController
-from app.common.user_model import User
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from run import SessionLocal
 from sqlalchemy.orm import Session
 
@@ -15,4 +14,4 @@ def get_db():
 
 @router.get("/user_profile/{userId}")
 def get_user_profile(userId:str, db: Session = Depends(get_db)):
-    return UserProfileController.get_user_profile(db, userId)
+    return UserProfileController().get_user_profile(db, userId)

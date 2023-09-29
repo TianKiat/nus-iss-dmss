@@ -12,5 +12,5 @@ class UserProfileGateway():
     def retrive_profile(self, db: Session, userId):
         try:
             return db.query(UserProfile).filter(UserProfile.userID == userId).first()
-        except Exception as e:
-            print(f"Error: {e}")
+        except RuntimeError as exception:
+            print(f"Error: {exception}")

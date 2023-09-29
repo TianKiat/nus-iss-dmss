@@ -1,6 +1,4 @@
 from app.datasource.user_profile_gateway import UserProfileGateway
-from app.common.user_model import User
-
 # import service class needed
 # import gateway class needed
 
