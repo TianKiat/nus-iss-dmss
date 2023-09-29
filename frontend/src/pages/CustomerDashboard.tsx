@@ -18,6 +18,7 @@ import {
     Tabs,
     Tbody,
     Td,
+    Text,
     Tr,
     UnorderedList
 } from '@chakra-ui/react'
@@ -171,11 +172,15 @@ interface CustomerDashboardProps {
 }
  
 export default function (props : CustomerDashboardProps) {
+    const [showOrderList, setShowOrderList] = useState(false);
     const [orderHistory, setOrderHistory] = useState([]);
+    const [favoriteOrder, setFavoriteOrder] = useState([]);
     const [updateOrderHistoryTrigger, setUpdateOrderHistoryTrigger] = useState();
     
     useEffect(() => {
         const fetchAccess = async() => {
+            setShowOrderList(false);
+            
             const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/order_history`, {
                 method: 'POST',
                 body: JSON.stringify({userID: props.userID}),
@@ -186,6 +191,15 @@ export default function (props : CustomerDashboardProps) {
             });
             const result = await response.json();
             setOrderHistory(result);
+
+            const favoriteOrderList: any = result.filter(
+                (item: { [x: string]: { [x: string]: any } }) => {
+                    return item["invoice"]["isFavorite"]
+                }
+            );
+            setFavoriteOrder(favoriteOrderList);
+
+            setShowOrderList(true);
         }
 
         fetchAccess();
@@ -213,38 +227,50 @@ export default function (props : CustomerDashboardProps) {
                     </TabList>
                     <TabPanels>
                         <TabPanel>
-                            {orderHistory.map((item) => {
-                                if (item["invoice"]["isFavorite"]) {
-                                    return (
-                                        <LongCard
-                                            key={item["invoice"]["invoiceID"]}
-                                            userID={props.userID}
-                                            invoiceID={item["invoice"]["invoiceID"]}
-                                            isFavorite={true}
-                                            vendorName={item["vendor"]["profileName"]}
-                                            date={dateStringFormatTransform(item["invoice"]["date"])}
-                                            menuitems={ordersToMenuitemsList(item["orders"])}
-                                            price={item["invoice"]["totalPrice"]}
-                                            updateOrderHistoryTriggerFunction={setUpdateOrderHistoryTrigger}
-                                        />
+                            {
+                                showOrderList ?
+                                    (
+                                        favoriteOrder.length > 0 ?
+                                            favoriteOrder.map((item) => (
+                                                <LongCard
+                                                    key={item["invoice"]["invoiceID"]}
+                                                    userID={props.userID}
+                                                    invoiceID={item["invoice"]["invoiceID"]}
+                                                    isFavorite={item["invoice"]["isFavorite"]}
+                                                    vendorName={item["vendor"]["profileName"]}
+                                                    date={dateStringFormatTransform(item["invoice"]["date"])}
+                                                    menuitems={ordersToMenuitemsList(item["orders"])}
+                                                    price={item["invoice"]["totalPrice"]}
+                                                    updateOrderHistoryTriggerFunction={setUpdateOrderHistoryTrigger}
+                                                />
+                                            ))
+                                            : <Text>No order history</Text>
                                     )
-                                }
-                            })}
+                                    : <Text>Loading ...</Text>
+                            }
                         </TabPanel>
                         <TabPanel>
-                            {orderHistory.map((item) => (
-                                <LongCard
-                                    key={item["invoice"]["invoiceID"]}
-                                    userID={props.userID}
-                                    invoiceID={item["invoice"]["invoiceID"]}
-                                    isFavorite={item["invoice"]["isFavorite"]}
-                                    vendorName={item["vendor"]["profileName"]}
-                                    date={dateStringFormatTransform(item["invoice"]["date"])}
-                                    menuitems={ordersToMenuitemsList(item["orders"])}
-                                    price={item["invoice"]["totalPrice"]}
-                                    updateOrderHistoryTriggerFunction={setUpdateOrderHistoryTrigger}
-                                />
-                            ))}
+                            {
+                                showOrderList ?
+                                    (
+                                        orderHistory.length > 0 ?
+                                            orderHistory.map((item) => (
+                                                <LongCard
+                                                    key={item["invoice"]["invoiceID"]}
+                                                    userID={props.userID}
+                                                    invoiceID={item["invoice"]["invoiceID"]}
+                                                    isFavorite={item["invoice"]["isFavorite"]}
+                                                    vendorName={item["vendor"]["profileName"]}
+                                                    date={dateStringFormatTransform(item["invoice"]["date"])}
+                                                    menuitems={ordersToMenuitemsList(item["orders"])}
+                                                    price={item["invoice"]["totalPrice"]}
+                                                    updateOrderHistoryTriggerFunction={setUpdateOrderHistoryTrigger}
+                                                />
+                                            ))
+                                            : <Text>No order history</Text>
+                                    )
+                                    : <Text>Loading ...</Text>
+                            }
                         </TabPanel>
                     </TabPanels>
                 </Tabs>
