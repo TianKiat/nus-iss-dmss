@@ -1,19 +1,20 @@
-from app.service.user_service import RegisterFactory, UserService
+from app.service.user_service import RegisterFactory, ValidateFieldOTPFactory, UserService
 
 class RegisterUserController():
     def __init__(self):
         pass
 
+    def validate_fields_otp(self, db, data):
+        service = ValidateFieldOTPFactory().create_validate(data.role)
+        validate_val = service.validate_fields_otp(db, data)
+        if validate_val:
+            return validate_val
+        return UserService().generate_otp_email(db, data)
+
     def register(self, db, user):
-        service = RegisterFactory().create_register(user.role)
-        return service.register(db, user)
-
-    def generate_otp(self, db, email):
-        return UserService().generate_otp_email(db, email)
-
-    def verify_otp(self, db, otp, email):
-        return UserService().verify_otp(db, otp, email)
-
-    def delete_record(self, db, del_id):
-        return UserService().delete_record(db, del_id)
+        verify_otp = UserService().verify_otp(db, user.otp, user.email)
+        if verify_otp:
+            service = RegisterFactory().create_register(user.role)
+            return service.register(db, user)
+        return {'id': -1}
     

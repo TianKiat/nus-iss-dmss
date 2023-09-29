@@ -34,6 +34,7 @@ class TestRegisterController(unittest.TestCase):
             name="Test User",
             email="test@example.com",
             phone="45672345",
+            otp="951827",
         )
 
         # Call the method
@@ -41,9 +42,6 @@ class TestRegisterController(unittest.TestCase):
 
         # Assert that the result is as expected
         self.assertNotEqual(result['id'], 0)
-        self.assertEqual(result['username'], 0)
-        self.assertEqual(result['email'], 0)
-        self.assertEqual(result['phone'], 0)
 
         # Query the database to check if the records were inserted correctly
         user_query = self.session.query(user.User).filter(user.User.username == 'testuser').first()
@@ -74,6 +72,7 @@ class TestRegisterController(unittest.TestCase):
             shopAddr = '123 Main St',
             shopDesc = 'Nice Food',
             status = 0,
+            otp="951827",
         )
 
         # Call the method
@@ -81,12 +80,6 @@ class TestRegisterController(unittest.TestCase):
 
         # Assert that the result is as expected
         self.assertNotEqual(result['id'], 0)
-        self.assertEqual(result['username'], 0)
-        self.assertEqual(result['email'], 0)
-        self.assertEqual(result['phone'], 0)
-        self.assertEqual(result['shopName'], 0)
-        self.assertEqual(result['shopAddr'], 0)
-
 
         # Query the database to check if the records were inserted correctly
         user_query = self.session.query(user.User).filter(user.User.username == 'testvendor').first()

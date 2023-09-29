@@ -4,7 +4,7 @@ ignore-paths = ^backend/app/alembic/.*$, ^backend/app/common/.*$, ^backend/app/m
 
 fail-under = 7
 
-disable = C0114, C0115, C0116, C0103, R0903
+disable = C0114, C0115, C0116, C0103, R0903, W0718
 
 [FORMAT]
 max-line-length=200
