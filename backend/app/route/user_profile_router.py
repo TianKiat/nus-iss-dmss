@@ -1,8 +1,8 @@
-from fastapi import APIRouter, HTTPException, Depends
-from sqlalchemy.orm import Session
 from app.apicontroller.user_profile_controller import UserProfileController
-from run import SessionLocal
 from app.common.user_model import User
+from fastapi import APIRouter, Depends, HTTPException
+from run import SessionLocal
+from sqlalchemy.orm import Session
 
 router = APIRouter()
 

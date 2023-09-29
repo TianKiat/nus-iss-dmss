@@ -1,19 +1,17 @@
 'use client'
 
 import {
-  Flex,
   Box,
-  FormControl,
-  FormLabel,
-  Input,
-  Checkbox,
-  Stack,
-  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Flex,
   Heading,
+  Stack,
+  StackDivider,
   Text,
-  useColorModeValue,
-  Card, CardHeader, CardBody, CardFooter, StackDivider, HStack
-} from '@chakra-ui/react'
+  useColorModeValue
+} from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 interface UserData {
   profileName: string;

@@ -1,10 +1,11 @@
 import unittest
-from unittest.mock import MagicMock
+from app.apicontroller.user_profile_controller import UserProfileController
 from app.helper.test_fixtures import setup_test_fixtures
+from app.models import user
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from app.models import user, user_profile
-from app.apicontroller.user_profile_controller import UserProfileController
+
+
 class TestRegisterController(unittest.TestCase):
 
     def setUp(self):
