@@ -48,13 +48,22 @@ class UserService():
         except Exception as e:
             print(f'Error: {e}')
 
-    def generate_otp_email(self, db, email):
+    # def generate_otp_email(self, db, email):
+    #     otp = self.generate_otp(6)
+    #     print(otp)
+    #     if self.send_otp_email(otp, email):
+    #         # save otp and email to db for check
+    #         hashed_otp = bcrypt.hashpw(otp.encode('utf-8'), bcrypt.gensalt())
+    #         UserGateway().modify_otp_data(db, hashed_otp, email)
+    #         return {"otp": 1}
+    #     return {"otp": 0}
+    def generate_otp_email(self, db, data):
         otp = self.generate_otp(6)
         print(otp)
-        if self.send_otp_email(otp, email):
+        if self.send_otp_email(otp, data.email):
             # save otp and email to db for check
             hashed_otp = bcrypt.hashpw(otp.encode('utf-8'), bcrypt.gensalt())
-            UserGateway().modify_otp_data(db, hashed_otp, email)
+            UserGateway().modify_otp_data(db, hashed_otp, data.email)
             return {"otp": 1}
         return {"otp": 0}
 
@@ -64,11 +73,8 @@ class UserService():
         filtered_otp = next(filter(lambda x: x.email.lower() == email.lower(), otps_data))
         valid_otp = bcrypt.checkpw(otp.encode('utf-8'), filtered_otp.otp.encode("utf-8"))
         if valid_otp:
-            return {"otp": 1}
-        return {"otp": 0}
-
-    def delete_record(self, db, del_id):
-        UserGateway().delete_record(db, del_id)
+            return True
+        return False
 
     def login_user(self, db, user: Login):
         return UserGateway().auth(db, user)
@@ -80,12 +86,37 @@ class Register:
 class CustomerRegister(Register):
     @override
     def register(self, db, customer: User):
-        response_dict = {
-            'id': 0,
-            'username': 0,
-            'email': 0,
-            'phone': 0 
-        }
+        # hash password
+        hashed_password = bcrypt.hashpw(customer.password.encode('utf-8'), bcrypt.gensalt())
+        customer.password = hashed_password
+        user_id = UserGateway().register_customer_data(db, customer)
+        return {"id": user_id}
+
+class VendorRegister(Register):
+    @override
+    def register(self, db, vendor: Vendor):
+        # hash password
+        hashed_password = bcrypt.hashpw(vendor.password.encode('utf-8'), bcrypt.gensalt())
+        vendor.password = hashed_password
+        user_id = UserGateway().register_vendor_data(db, vendor)
+        return {"id": user_id}
+
+class RegisterFactory:
+    def create_register(self, role):
+        if role == 2: # vendor
+            return VendorRegister()
+        if role == 3: # customer
+            return CustomerRegister()
+
+
+class ValidateFieldsOTP:
+    def validate_fields_otp(self):
+        pass
+
+class CustomerValidateFieldsOTP(ValidateFieldsOTP):
+    @override
+    def validate_fields_otp(self, db, customer: User):
+        response_dict = {}
         # check for duplicate username
         users_data = UserGateway().retrieve_user_data(db)
         filtered_users = list(filter(lambda x: x.username.lower() == customer.username.lower(), users_data))
@@ -102,26 +133,15 @@ class CustomerRegister(Register):
         if len(filtered_phone) != 0:
             response_dict['phone'] = 1
 
-        if len(filtered_users) == 0 and len(filtered_customers) == 0 and len(filtered_phone) == 0:
-            # hash password
-            hashed_password = bcrypt.hashpw(customer.password.encode('utf-8'), bcrypt.gensalt())
-            customer.password = hashed_password
-            user_id = UserGateway().register_customer_data(db, customer)
-            response_dict['id'] = user_id
+        if response_dict:
+            response_dict['otp'] = 0
 
         return response_dict
 
-class VendorRegister(Register):
+class VendorValidateFieldsOTP(ValidateFieldsOTP):
     @override
-    def register(self, db, vendor: Vendor):
-        response_dict = {
-            'id': 0,
-            'username': 0,
-            'email': 0,
-            'phone': 0,
-            'shopName': 0,
-            'shopAddr': 0
-        }
+    def validate_fields_otp(self, db, vendor: Vendor):
+        response_dict = {}
         # check for duplicate username
         users_data = UserGateway().retrieve_user_data(db)
         filtered_users = list(filter(lambda x: x.username.lower() == vendor.username.lower(), users_data))
@@ -148,22 +168,14 @@ class VendorRegister(Register):
         if len(filtered_vendor_shop_addr) != 0:
             response_dict['shopAddr'] = 1
 
-        if len(filtered_users) == 0 and len(filtered_vendor_email) == 0 and len(filtered_phone) == 0 \
-            and len(filtered_vendor_shop_name) == 0 and len(filtered_vendor_shop_addr) == 0:
-
-            # hash password
-            hashed_password = bcrypt.hashpw(vendor.password.encode('utf-8'), bcrypt.gensalt())
-            vendor.password = hashed_password
-
-            user_id = UserGateway().register_vendor_data(db, vendor)
-            response_dict['id'] = user_id
+        if response_dict:
+            response_dict['otp'] = 0
 
         return response_dict
 
-class RegisterFactory:
-    def create_register(self, role):
+class ValidateFieldOTPFactory:
+    def create_validate(self, role):
         if role == 2: # vendor
-            return VendorRegister()
+            return VendorValidateFieldsOTP()
         if role == 3: # customer
-            return CustomerRegister()
-
+            return CustomerValidateFieldsOTP()

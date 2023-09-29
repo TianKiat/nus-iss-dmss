@@ -1,5 +1,5 @@
 import datetime
-from app.models import access, access_control, role, user, user_profile, vendor_profile, menuitem, invoice, order, promotion
+from app.models import access, access_control, role, user, user_profile, vendor_profile, menuitem, invoice, order, promotion, otp
 
 def add_single_row_to_table(session, table_cls, values):
     new_row = table_cls(**values)
@@ -29,6 +29,7 @@ def setup_test_fixtures(session):
     setup_invoice_table(session)
     setup_order_table(session)
     setup_promotion_table(session)
+    setup_otp_table(session)
 
 def setup_access_table(session):
     values = [
@@ -101,3 +102,10 @@ def setup_promotion_table(session):
         {'promoCode': 'NDP2023', 'discount': 25, 'minimumSpending': 75, 'isValid': True}
     ]
     add_multiple_row_to_table(session, promotion.Promotion, values)
+
+def setup_otp_table(session):
+    values = [
+        {'otp': '$2b$12$qv/EDAIrMDCiDEv8b4j2yu0mcbwxqVtoLsbrgSSrYxL4P2VfCzoUG', 'email': 'test@example.com'},
+        {'otp': '$2b$12$qv/EDAIrMDCiDEv8b4j2yu0mcbwxqVtoLsbrgSSrYxL4P2VfCzoUG', 'email': 'vendor@test.com'},
+    ]
+    add_multiple_row_to_table(session, otp.Otp, values)

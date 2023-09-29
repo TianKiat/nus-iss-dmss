@@ -7,6 +7,7 @@ class User(BaseModel):
     email: str
     phone: str
     role: int
+    otp: str
 
 class Vendor(BaseModel):
     username: str
@@ -18,6 +19,7 @@ class Vendor(BaseModel):
     shopName: str
     shopDesc: str
     status: int
+    otp: str
 
 class Login(BaseModel):
     username: str
