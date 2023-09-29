@@ -12,3 +12,4 @@ class VendorProfile(Base):
     phone = Column(CHAR(8), unique=True, nullable=False)
     status = Column(Boolean, nullable=False)
     userID = Column(Integer, ForeignKey(User.userID), unique=True, nullable=False)
+    shopDesc = Column(String(500),nullable=True)

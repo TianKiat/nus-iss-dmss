@@ -1,11 +1,7 @@
 import uuid
-import mysql.connector
 from sqlalchemy.orm import Session
 from app.common.user_model import User, Vendor, Login
-from app.models import user, user_profile, vendor_profile
-from app.common.constants import DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE
-
-sqldb = mysql.connector.connect(host = DB_HOST, user = DB_USERNAME, password = DB_PASSWORD, database = DB_DATABASE)
+from app.models import user, user_profile, vendor_profile, otp
 
 class UserGateway():
     def __init__(self):
@@ -29,7 +25,29 @@ class UserGateway():
         except Exception as e:
             print(f"Error: {e}")
 
-    def insert_customer_data(self, db: Session, customer: User):
+    def retrieve_otp_data(self, db: Session):
+        try:
+            return db.query(otp.Otp).all()
+        except Exception as e:
+            print(f"Error: {e}")
+
+    def modify_otp_data(self, db: Session, otp2, email):
+        try:
+            data_to_update = db.query(otp.Otp).filter(otp.Otp.email == email).first()
+            if data_to_update:
+                data_to_update.otp = otp2
+            else:
+                otp_data = {
+                    'otp': otp2,
+                    'email': email
+                }
+                otp_table = otp.Otp(**otp_data)
+                db.add(otp_table)
+            db.commit()
+        except Exception as e:
+            print(f"Error: {e}")
+
+    def register_customer_data(self, db: Session, customer: User):
         try:
             user_data = {
                 'username': customer.username,
@@ -40,7 +58,7 @@ class UserGateway():
             db.add(user_table)
             db.commit()
 
-            user_id_object = db.query(user.User).filter(user.User.username == customer.username).first()
+            user_id_object = db.query(user.User).filter(user.User.username == user_data['username']).first()
 
             if user_id_object:
                 user_id = user_id_object.userID
@@ -60,7 +78,7 @@ class UserGateway():
         except Exception as e:
             print(f"Error: {e}")
 
-    def insert_vendor_data(self, db: Session, vendor: Vendor):
+    def register_vendor_data(self, db: Session, vendor: Vendor):
         try:
             user_data = {
                 'username': vendor.username,
@@ -71,17 +89,18 @@ class UserGateway():
             db.add(user_table)
             db.commit()
 
-            user_id_object = db.query(user.User).filter(user.User.username == vendor.username).first()
+            user_id_object = db.query(user.User).filter(user.User.username == user_data['username']).first()
             if user_id_object:
                 user_id = user_id_object.userID
 
             vendor_profile_data = {
-                'profileName': vendor.name,
-                'address': vendor.address,
+                'profileName': vendor.shopName,
+                'address': vendor.shopAddr,
                 'email': vendor.email,
                 'phone': vendor.phone,
                 'status': vendor.status,
-                'userID': user_id
+                'userID': user_id,
+                'shopDesc':vendor.shopDesc
             }
             vendor_profile_table = vendor_profile.VendorProfile(**vendor_profile_data)
             db.add(vendor_profile_table)
@@ -91,6 +110,22 @@ class UserGateway():
 
         except Exception as e:
             print(f"Error: {e}")
+
+    def delete_record(self, db: Session, del_id):
+        user_profile_to_delete = db.query(user_profile.UserProfile).filter(user_profile.UserProfile.userID == del_id).first()
+        if user_profile_to_delete:
+            db.delete(user_profile_to_delete)
+            db.commit()
+
+        vendor_profile_to_delete = db.query(vendor_profile.VendorProfile).filter(vendor_profile.VendorProfile.userID == del_id).first()
+        if vendor_profile_to_delete:
+            db.delete(vendor_profile_to_delete)
+            db.commit()
+
+        user_to_delete = db.query(user.User).filter(user.User.userID == del_id).first()
+        if user_to_delete:
+            db.delete(user_to_delete)
+            db.commit()
 
     # login authentication
     def auth(self, db: Session, login: Login):
