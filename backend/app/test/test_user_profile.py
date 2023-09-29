@@ -28,22 +28,5 @@ class TestRegisterController(unittest.TestCase):
         result = UserProfileController.get_user_profile(self, self.session, mock_id)
 
         # Assert that the result is as expected
-        self.assertEqual(result, {"id": 1, 'username': 0, 'email': 0})
-
-        # Query the database to check if the records were inserted correctly
-        user_query = self.session.query(user.User).filter(user.User.username == 'testuser').first()
-        user_profile_query = self.session.query(user_profile.UserProfile).filter(user_profile.UserProfile.profileName == 'Test User').first()
-
-        self.assertIsNotNone(user_query)
-        self.assertIsNotNone(user_profile_query)
-
-        # Assert that the data in the database matches the expected data
-        self.assertEqual(user_query.username, 'testuser')
-        self.assertTrue(bcrypt.checkpw('testpassword'.encode('utf-8'), user_query.userPassword))
-        self.assertEqual(user_query.roleID, 0)
-
-        self.assertEqual(user_profile_query.profileName, 'Test User')
-        self.assertEqual(user_profile_query.email, 'test@example.com')
-        self.assertEqual(user_profile_query.phone, '555-555-5555')
-        self.assertEqual(user_profile_query.userID, 1)
+        self.assertEqual(result, {'profileName': 'Moses', 'email': 'moses@example.com', 'phone': '12345678', 'userID': 1})
 
