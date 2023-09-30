@@ -347,11 +347,12 @@ function CustomerSignUp({ formData, error, dupError, handleChange, isPasswordMat
   const handleResendClick = async () => {
     try {
       const apiURL = process.env.VITE_API_BASE_URL;
-      await fetch(`${apiURL}/register_otp?email=${formData.email}`, {
+      await fetch(`${apiURL}/validate_customer_fields_otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify(formData),
       });
     } catch (error) {
       console.error('Error:', error);
@@ -520,11 +521,12 @@ function VendorSignUp({ formData, error, dupError, handleChange, isPasswordMatch
   const handleResendClick = async () => {
     try {
       const apiURL = process.env.VITE_API_BASE_URL;
-      await fetch(`${apiURL}/register_otp?email=${formData.email}`, {
+      await fetch(`${apiURL}/validate_vendor_fields_otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify(formData),
       });
     } catch (error) {
       console.error('Error:', error);
@@ -679,8 +681,6 @@ export default function Register() {
     status: 0,
     otp: "",
   };
-  const [userId, setUserId] = useState(0);
-
   const [showAlert, setShowAlert] = useState(false);
 
   const [selectedTab, setSelectedTab] = useState<number>(0);
@@ -796,7 +796,6 @@ export default function Register() {
       shopName: false,
       shopAddr: false,
     });
-    setUserId(0);
   };
 
   const handleCustomerChange = (e: { target: { name: string; value: string; }; }) => {
@@ -931,7 +930,7 @@ export default function Register() {
     console.log('CustomerData to be sent to the backend:', customerData);
 
     try {
-      const response = await fetch(`${apiURL}/register_customer`, {
+      const response = await fetch(`${apiURL}/validate_customer_fields_otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -941,47 +940,24 @@ export default function Register() {
 
       if (response.status === 200) {
         // Registration successful, handle accordingly (e.g., show a success message)
-        const customerID = await response.json();
-        if (customerID.id !== 0) {
-          setUserId(customerID.id)
-          console.log("Customer in DB")
-          try {
-            const otpResponse = await fetch(`${apiURL}/register_otp?email=${customerData.email}`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            });
-
-            if (otpResponse.status === 200) {
-              // Registration successful, handle accordingly (e.g., show a success message)
-              const customerOtp = await otpResponse.json();
-              if (customerOtp.otp !== 0) {
-                setCustomerOpenClose(true);
-              }
-            } else {
-              // Registration failed, handle accordingly (e.g., show an error message)
-              console.error('Error:', otpResponse.statusText);
-            }
-          } catch (error) {
-            console.error('Error:', error);
-            // Handle network errors or other exceptions
-          }
+        const customer = await response.json();
+        if (customer.otp === 1) {
+          setCustomerOpenClose(true);
         }
         else {
-          if (customerID.username !== 0) {
+          if (Object.prototype.hasOwnProperty.call(customer, 'username') && customer.username !== 0) {
             setCustomerDupErrors(prevErrors => ({
               ...prevErrors,
               username: true
             }));
           }
-          if (customerID.email !== 0) {
+          if (Object.prototype.hasOwnProperty.call(customer, 'email') && customer.email !== 0) {
             setCustomerDupErrors(prevErrors => ({
               ...prevErrors,
               email: true
             }));
           }
-          if (customerID.phone !== 0) {
+          if (Object.prototype.hasOwnProperty.call(customer, 'phone') && customer.phone !== 0) {
             setCustomerDupErrors(prevErrors => ({
               ...prevErrors,
               phone: true
@@ -1000,29 +976,30 @@ export default function Register() {
 
   const handleCustomerOtpSubmit = async () => {
     try {
-      const otpResponse = await
-        fetch(`${apiURL}/verify_otp?otp=${customerData.otp}&email=${customerData.email}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+      const otpResponse = await fetch(`${apiURL}/register_customer`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(customerData),
+      });
 
       if (otpResponse.status === 200) {
         const otp = await otpResponse.json();
-        if (otp.otp === 1) {
+        if (otp.id === -1) {
+          setCustomerErrors((prevErrors) => ({
+            ...prevErrors,
+            otp: true,
+          }));
+        }
+        else {
+          console.log("Customer in DB")
           resetFormFields()
           setCustomerOpenClose(false)
           setShowAlert(true);
           setTimeout(() => {
             window.location.href = '/login';
           }, 3000);
-        }
-        else {
-          setCustomerErrors((prevErrors) => ({
-            ...prevErrors,
-            otp: true,
-          }));
         }
       }
     } catch (error) {
@@ -1037,19 +1014,6 @@ export default function Register() {
       ...prevErrors,
       otp: "",
     }));
-
-    try {
-      await
-        fetch(`${apiURL}/delete_record?id=${userId}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-    } catch (error) {
-      console.error('Error:', error);
-      // Handle network errors or other exceptions
-    }
   }
 
   const handleVendorSubmit = async () => {
@@ -1111,7 +1075,7 @@ export default function Register() {
     console.log('VendorData to be sent to the backend:', vendorData);
 
     try {
-      const response = await fetch(`${apiURL}/register_vendor`, {
+      const response = await fetch(`${apiURL}/validate_vendor_fields_otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1121,58 +1085,36 @@ export default function Register() {
 
       if (response.status === 200) {
         // Registration successful, handle accordingly (e.g., show a success message)
-        const vendorID = await response.json();
-        if (vendorID.id !== 0) {
-          console.log("Vendor in DB")
-          try {
-            const response = await fetch(`${apiURL}/register_otp?email=${vendorData.email}`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            });
-
-            if (response.status === 200) {
-              // Registration successful, handle accordingly (e.g., show a success message)
-              const vendorOtp = await response.json();
-              if (vendorOtp.otp !== 0) {
-                setVendorOpenClose(true);
-              }
-            } else {
-              // Registration failed, handle accordingly (e.g., show an error message)
-              console.error('Error:', response.statusText);
-            }
-          } catch (error) {
-            console.error('Error:', error);
-            // Handle network errors or other exceptions
-          }
+        const vendor = await response.json();
+        if (vendor.otp === 1) {
+          setVendorOpenClose(true);
         }
         else {
-          if (vendorID.username !== 0) {
+          if (Object.prototype.hasOwnProperty.call(vendor, 'username') && vendor.username !== 0) {
             setVendorDupErrors(prevErrors => ({
               ...prevErrors,
               username: true
             }));
           }
-          if (vendorID.email !== 0) {
+          if (Object.prototype.hasOwnProperty.call(vendor, 'email') && vendor.email !== 0) {
             setVendorDupErrors(prevErrors => ({
               ...prevErrors,
               email: true
             }));
           }
-          if (vendorID.phone !== 0) {
+          if (Object.prototype.hasOwnProperty.call(vendor, 'phone') && vendor.phone !== 0) {
             setVendorDupErrors(prevErrors => ({
               ...prevErrors,
               phone: true
             }));
           }
-          if (vendorID.shopName !== 0) {
+          if (Object.prototype.hasOwnProperty.call(vendor, 'shopName') && vendor.shopName !== 0) {
             setVendorDupErrors(prevErrors => ({
               ...prevErrors,
               shopName: true
             }));
           }
-          if (vendorID.shopAddr !== 0) {
+          if (Object.prototype.hasOwnProperty.call(vendor, 'shopAddr') && vendor.shopAddr !== 0) {
             setVendorDupErrors(prevErrors => ({
               ...prevErrors,
               shopAddr: true
@@ -1191,28 +1133,30 @@ export default function Register() {
 
   const handleVendorOtpSubmit = async () => {
     try {
-      const otpResponse = await fetch(`${apiURL}/verify_otp?otp=${vendorData.otp}&email=${vendorData.email}`, {
+      const otpResponse = await fetch(`${apiURL}/register_vendor`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify(vendorData),
       });
 
       if (otpResponse.status === 200) {
         const otp = await otpResponse.json();
-        if (otp.otp === 1) {
+        if (otp.id === -1) {
+          setVendorErrors((prevErrors) => ({
+            ...prevErrors,
+            otp: true,
+          }));
+        }
+        else {
+          console.log("Vendor in DB")
           resetFormFields()
           setVendorOpenClose(false)
           setShowAlert(true);
           setTimeout(() => {
             window.location.href = '/login';
           }, 3000);
-        }
-        else {
-          setVendorErrors((prevErrors) => ({
-            ...prevErrors,
-            otp: true,
-          }));
         }
       }
     } catch (error) {
@@ -1227,19 +1171,6 @@ export default function Register() {
       ...prevErrors,
       otp: "",
     }));
-
-    try {
-      await
-        fetch(`${apiURL}/delete_record?id=${userId}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-    } catch (error) {
-      console.error('Error:', error);
-      // Handle network errors or other exceptions
-    }
   }
 
   return (
