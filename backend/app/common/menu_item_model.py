@@ -5,6 +5,7 @@ class MenuItemModel(BaseModel):
     menuItemID: PositiveInt
     menuItemName: constr(max_length=50)
     price: PositiveFloat
+    menuItemImage : str
     menuItemDesc: constr(max_length=250)
     isValid: StrictBool 
     vendorProfileID: PositiveInt

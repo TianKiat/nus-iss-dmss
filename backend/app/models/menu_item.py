@@ -14,3 +14,12 @@ class MenuItem(Base):
     vendorProfileID = Column(Integer, ForeignKey(VendorProfile.vendorProfileID))
 
     __table_args__ = tuple(UniqueConstraint(menuItemName, vendorProfileID))
+
+    def __init__(self, id, name, price, imageUrl, desc, vendorProfileId):
+        self.menuItemID = id
+        self.menuItemName = name
+        self.price = price
+        self.menuItemImage = imageUrl
+        self.menuItemDesc = desc
+        self.isValid = True
+        self.vendorProfileID = vendorProfileId

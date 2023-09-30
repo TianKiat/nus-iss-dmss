@@ -14,7 +14,7 @@ class VendorController:
         if (user_profile is None):
             return []
         
-        menuItems = MenuItemService.get_menu_item_for_vendor(db, user_profile.vendorProfileID)
+        menuItems = MenuItemService.get_menu_item_for_vendor(db=db, vendorProfileId=user_profile.vendorProfileID)
 
         if len(menuItems) < 1:
             return []
@@ -27,7 +27,19 @@ class VendorController:
         return result
 
     def create_menu_item(db, menuItem : MenuItemModel):
-        return MenuItemModel.model_validate(MenuItemService.create_menu_item_for_vendor(db, menuItem))
+        orm = MenuItem(menuItem.menuItemID,
+                       menuItem.menuItemName,
+                       menuItem.price,
+                       menuItem.menuItemImage,
+                       menuItem.menuItemDesc,
+                       menuItem.vendorProfileID)
+        return MenuItemModel.model_validate(MenuItemService.create_menu_item_for_vendor(db=db, menuItem=orm))
     
     def update_menu_item(db, menuItem : MenuItemModel):
-        return MenuItemModel.model_validate(MenuItemService.update_menu_item_for_vendor(db, menuItem))
+        orm = MenuItem(menuItem.menuItemID,
+                       menuItem.menuItemName,
+                       menuItem.price,
+                       menuItem.menuItemImage,
+                       menuItem.menuItemDesc,
+                       menuItem.vendorProfileID)
+        return MenuItemModel.model_validate(MenuItemService.update_menu_item_for_vendor(db=db, menuItem=orm))
