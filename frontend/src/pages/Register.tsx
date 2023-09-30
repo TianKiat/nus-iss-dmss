@@ -24,9 +24,17 @@ import {
   AlertIcon,
   AlertDescription,
   AlertTitle,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import React from "react";
 
 interface ICustomerData {
   name: string,
@@ -36,9 +44,11 @@ interface ICustomerData {
   phone: string,
   reEnterPassword: string,
   role: string,
+  otp: string,
 }
 
-interface IVendorData extends ICustomerData {
+interface IVendorData extends Omit<ICustomerData, 'name'> {
+  shopAddr: string
   shopName: string,
   shopDesc: string,
 }
@@ -70,9 +80,10 @@ function NameField({ name, nameError, onChange }: {
   )
 }
 
-function UsernameField({ username, usernameError, onChange }: {
+function UsernameField({ username, usernameError, usernameDup, onChange }: {
   username: string;
   usernameError: boolean;
+  usernameDup: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
 
@@ -81,7 +92,7 @@ function UsernameField({ username, usernameError, onChange }: {
       <FormControl
         id="username"
         isRequired
-        isInvalid={usernameError}
+        isInvalid={usernameError || usernameDup}
       >
         <FormLabel>Username</FormLabel>
         <Input
@@ -92,15 +103,17 @@ function UsernameField({ username, usernameError, onChange }: {
         />
         {/* Display error message */}
         {usernameError ? (<FormErrorMessage>Required</FormErrorMessage>) : ("")}
+        {usernameDup ? (<FormErrorMessage>Username already exists</FormErrorMessage>) : ("")}
       </FormControl>
     </>
   )
 }
 
-function EmailField({ email, emailError, emailValid, onChangeEmail }: {
+function EmailField({ email, emailError, emailValid, emailDup, onChangeEmail }: {
   email: string;
   emailError: boolean;
   emailValid: boolean;
+  emailDup: boolean;
   onChangeEmail: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
@@ -108,7 +121,7 @@ function EmailField({ email, emailError, emailValid, onChangeEmail }: {
       <FormControl
         id="email"
         isRequired
-        isInvalid={emailError || !emailValid}
+        isInvalid={emailError || !emailValid || emailDup}
       >
         <FormLabel>Email address</FormLabel>
         <Input
@@ -120,14 +133,18 @@ function EmailField({ email, emailError, emailValid, onChangeEmail }: {
         {/* Display error message */}
         {emailError ? (<FormErrorMessage>Required</FormErrorMessage>) : ("")}
         {(!emailValid && !emailError && email !== "") ? (<FormErrorMessage>Invalid email address</FormErrorMessage>) : ""}
+        {emailDup ? (<FormErrorMessage>Email already exists</FormErrorMessage>) : ("")}
+
       </FormControl>
     </>
   )
 }
 
-function PhoneField({ phone, phoneError, onChange }: {
+function PhoneField({ phone, phoneError, phoneValid, phoneDupError, onChange }: {
   phone: string;
   phoneError: boolean;
+  phoneValid: boolean;
+  phoneDupError: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
@@ -135,7 +152,7 @@ function PhoneField({ phone, phoneError, onChange }: {
       <FormControl
         id="phone"
         isRequired
-        isInvalid={phoneError}
+        isInvalid={phoneError || !phoneValid || phoneDupError}
       >
         <FormLabel>HP No.</FormLabel>
         <Input
@@ -146,6 +163,8 @@ function PhoneField({ phone, phoneError, onChange }: {
         />
         {/* Display error message */}
         {phoneError ? (<FormErrorMessage>Required</FormErrorMessage>) : ("")}
+        {(!phoneValid && !phoneError && phone !== "") ? (<FormErrorMessage>Invalid phone number - Only 8 digits</FormErrorMessage>) : ""}
+        {phoneDupError ? (<FormErrorMessage>HP No. already exists</FormErrorMessage>) : ("")}
       </FormControl>
     </>
   )
@@ -221,11 +240,15 @@ function PasswordsField({ password, reEnterPassword, passwordError, reEnterPassw
     </>)
 }
 
-function ShopFields({ shopName, shopDesc, shopNameError, shopDescError, onChangeShop }: {
+function ShopFields({ shopName, shopAddr, shopDesc, shopNameError, shopAddrError, shopDescError, shopNameDupError, shopAddrDupError, onChangeShop }: {
   shopName: string,
+  shopAddr: string,
   shopDesc: string,
   shopNameError: boolean;
+  shopAddrError: boolean;
   shopDescError: boolean;
+  shopNameDupError: boolean;
+  shopAddrDupError: boolean;
   onChangeShop: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
@@ -233,7 +256,7 @@ function ShopFields({ shopName, shopDesc, shopNameError, shopDescError, onChange
       <FormControl
         id="ShopName"
         isRequired
-        isInvalid={shopNameError}
+        isInvalid={shopNameError || shopNameDupError}
       >
         <FormLabel>Shop Name</FormLabel>
         <Input
@@ -244,6 +267,23 @@ function ShopFields({ shopName, shopDesc, shopNameError, shopDescError, onChange
         />
         {/* Display error message */}
         {shopNameError ? (<FormErrorMessage>Required</FormErrorMessage>) : ("")}
+        {shopNameDupError ? (<FormErrorMessage>Shop Name already exists</FormErrorMessage>) : ("")}
+      </FormControl>
+      <FormControl
+        id="ShopAddr"
+        isRequired
+        isInvalid={shopAddrError || shopAddrDupError}
+      >
+        <FormLabel>Shop Address</FormLabel>
+        <Input
+          type="text"
+          value={shopAddr}
+          onChange={onChangeShop}
+          name="shopAddr"
+        />
+        {/* Display error message */}
+        {shopAddrError ? (<FormErrorMessage>Required</FormErrorMessage>) : ("")}
+        {shopAddrDupError ? (<FormErrorMessage>Shop Address already exists</FormErrorMessage>) : ("")}
       </FormControl>
       <FormControl
         id="ShopDesc"
@@ -259,17 +299,23 @@ function ShopFields({ shopName, shopDesc, shopNameError, shopDescError, onChange
         />
         {/* Display error message */}
         {shopDescError ? (<FormErrorMessage>Required</FormErrorMessage>) : ("")}
-      </FormControl>
+      </FormControl >
     </>
   )
 }
 
-function CustomerSignUp({ formData, error, handleChange, isPasswordMatch, handleSubmit }: {
+function CustomerSignUp({ formData, error, dupError, handleChange, isPasswordMatch, isOpen, handleSubmit, handleOtpSubmit, handleCloseModal, setData, setError }: {
   formData: ICustomerData;
   error: Record<string, boolean>;
+  dupError: Record<string, boolean>;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   isPasswordMatch: boolean;
+  isOpen: boolean;
   handleSubmit: () => void;
+  handleOtpSubmit: () => void;
+  handleCloseModal: () => void;
+  setData: (formData: Record<string, string>) => void;
+  setError: (error: Record<string, boolean>) => void;
 }) {
 
   const [showPassword, setShowPassword] = useState(false);
@@ -278,8 +324,100 @@ function CustomerSignUp({ formData, error, handleChange, isPasswordMatch, handle
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
+  const initialRef = useRef(null)
+
+  const [countdown, setCountdown] = useState(60);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isOpen && countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown(prevCountdown => prevCountdown - 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [isOpen, countdown]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setCountdown(60); // Reset countdown when modal closes
+    }
+  }, [isOpen]);
+
+  const handleResendClick = async () => {
+    try {
+      const apiURL = process.env.VITE_API_BASE_URL;
+      await fetch(`${apiURL}/validate_customer_fields_otp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle network errors or other exceptions
+    }
+    setData({
+      ...formData,
+      otp: ""
+    })
+    setError({
+      ...error,
+      otp: false
+    })
+    setCountdown(60);
+  };
+
   return (
     <>
+      <Modal
+        closeOnOverlayClick={false}
+        closeOnEsc={false}
+        initialFocusRef={initialRef}
+        isOpen={isOpen}
+        onClose={handleCloseModal}
+        isCentered
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader textAlign="center" mb={5}>An email with a OTP has been sent to your email address</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <FormControl
+              id="otp"
+              isRequired
+              isInvalid={error.otp}
+            >
+              <FormLabel>One-Time Pasword</FormLabel>
+              <Input
+                ref={initialRef}
+                type="otp"
+                value={formData.otp}
+                onChange={handleChange}
+                name="otp"
+              />
+              {error.otp ? (<FormErrorMessage>Please enter the correct OTP - 6 digits only</FormErrorMessage>) : ("")}
+
+            </FormControl>
+            {countdown > 0 ? (
+              <Box mt={4}>
+                Resend OTP in {countdown} seconds
+              </Box>
+            ) : (
+              <Box mt={4} color="blue.400" cursor="pointer" onClick={handleResendClick}>
+                Resend OTP
+              </Box>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={handleOtpSubmit} colorScheme='blue' mr={3}>
+              Verify
+            </Button>
+            <Button onClick={handleCloseModal}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
       <Stack spacing={4}>
         <NameField
           name={formData.name}
@@ -289,17 +427,21 @@ function CustomerSignUp({ formData, error, handleChange, isPasswordMatch, handle
         <UsernameField
           username={formData.username}
           usernameError={error.username}
+          usernameDup={dupError.username}
           onChange={handleChange}
         />
         <EmailField
           email={formData.email}
           emailError={error.email}
           emailValid={error.emailValid}
+          emailDup={dupError.email}
           onChangeEmail={handleChange}
         />
         <PhoneField
           phone={formData.phone}
           phoneError={error.phone}
+          phoneValid={error.phoneValid}
+          phoneDupError={dupError.phone}
           onChange={handleChange}
         />
         <PasswordsField
@@ -336,12 +478,18 @@ function CustomerSignUp({ formData, error, handleChange, isPasswordMatch, handle
   );
 }
 
-function VendorSignUp({ formData, error, handleChange, isPasswordMatch, handleSubmit }: {
+function VendorSignUp({ formData, error, dupError, handleChange, isPasswordMatch, isOpen, handleSubmit, handleOtpSubmit, handleCloseModal, setData, setError }: {
   formData: IVendorData;
   error: Record<string, boolean>;
+  dupError: Record<string, boolean>;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   isPasswordMatch: boolean;
+  isOpen: boolean;
   handleSubmit: () => void;
+  handleOtpSubmit: () => void;
+  handleCloseModal: () => void;
+  setData: (formData: Record<string, string>) => void;
+  setError: (error: Record<string, boolean>) => void;
 }) {
 
   const [showPassword, setShowPassword] = useState(false);
@@ -350,28 +498,116 @@ function VendorSignUp({ formData, error, handleChange, isPasswordMatch, handleSu
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
+  const initialRef = useRef(null)
+
+  const [countdown, setCountdown] = useState(60);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isOpen && countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown(prevCountdown => prevCountdown - 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [isOpen, countdown]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setCountdown(60); // Reset countdown when modal closes
+    }
+  }, [isOpen]);
+
+  const handleResendClick = async () => {
+    try {
+      const apiURL = process.env.VITE_API_BASE_URL;
+      await fetch(`${apiURL}/validate_vendor_fields_otp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle network errors or other exceptions
+    }
+    setData({
+      ...formData,
+      otp: ""
+    })
+    setError({
+      ...error,
+      otp: false
+    })
+    setCountdown(60);
+  };
+
   return (
     <>
+      <Modal
+        initialFocusRef={initialRef}
+        isOpen={isOpen}
+        onClose={handleCloseModal}
+        isCentered
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader textAlign="center" mb={5}>An email with a OTP has been sent to your email address</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <FormControl
+              id="otp"
+              isRequired
+              isInvalid={error.otp}
+            >
+              <FormLabel>One-Time Password</FormLabel>
+              <Input
+                ref={initialRef}
+                type="otp"
+                value={formData.otp}
+                onChange={handleChange}
+                name="otp"
+              />
+              {error.otp ? (<FormErrorMessage>Please enter the correct OTP - 6 digits only</FormErrorMessage>) : ("")}
+            </FormControl>
+            {countdown > 0 ? (
+              <Box mt={4}>
+                Resend OTP in {countdown} seconds
+              </Box>
+            ) : (
+              <Box mt={4} color="blue.400" cursor="pointer" onClick={handleResendClick}>
+                Resend OTP
+              </Box>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={handleOtpSubmit} colorScheme='blue' mr={3}>
+              Verify
+            </Button>
+            <Button onClick={handleCloseModal}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
       <Stack spacing={4}>
-        <NameField
-          name={formData.name}
-          nameError={error.name}
-          onChange={handleChange}
-        />
         <UsernameField
           username={formData.username}
           usernameError={error.username}
+          usernameDup={dupError.username}
           onChange={handleChange}
         />
         <EmailField
           email={formData.email}
           emailError={error.email}
           emailValid={error.emailValid}
+          emailDup={dupError.email}
           onChangeEmail={handleChange}
         />
         <PhoneField
           phone={formData.phone}
           phoneError={error.phone}
+          phoneValid={error.phoneValid}
+          phoneDupError={dupError.phone}
           onChange={handleChange}
         />
         <PasswordsField
@@ -386,9 +622,13 @@ function VendorSignUp({ formData, error, handleChange, isPasswordMatch, handleSu
         />
         <ShopFields
           shopName={formData.shopName}
+          shopAddr={formData.shopAddr}
           shopDesc={formData.shopDesc}
           shopNameError={error.shopName}
+          shopAddrError={error.shopAddrError}
           shopDescError={error.shopDesc}
+          shopNameDupError={dupError.shopName}
+          shopAddrDupError={dupError.shopAddr}
           onChangeShop={handleChange}
         />
         <Stack spacing={10} pt={2}>
@@ -416,21 +656,31 @@ function VendorSignUp({ formData, error, handleChange, isPasswordMatch, handleSu
 }
 
 export default function Register() {
+  const apiURL = process.env.VITE_API_BASE_URL;
   const initialCustomerFormData = {
-    role: "0", // Initialize role with a default value
+    role: "3", // Initialize role with a default value
     name: "",
     username: "",
     email: "",
     phone: "",
     password: "",
     reEnterPassword: "",
+    otp: "",
   };
 
   const initialVendorFormData = {
-    ...initialCustomerFormData,
+    role: "2",
+    username: "",
+    email: "",
+    phone: "",
+    password: "",
+    reEnterPassword: "",
     shopName: "",
     shopDesc: "",
-  }
+    shopAddr: "",
+    status: 0,
+    otp: "",
+  };
   const [showAlert, setShowAlert] = useState(false);
 
   const [selectedTab, setSelectedTab] = useState<number>(0);
@@ -438,6 +688,10 @@ export default function Register() {
   const [customerData, setCustomerData] = useState(initialCustomerFormData);
 
   const [vendorData, setVendorData] = useState(initialVendorFormData);
+
+  const [isCustomerOpen, setCustomerOpenClose] = useState(false);
+
+  const [isVendorOpen, setVendorOpenClose] = useState(false);
 
   // Initialize isPasswordMatch to true
   const [isPasswordMatch, setIsPasswordMatch] = useState(true);
@@ -448,14 +702,36 @@ export default function Register() {
     email: false,
     emailValid: true,
     phone: false,
+    phoneValid: true,
     password: false,
     reEnterPassword: false,
+    otp: false,
+  });
+
+  const [customersDupErrors, setCustomerDupErrors] = useState<Record<string, boolean>>({
+    username: false,
+    email: false,
+    phone: false,
   });
 
   const [vendorErrors, setVendorErrors] = useState<Record<string, boolean>>({
-    ...customerErrors,
+    username: false,
+    email: false,
+    emailValid: true,
+    phone: false,
+    phoneValid: true,
+    password: false,
+    reEnterPassword: false,
     shopName: false,
     shopDesc: false,
+    shopAddr: false,
+    otp: false,
+  });
+
+  const [vendorsDupErrors, setVendorDupErrors] = useState<Record<string, boolean>>({
+    ...customersDupErrors,
+    shopName: false,
+    shopAddr: false,
   });
 
   const requiredCustomerFields = [
@@ -468,9 +744,14 @@ export default function Register() {
   ];
 
   const requiredVendorFields = [
-    ...requiredCustomerFields,
+    "username",
+    "email",
+    "phone",
+    "password",
+    "reEnterPassword",
     "shopName",
     "shopDesc",
+    "shopAddr",
   ];
 
   // Function to reset form fields
@@ -485,19 +766,35 @@ export default function Register() {
       email: false,
       emailValid: true,
       phone: false,
+      phoneValid: true,
       password: false,
       reEnterPassword: false,
+      opt: false,
     });
     setVendorErrors({
-      name: false,
       username: false,
       email: false,
       emailValid: true,
       phone: false,
+      phoneValid: true,
       password: false,
       reEnterPassword: false,
       shopName: false,
       shopDesc: false,
+      shopAddr: false,
+      opt: false,
+    });
+    setCustomerDupErrors({
+      username: false,
+      email: false,
+      phone: false,
+    });
+    setVendorDupErrors({
+      username: false,
+      email: false,
+      phone: false,
+      shopName: false,
+      shopAddr: false,
     });
   };
 
@@ -513,9 +810,17 @@ export default function Register() {
       username: false,
       email: false,
       emailValid: true,
+      phoneValid: true,
       phone: false,
       password: false,
       reEnterPassword: false,
+      opt: false,
+    });
+
+    setCustomerDupErrors({
+      username: false,
+      email: false,
+      phone: false,
     });
 
     // // Check if passwords match and update isPasswordMatch state
@@ -535,15 +840,24 @@ export default function Register() {
 
     // Reset errors
     setVendorErrors({
-      name: false,
       username: false,
       email: false,
       emailValid: true,
       phone: false,
+      phoneValid: true,
       password: false,
       reEnterPassword: false,
       shopName: false,
       shopDesc: false,
+      shopAddr: false,
+      opt: false,
+    });
+
+    setVendorDupErrors({
+      username: false,
+      email: false,
+      shopName: false,
+      shopAddr: false,
     });
 
     // Check if passwords match and update isPasswordMatch state
@@ -581,12 +895,23 @@ export default function Register() {
       emailValid: isEmailValid,
     }));
 
+    const isPhoneValid = /^\d{8}$/.test(customerData.phone);
+    setCustomerErrors((prevErrors) => ({
+      ...prevErrors,
+      phoneValid: isPhoneValid,
+    }));
+
     // Check if passwords match and update isPasswordMatch state
     setIsPasswordMatch(customerData.password === customerData.reEnterPassword);
 
     if (!isEmailValid) {
       console.log("Invalid email address.");
       return; // Prevent signup when email is invalid
+    }
+
+    if (!isPhoneValid) {
+      console.log("Invalid phone number.");
+      return; // Prevent signup when phone is invalid
     }
 
     if (emptyFields.length > 0) {
@@ -600,12 +925,12 @@ export default function Register() {
       console.log("Passwords do not match.");
       return; // Prevent signup when passwords don't match
     }
+
     // Log the formData before sending it to the backend
     console.log('CustomerData to be sent to the backend:', customerData);
 
     try {
-      const apiURL = process.env.VITE_API_BASE_URL;
-      const response = await fetch(`${apiURL}/register_customer`, {
+      const response = await fetch(`${apiURL}/validate_customer_fields_otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -615,17 +940,29 @@ export default function Register() {
 
       if (response.status === 200) {
         // Registration successful, handle accordingly (e.g., show a success message)
-        const customerID = await response.json();
-        if (customerID != null) {
-          console.log("Customer in DB")
-          resetFormFields()
-          setShowAlert(true);
-          setTimeout(() => {
-            window.location.href = '/login';
-          }, 3000);
+        const customer = await response.json();
+        if (customer.otp === 1) {
+          setCustomerOpenClose(true);
         }
         else {
-          console.log("Failed Registration")
+          if (Object.prototype.hasOwnProperty.call(customer, 'username') && customer.username !== 0) {
+            setCustomerDupErrors(prevErrors => ({
+              ...prevErrors,
+              username: true
+            }));
+          }
+          if (Object.prototype.hasOwnProperty.call(customer, 'email') && customer.email !== 0) {
+            setCustomerDupErrors(prevErrors => ({
+              ...prevErrors,
+              email: true
+            }));
+          }
+          if (Object.prototype.hasOwnProperty.call(customer, 'phone') && customer.phone !== 0) {
+            setCustomerDupErrors(prevErrors => ({
+              ...prevErrors,
+              phone: true
+            }));
+          }
         }
       } else {
         // Registration failed, handle accordingly (e.g., show an error message)
@@ -635,6 +972,48 @@ export default function Register() {
       console.error('Error:', error);
       // Handle network errors or other exceptions
     }
+  }
+
+  const handleCustomerOtpSubmit = async () => {
+    try {
+      const otpResponse = await fetch(`${apiURL}/register_customer`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(customerData),
+      });
+
+      if (otpResponse.status === 200) {
+        const otp = await otpResponse.json();
+        if (otp.id === -1) {
+          setCustomerErrors((prevErrors) => ({
+            ...prevErrors,
+            otp: true,
+          }));
+        }
+        else {
+          console.log("Customer in DB")
+          resetFormFields()
+          setCustomerOpenClose(false)
+          setShowAlert(true);
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 3000);
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle network errors or other exceptions
+    }
+  }
+
+  const closeCustomerModal = async () => {
+    setCustomerOpenClose(false)
+    setCustomerData((prevErrors) => ({
+      ...prevErrors,
+      otp: "",
+    }));
   }
 
   const handleVendorSubmit = async () => {
@@ -664,9 +1043,20 @@ export default function Register() {
       emailValid: isEmailValid,
     }));
 
-    if (!vendorErrors.emailValid) {
+    const isPhoneValid = /^\d{8}$/.test(vendorData.phone);
+    setVendorErrors((prevErrors) => ({
+      ...prevErrors,
+      phoneValid: isPhoneValid,
+    }));
+
+    if (!isEmailValid) {
       console.log("Invalid email address.");
       return; // Prevent signup when email is invalid
+    }
+
+    if (!isPhoneValid) {
+      console.log("Invalid phone number.");
+      return; // Prevent signup when phone is invalid
     }
 
     if (emptyFields.length > 0) {
@@ -680,12 +1070,12 @@ export default function Register() {
       console.log("Passwords do not match.");
       return; // Prevent signup when passwords don't match
     }
+
     // Log the formData before sending it to the backend
     console.log('VendorData to be sent to the backend:', vendorData);
 
     try {
-      const apiURL = process.env.VITE_API_BASE_URL;
-      const response = await fetch(`${apiURL}/register_vendor`, {
+      const response = await fetch(`${apiURL}/validate_vendor_fields_otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -695,18 +1085,41 @@ export default function Register() {
 
       if (response.status === 200) {
         // Registration successful, handle accordingly (e.g., show a success message)
-        const vendorID = await response.json();
-        if (vendorID != null) {
-          console.log("Vendor in DB")
-          // alert('Registration successful!');
-          resetFormFields()
-          setShowAlert(true);
-          setTimeout(() => {
-            window.location.href = '/login';
-          }, 3000);
+        const vendor = await response.json();
+        if (vendor.otp === 1) {
+          setVendorOpenClose(true);
         }
         else {
-          console.log("Failed Registration")
+          if (Object.prototype.hasOwnProperty.call(vendor, 'username') && vendor.username !== 0) {
+            setVendorDupErrors(prevErrors => ({
+              ...prevErrors,
+              username: true
+            }));
+          }
+          if (Object.prototype.hasOwnProperty.call(vendor, 'email') && vendor.email !== 0) {
+            setVendorDupErrors(prevErrors => ({
+              ...prevErrors,
+              email: true
+            }));
+          }
+          if (Object.prototype.hasOwnProperty.call(vendor, 'phone') && vendor.phone !== 0) {
+            setVendorDupErrors(prevErrors => ({
+              ...prevErrors,
+              phone: true
+            }));
+          }
+          if (Object.prototype.hasOwnProperty.call(vendor, 'shopName') && vendor.shopName !== 0) {
+            setVendorDupErrors(prevErrors => ({
+              ...prevErrors,
+              shopName: true
+            }));
+          }
+          if (Object.prototype.hasOwnProperty.call(vendor, 'shopAddr') && vendor.shopAddr !== 0) {
+            setVendorDupErrors(prevErrors => ({
+              ...prevErrors,
+              shopAddr: true
+            }));
+          }
         }
       } else {
         // Registration failed, handle accordingly (e.g., show an error message)
@@ -716,6 +1129,48 @@ export default function Register() {
       console.error('Error:', error);
       // Handle network errors or other exceptions
     }
+  }
+
+  const handleVendorOtpSubmit = async () => {
+    try {
+      const otpResponse = await fetch(`${apiURL}/register_vendor`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(vendorData),
+      });
+
+      if (otpResponse.status === 200) {
+        const otp = await otpResponse.json();
+        if (otp.id === -1) {
+          setVendorErrors((prevErrors) => ({
+            ...prevErrors,
+            otp: true,
+          }));
+        }
+        else {
+          console.log("Vendor in DB")
+          resetFormFields()
+          setVendorOpenClose(false)
+          setShowAlert(true);
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 3000);
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle network errors or other exceptions
+    }
+  }
+
+  const closeVendorModal = async () => {
+    setVendorOpenClose(false)
+    setVendorData((prevErrors) => ({
+      ...prevErrors,
+      otp: "",
+    }));
   }
 
   return (
@@ -765,10 +1220,10 @@ export default function Register() {
               resetFormFields(); // Reset form fields when tab changes
               selectedTab === 0 ? setCustomerData((prevData) => ({
                 ...prevData,
-                role: "0"
+                role: "3"
               })) : setVendorData((prevData) => ({
                 ...prevData,
-                role: "1"
+                role: "2"
               }))
             }}>
               <TabList>
@@ -780,17 +1235,31 @@ export default function Register() {
                   <CustomerSignUp
                     formData={customerData}
                     error={customerErrors}
+                    dupError={customersDupErrors}
                     handleChange={handleCustomerChange}
                     isPasswordMatch={isPasswordMatch}
-                    handleSubmit={handleCustomerSubmit} />
+                    isOpen={isCustomerOpen}
+                    handleSubmit={handleCustomerSubmit}
+                    handleOtpSubmit={handleCustomerOtpSubmit}
+                    handleCloseModal={closeCustomerModal}
+                    setData={(data) => setCustomerData({ ...customerData, ...data })}
+                    setError={(error) => setCustomerErrors(error)}
+                  />
                 </TabPanel>
                 <TabPanel>
                   <VendorSignUp
                     formData={vendorData}
                     error={vendorErrors}
+                    dupError={vendorsDupErrors}
                     handleChange={handleVendorChange}
                     isPasswordMatch={isPasswordMatch}
-                    handleSubmit={handleVendorSubmit} />
+                    isOpen={isVendorOpen}
+                    handleSubmit={handleVendorSubmit}
+                    handleOtpSubmit={handleVendorOtpSubmit}
+                    handleCloseModal={closeVendorModal}
+                    setData={(data) => setVendorData({ ...vendorData, ...data })}
+                    setError={(error) => setVendorErrors(error)}
+                  />
                 </TabPanel>
               </TabPanels>
             </Tabs>

@@ -1,10 +1,9 @@
 from app.service.user_service import UserService
-
-# import service class needed
+from app.common.user_model import Login
 
 class LoginUserController():
     def __init__(self):
         pass
 
-    def login_user(user_data):
-        return UserService.login_user(user_data)
+    def login_user(self, db, user: Login):
+        return UserService().login_user(db, user)
