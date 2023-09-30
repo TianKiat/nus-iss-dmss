@@ -8,9 +8,9 @@ import Home from "./pages/Home";
 import LoginCustomer from "./pages/LoginCustomer";
 import LoginVendor from "./pages/LoginVendor";
 import Register from "./pages/Register";
-import RegisterVendor from "./pages/RegisterVendor";
 import Error from "./pages/Error";
 import Dashboard from "./pages/Dashboard";
+import VendorDashboard from "./pages/VendorDashboard";
 function App() {
 
   return (
@@ -22,6 +22,7 @@ function App() {
             <Route path="login" element={<LoginCustomer />} />
             <Route path="vendor/login" element={<LoginVendor />} />
             <Route path="register" element={<Register />} />
+            <Route path="vendor/dashboard" element={<VendorDashboard />} />
             {/* <Route path="vendor/register" element={<RegisterVendor />} /> */}
             <Route path="dashboard" element={<Dashboard userID={1} userRole="customer"/>} />
             <Route path="*" element={<Error />} />

@@ -186,6 +186,7 @@ function MenuTab() {
 
 export default function VendorDashboard() {
   if (true)//sessionStorage.getItem("token"))
+
     return (
       <Container maxW="6xl">
         <Heading paddingBlock={"1.5rem"}>Dashboard</Heading>
