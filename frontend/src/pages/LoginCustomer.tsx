@@ -15,9 +15,7 @@ import {
   Button,
   Heading,
   Text,
-  useColorModeValue,
-  Radio,
-  RadioGroup
+  useColorModeValue
 } from '@chakra-ui/react'
 
 export default function LoginCustomer() {
@@ -62,7 +60,7 @@ export default function LoginCustomer() {
   }
 
   // empty object validator
-  function isEmpty(obj: any) {
+  function isEmpty(obj: {}) {
     return Object.keys(obj).length === 0;
   }
 
