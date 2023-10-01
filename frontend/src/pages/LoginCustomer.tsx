@@ -24,7 +24,7 @@ export default function LoginCustomer() {
   const [password, setPassword] = useState('');
   // const [userID, setUserID] = useState('');
   // const [session, setSession] = useState('');
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const handleSubmit = () => {
     fetch('http://127.0.0.1:8000/login_user', {
@@ -60,7 +60,7 @@ export default function LoginCustomer() {
   }
 
   // empty object validator
-  function isEmpty(obj: {}) {
+  function isEmpty(obj: object) {
     return Object.keys(obj).length === 0;
   }
 
