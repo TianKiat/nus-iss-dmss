@@ -44,7 +44,7 @@ import {
 } from "@chakra-ui/icons";
 import Error from "./Error";
 import { FunctionComponent, useState } from "react";
-
+import { useFetch } from "../useFetch";
 const DataCard = ({
   id,
   icon,
@@ -85,19 +85,28 @@ const DataCard = ({
   );
 };
 
-type MenuItem = {
+interface MenuItem {
+  menuItemID: Number;
+  menuItemName: string;
   price: Number;
   menuItemImage: string;
   menuItemDesc: string;
-};
+  isValid: boolean;
+  vendorProfileID: Number;
+}
 
 const MenuItemRow = (props: MenuItem) => (
   <ListItem>
     <Stack direction={"row"} gap={"0.5rem"}>
-      <Divider orientation="vertical" />
-      <Text>{props.menuItemDesc}</Text>
-      <Divider orientation="vertical" />
+      <Box bg={"gray.600"} padding={"0.2rem"} borderRadius={"100vw"}>
+        <Text>{props.menuItemName}</Text>
+      </Box>
+      <Box bg={"gray.600"} padding={"0.2rem"} borderRadius={"100vw"}>
+      <Text>{props.menuItemDesc === "" || props.menuItemDesc === null? "NA" : props.menuItemDesc}</Text>
+      </Box>
+      <Box bg={"gray.600"} padding={"0.2rem"} borderRadius={"100vw"}>
       <Text>$ {props.price.toFixed(2)}</Text>
+      </Box>
     </Stack>
   </ListItem>
 );
@@ -108,14 +117,18 @@ interface MenuListProps {
 
 const MenuList: FunctionComponent<MenuListProps> = (props) => {
   return (
-    <List>
+    <List spacing={"1.5rem"}>
       {props.items.map((m) => {
         return (
           <MenuItemRow
             key={m.menuItemDesc}
+            menuItemID={0}
+            menuItemName={m.menuItemName}
             menuItemDesc={m.menuItemDesc}
             price={m.price}
             menuItemImage={m.menuItemImage}
+            isValid={true}
+            vendorProfileID={m.vendorProfileID}
           ></MenuItemRow>
         );
       })}
@@ -127,15 +140,23 @@ function MenuTab() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [description, setDescription] = useState<string>("");
   const [price, setprice] = useState<Number>(0);
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([
-    {
-      price: 12.0,
-      menuItemImage: "url",
-      menuItemDesc: "Char kway Teow",
-    },
-  ]);
+
+  const user_id = 1;
+  const url = `${import.meta.env.VITE_API_BASE_URL}/menu_items/get/${user_id}`;
+
+  const { data, error } = useFetch<MenuItem[]>(url);
+
   function onSubmit() {
     console.log("submit new item with " + description + " " + price.toFixed(2));
+  }
+
+  function GetList() {
+    if (error) return <p>There is an error.</p>;
+    if (!data) {
+      return <p>Loading...</p>;
+    }
+    console.log(data);
+    return <MenuList items={data}></MenuList>;
   }
   return (
     <>
@@ -148,7 +169,7 @@ function MenuTab() {
           icon={<AddIcon />}
         />
       </Flex>
-      <MenuList items={menuItems}></MenuList>
+      {GetList()}
       <Modal onClose={onClose} isOpen={isOpen} isCentered size={"xl"}>
         <ModalOverlay />
         <ModalContent>
@@ -175,8 +196,10 @@ function MenuTab() {
             </Stack>
           </ModalBody>
           <ModalFooter gap={"0.5rem"}>
-          <Button onClick={onSubmit}>Submit</Button>
-            <Button onClick={onClose} variant='outline'>Close</Button>
+            <Button onClick={onSubmit}>Submit</Button>
+            <Button onClick={onClose} variant="outline">
+              Close
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -185,7 +208,8 @@ function MenuTab() {
 }
 
 export default function VendorDashboard() {
-  if (true)//sessionStorage.getItem("token"))
+  if (true)
+    //sessionStorage.getItem("token"))
 
     return (
       <Container maxW="6xl">

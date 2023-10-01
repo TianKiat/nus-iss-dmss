@@ -20,6 +20,7 @@ function App() {
             <Route path="login" element={<LoginCustomer />} />
             <Route path="vendor/login" element={<LoginVendor />} />
             <Route path="register" element={<Register />} />
+            <Route path="dashboard" element={<Dashboard userRole="vendor"/>} />
             {/* <Route path="vendor/dashboard" element={<VendorDashboard />} /> */}
             {/* <Route path="vendor/register" element={<RegisterVendor />} /> */}
             <Route path="profile" element={<Profile />} />
