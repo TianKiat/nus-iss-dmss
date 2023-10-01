@@ -15,23 +15,30 @@ def get_db():
 router = APIRouter()
 
 
-@router.get("menu_items/{user_id}", description="Retrieve menu items for vendor")
+@router.get("/menu_items/get/{user_id}", description="Retrieve menu items for vendor")
 def menu_items(user_id: int = 0, db: Session = Depends(get_db)):
     try:
-        return "hello" # VendorController.get_menu_items(db, user_id)
+        return VendorController.get_menu_items(db, user_id)
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex
 
-@router.post("menu_items/create", description="Create menu item for vendor")
+@router.post("/menu_items/create", description="Create menu item for vendor")
 def create_menu_item(menuItem: MenuItemModel, db: Session = Depends(get_db)):
     try:
         return VendorController.create_menu_item(db, menuItem)
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex
 
-@router.post("menu_items/update", description="Update menu item for vendor")
+@router.post("/menu_items/update", description="Update menu item for vendor")
 def update_menu_items(menuItem: MenuItemModel, db: Session = Depends(get_db)):
     try:
         return VendorController.update_menu_item(db, menuItem)
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail=str(ex)) from ex
+    
+@router.post("/menu_items/delete", description="Delete menu item for vendor")
+def menu_items(menu_item_id: int = 0, db: Session = Depends(get_db)):
+    try:
+        return VendorController.delete_menu_item(db, menu_item_id)
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex

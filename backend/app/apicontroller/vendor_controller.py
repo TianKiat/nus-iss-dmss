@@ -23,7 +23,7 @@ class VendorController:
 
         for i in menuItems:
             item : MenuItem = i
-            result.append(MenuItemModel.model_validate(item))
+            result.append(item)
         return result
 
     def create_menu_item(db, menuItem : MenuItemModel):
@@ -33,7 +33,7 @@ class VendorController:
                        menuItem.menuItemImage,
                        menuItem.menuItemDesc,
                        menuItem.vendorProfileID)
-        return MenuItemModel.model_validate(MenuItemService.create_menu_item_for_vendor(db=db, menuItem=orm))
+        return MenuItemService.create_menu_item_for_vendor(db=db, menuItem=orm)
     
     def update_menu_item(db, menuItem : MenuItemModel):
         orm = MenuItem(menuItem.menuItemID,
@@ -42,4 +42,7 @@ class VendorController:
                        menuItem.menuItemImage,
                        menuItem.menuItemDesc,
                        menuItem.vendorProfileID)
-        return MenuItemModel.model_validate(MenuItemService.update_menu_item_for_vendor(db=db, menuItem=orm))
+        return MenuItemService.update_menu_item_for_vendor(db=db, menuItem=orm)
+    
+    def delete_menu_item(db, menuItemId : int):
+        return MenuItemService.delete_menu_item_for_vendor(db=db, menuItemId=menuItemId)

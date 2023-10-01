@@ -13,8 +13,26 @@ class MenuItemGateway():
 
     def create_menu_item(self, db: Session, menuItem: MenuItem):
         try:
-            menuItem.menuItemID = uuid()
+            # return db.__getstate__
             db.add(menuItem)
+            db.commit()
+
+            return {"id" : menuItem.menuItemID}
+
+        except Exception as e:
+            return {"error": e.__repr__}
+        
+    
+    def update_menu_item(self, db: Session, menuItem: MenuItem):
+        try:
+            itemToUpdate = db.query(MenuItem).filter(MenuItem.menuItemID == menuItem.menuItemID).first()
+            if itemToUpdate:
+                itemToUpdate.menuItemName = menuItem.menuItemName
+                itemToUpdate.price = menuItem.price
+                itemToUpdate.menuItemImage = menuItem.menuItemImage
+                itemToUpdate.menuItemDesc = menuItem.menuItemDesc
+            else:
+                db.add(menuItem)
             db.commit()
 
             return {"id" : menuItem.menuItemID}
@@ -22,12 +40,14 @@ class MenuItemGateway():
         except Exception as e:
             print(f"Error: {e}")
     
-    def update_menu_item(self, db: Session, menuItem: MenuItem):
+    def delete_menu_item(self, db: Session, menuItemId: int):
         try:
-            db.query(MenuItem).filter(MenuItem.menuItemID == menuItem.menuItemID).update(menuItem)
-            db.commit()
+            itemToUpdate = db.query(MenuItem).filter(MenuItem.menuItemID == menuItemId).first()
+            if itemToUpdate:
+                db.delete(itemToUpdate)
+                db.commit()
 
-            return {"id" : menuItem.menuItemID}
+            return {"id" : menuItemId}
 
         except Exception as e:
             print(f"Error: {e}")
