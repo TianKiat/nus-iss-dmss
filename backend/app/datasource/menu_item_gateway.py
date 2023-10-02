@@ -24,8 +24,8 @@ class MenuItemGateway():
             item_table = MenuItem(**item_data)
             db.add(item_table)
             db.commit()
-
-            return {"id" : menuItem.menuItemID}
+            item_new = db.query(MenuItem).filter(MenuItem.menuItemName == menuItem.menuItemName & MenuItem.vendorProfileID == menuItem.vendorProfileID).first()
+            return {"id" : item_new.menuItemID}
 
         except Exception as e:
             return {"error": e.__repr__}

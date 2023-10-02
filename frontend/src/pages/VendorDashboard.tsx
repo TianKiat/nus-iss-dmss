@@ -123,7 +123,57 @@ interface MenuListProps {
 }
 
 const MenuList: FunctionComponent<MenuListProps> = (props) => {
+  // const { isOpen, onOpen, onClose } = useDisclosure();
+  // const [description, setDescription] = useState<string>("");
+  // const [itemName, setItemName] = useState<string>("");
+  // const [imageUrl, setImageUrl] = useState<string>("");
+  // const [price, setprice] = useState<Number>(0);
+  // const user_id = 1;
+  // const postUrl = `${import.meta.env.VITE_API_BASE_URL}/menu_items/update/`;
+
+  // function onEdit() {
+  //   let itemToAdd: MenuItem = {
+  //     menuItemID: 1, // temp id
+  //     menuItemName: itemName,
+  //     price: price,
+  //     menuItemImage: imageUrl,
+  //     menuItemDesc: description,
+  //     isValid: true,
+  //     vendorProfileID: user_id,
+  //   };
+  //   console.log(itemToAdd);
+  //   fetch(postUrl, {
+  //     // Adding method type
+  //     method: "POST",
+
+  //     // Adding body or contents to send
+  //     body: JSON.stringify(itemToAdd),
+
+  //     // Adding headers to the request
+  //     headers: {
+  //       "Content-type": "application/json; charset=UTF-8",
+  //     },
+  //   })
+  //     // Converting to JSON
+  //     .then((response) => response.json())
+
+  //     // Displaying results to console
+  //     .then((json) => {
+  //       console.log(json);
+  //       onClose();
+  //     });
+  // }
+
+  // function onEditClick(item: MenuItem) {
+  //   setItemName(item.menuItemName);
+  //   setDescription(item.menuItemDesc);
+  //   setprice(item.price);
+  //   setImageUrl(item.menuItemImage);
+  //   onOpen();
+  // }
+
   return (
+    <>
     <TableContainer>
       <Table variant="striped">
         <TableCaption>Imperial to metric conversion factors</TableCaption>
@@ -141,22 +191,80 @@ const MenuList: FunctionComponent<MenuListProps> = (props) => {
         <Tbody>
           {props.items.map((m) => {
             return (
-              <MenuItemRow
-                key={m.menuItemDesc + m.menuItemName}
-                menuItemID={0}
-                menuItemName={m.menuItemName}
-                menuItemDesc={m.menuItemDesc}
-                price={m.price}
-                menuItemImage={m.menuItemImage}
-                isValid={true}
-                vendorProfileID={m.vendorProfileID}
-              ></MenuItemRow>
+              <Tr>
+                <Td>{m.menuItemName}</Td>
+                <Td>{m.menuItemDesc === null ? "NA" : m.menuItemDesc}</Td>
+                <Td isNumeric>${m.price.toFixed(2)}</Td>
+                <Td>
+                  <IconButton aria-label="Edit Menu Item" icon={<ViewIcon />} />
+                </Td>
+                <Td>
+                  <IconButton
+                    aria-label="Delete item"
+                    icon={<DeleteIcon />}
+                  />
+                </Td>
+              </Tr>
             );
           })}
         </Tbody>
         <Tfoot></Tfoot>
       </Table>
     </TableContainer>
+    {/* <Modal onClose={onclose} isOpen={isOpen} isCentered size={"xl"}>
+    <ModalOverlay />
+    <ModalContent>
+      <ModalHeader>Edit Menu Item</ModalHeader>
+      <ModalCloseButton />
+      <ModalBody>
+        <Stack spacing={"1rem"}>
+          <FormControl id="name">
+            <FormLabel>Name / Description</FormLabel>
+            <Input
+              type="text"
+              onChange={(e) => setItemName(e.target.value)}
+              isRequired
+              value={itemName}
+            />
+          </FormControl>
+          <FormControl id="description">
+            <FormLabel>Description</FormLabel>
+            <Input
+              type="text"
+              onChange={(e) => setDescription(e.target.value)}
+              isRequired
+              value={description}
+            />
+          </FormControl>
+          <FormControl id="price">
+            <FormLabel>Price</FormLabel>
+            <Input
+              type="text"
+              onChange={(e) => setprice(Number(e.target.value))}
+              isRequired
+              value={price.toString()}
+            />
+          </FormControl>
+          <FormControl id="imageUrl">
+            <FormLabel>Image Url</FormLabel>
+            <Input
+              type="text"
+              onChange={(e) => setImageUrl(e.target.value)}
+              isRequired
+              value={imageUrl}
+            />
+          </FormControl>
+        </Stack>
+      </ModalBody>
+      <ModalFooter gap={"0.5rem"}>
+        <Button onClick={onEdit}>Edit</Button>
+        <Button onClick={onClose} variant="outline">
+          Close
+        </Button>
+      </ModalFooter>
+    </ModalContent>
+  </Modal> */}
+  </>
   );
 };
 
@@ -169,7 +277,6 @@ function MenuTab() {
   const user_id = 1;
   let url = `${import.meta.env.VITE_API_BASE_URL}/menu_items/get/${user_id}`;
   const postUrl = `${import.meta.env.VITE_API_BASE_URL}/menu_items/create/`;
-  const { data, error } = useFetch<MenuItem[]>(url);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
 
   useEffect(() => {
@@ -178,10 +285,9 @@ function MenuTab() {
       const newData = await response.json();
       setMenuItems(newData);
     };
-  
+
     fetchData();
   }, []);
-  
 
   function onSubmit() {
     let itemToAdd: MenuItem = {
@@ -211,19 +317,13 @@ function MenuTab() {
 
       // Displaying results to console
       .then((json) => {
-        console.log(json);
+        console.log(json.id);
         onClose();
+        itemToAdd.menuItemID = json.id
         setMenuItems([...menuItems, itemToAdd]);
       });
   }
 
-  function GetList() {
-    if (error) return <p>There is an error.</p>;
-    if (!data) {
-      return <p>Loading...</p>;
-    }
-    return <MenuList items={data}></MenuList>;
-  }
   return (
     <>
       <Flex paddingBlock={"1rem"} align={"center"}>
@@ -285,6 +385,7 @@ function MenuTab() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+      
     </>
   );
 }
