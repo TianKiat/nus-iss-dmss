@@ -3,6 +3,7 @@
 import VendorDashboard from './VendorDashboard'
 import CustomerDashboard from './CustomerDashboard'
 import { useEffect, useState } from "react"
+import { Box, Container, Text } from '@chakra-ui/react'
 
 interface DashboardProps {
     userID : number
@@ -23,7 +24,18 @@ export default function Dashboard(props : DashboardProps) {
     // }, [props.userRole])
     
     return (
+        props.userID == null ?
+            // When userID is null aka not login
+            <Box p={4}>
+                <Container maxW={'5xl'} mt={12}>
+                    <Text>Not Login</Text>
+                </Container>
+            </Box>
 
-            role !== 'vendor' ? <CustomerDashboard userID={props.userID}></CustomerDashboard> : <VendorDashboard></VendorDashboard> // for now until login and session is done
+            // When userID is not null aka login
+            : (role !== 'vendor' ? 
+                <CustomerDashboard userID={props.userID}></CustomerDashboard>
+                : <VendorDashboard></VendorDashboard>
+        ) // for now until login and session is done
     );
 }
