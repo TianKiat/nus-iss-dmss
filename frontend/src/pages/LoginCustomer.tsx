@@ -62,7 +62,7 @@ export default function LoginCustomer() {
     return Object.keys(obj).length === 0;
   }
 
-  function roleRedirect(roleID: String) {
+  function roleRedirect(roleID: string) {
     if(roleID != ''){ 
       window.location.href='../';
     }
