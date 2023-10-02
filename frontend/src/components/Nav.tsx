@@ -34,12 +34,14 @@ function navButtons(userID: number, username: string) {
   if (userID != null) {
     return (
       <Stack flex={{ base: 1, md: 0 }} justify={"flex-end"} direction={"row"} spacing={6}>
-        <Button as={"a"} p={2} fontSize={"sm"} fontWeight={400} variant={"link"}>
-          <Icon as={FaUserCircle} w={5} h={5} marginRight={2}/>
-          <Heading size={'sm'} alignSelf={'center'} whiteSpace={'nowrap'}>
-            {username}
-          </Heading>
-        </Button>
+        <Link to={"./profile"}>
+          <Button as={"a"} p={2} fontSize={"sm"} fontWeight={400} variant={"link"}>
+            <Icon as={FaUserCircle} w={5} h={5} marginRight={2}/>
+            <Heading size={'sm'} alignSelf={'center'} whiteSpace={'nowrap'}>
+              {username}
+            </Heading>
+          </Button>
+        </Link>
         <Button as={"a"} display={{ base: "none", md: "inline-flex" }} fontSize={"sm"}
                 fontWeight={600} color={"white"} bg={"blue.400"} href={"/login"}
                 _hover={{ bg: "blue.300" }}>
