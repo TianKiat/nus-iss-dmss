@@ -1,9 +1,15 @@
 import { Outlet, Link } from "react-router-dom";
 import Nav from '../components/Nav'
-const Layout = () => {
+
+interface LayoutProps {
+  userID: number,
+  username: string
+}
+
+const Layout = (props: LayoutProps) => {
   return (
     <>
-      <Nav />
+      <Nav userID={props.userID} username={props.username} />
       <Outlet />
     </>
   )

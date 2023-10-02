@@ -8,19 +8,22 @@ import Profile from "./pages/Profile";
 import Register from "./pages/Register";
 import Error from "./pages/Error";
 import Dashboard from "./pages/Dashboard";
-import VendorDashboard from "./pages/VendorDashboard";
+
 function App() {
+  const userID = 1;
+  const username = "Joe";
+  const userRole = "customer";
 
   return (
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Layout />}>
+          <Route path="/" element={<Layout userID={userID} username={username} />}>
             <Route index element={<Home />} />
             <Route path="login" element={<LoginCustomer />} />
             <Route path="vendor/login" element={<LoginVendor />} />
             <Route path="register" element={<Register />} />
-            <Route path="dashboard" element={<Dashboard userRole="vendor"/>} />
+            <Route path="dashboard" element={<Dashboard userID={userID} userRole={userRole}/>} />
             {/* <Route path="vendor/dashboard" element={<VendorDashboard />} /> */}
             {/* <Route path="vendor/register" element={<RegisterVendor />} /> */}
             <Route path="profile" element={<Profile />} />
