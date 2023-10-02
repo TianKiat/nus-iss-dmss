@@ -244,7 +244,7 @@ export default function (props : CustomerDashboardProps) {
                                                     updateOrderHistoryTriggerFunction={setUpdateOrderHistoryTrigger}
                                                 />
                                             ))
-                                            : <Text>No order history</Text>
+                                            : <Text>No favorite order</Text>
                                     )
                                     : <Text>Loading ...</Text>
                             }

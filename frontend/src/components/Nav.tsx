@@ -30,16 +30,18 @@ import {
 
 import { Link } from "react-router-dom";
 
-function navButtons(isLogin: boolean) {
-  if (isLogin) {
+function navButtons(userID: number, username: string) {
+  if (userID != null) {
     return (
       <Stack flex={{ base: 1, md: 0 }} justify={"flex-end"} direction={"row"} spacing={6}>
-        <Button as={"a"} p={2} fontSize={"sm"} fontWeight={400} variant={"link"}>
-          <Icon as={FaUserCircle} w={5} h={5} marginRight={2}/>
-          <Heading size={'sm'} alignSelf={'center'} whiteSpace={'nowrap'}>
-            username
-          </Heading>
-        </Button>
+        <Link to={"./profile"}>
+          <Button as={"a"} p={2} fontSize={"sm"} fontWeight={400} variant={"link"}>
+            <Icon as={FaUserCircle} w={5} h={5} marginRight={2}/>
+            <Heading size={'sm'} alignSelf={'center'} whiteSpace={'nowrap'}>
+              {username}
+            </Heading>
+          </Button>
+        </Link>
         <Button as={"a"} display={{ base: "none", md: "inline-flex" }} fontSize={"sm"}
                 fontWeight={600} color={"white"} bg={"blue.400"} href={"/login"}
                 _hover={{ bg: "blue.300" }}>
@@ -62,9 +64,13 @@ function navButtons(isLogin: boolean) {
   }
 }
 
-export default function Nav() {
+interface NavProps {
+  userID: number,
+  username: string
+}
+
+export default function Nav(props: NavProps) {
   const { isOpen, onToggle } = useDisclosure();
-  const isLogin = false;
 
   return (
     <Box>
@@ -107,7 +113,7 @@ export default function Nav() {
           </Flex>
         </Flex>
 
-        {navButtons(isLogin)}
+        {navButtons(props.userID, props.username)}
       </Flex>
 
       <Collapse in={isOpen} animateOpacity>

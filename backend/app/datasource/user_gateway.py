@@ -114,12 +114,7 @@ class UserGateway():
     # login authentication
     def auth(self, db: Session, login: Login):
         try:
-            user_session_data = {
-                'userID': '',
-                'roleID': '',
-                'profileName': '',
-                'token': '' # not used for now
-            }
+            user_session_data = {}
 
             user_object = db.query(user.User).filter(user.User.username == login.username)\
                                              .filter(user.User.userPassword == login.password).first()
