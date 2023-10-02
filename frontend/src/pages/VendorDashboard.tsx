@@ -20,8 +20,15 @@ import {
   Flex,
   ListItem,
   Text,
-  Divider,
-  List,
+  Table,
+  Thead,
+  Tbody,
+  Tfoot,
+  Tr,
+  Th,
+  Td,
+  TableCaption,
+  TableContainer,
   IconButton,
   Button,
   Modal,
@@ -41,9 +48,11 @@ import {
   CalendarIcon,
   LockIcon,
   NotAllowedIcon,
+  DeleteIcon,
+  ViewIcon,
 } from "@chakra-ui/icons";
 import Error from "./Error";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useState, useEffect } from "react";
 import { useFetch } from "../useFetch";
 const DataCard = ({
   id,
@@ -96,19 +105,17 @@ interface MenuItem {
 }
 
 const MenuItemRow = (props: MenuItem) => (
-  <ListItem>
-    <Stack direction={"row"} gap={"0.5rem"}>
-      <Box bg={"gray.600"} padding={"0.2rem"} borderRadius={"100vw"}>
-        <Text>{props.menuItemName}</Text>
-      </Box>
-      <Box bg={"gray.600"} padding={"0.2rem"} borderRadius={"100vw"}>
-      <Text>{props.menuItemDesc === "" || props.menuItemDesc === null? "NA" : props.menuItemDesc}</Text>
-      </Box>
-      <Box bg={"gray.600"} padding={"0.2rem"} borderRadius={"100vw"}>
-      <Text>$ {props.price.toFixed(2)}</Text>
-      </Box>
-    </Stack>
-  </ListItem>
+  <Tr>
+    <Td>{props.menuItemName}</Td>
+    <Td>{props.menuItemDesc === null ? "NA" : props.menuItemDesc}</Td>
+    <Td isNumeric>${props.price.toFixed(2)}</Td>
+    <Td>
+      <IconButton aria-label="Edit Menu Item" icon={<ViewIcon />} />
+    </Td>
+    <Td>
+      <IconButton aria-label="Search database" icon={<DeleteIcon />} />
+    </Td>
+  </Tr>
 );
 
 interface MenuListProps {
@@ -117,37 +124,97 @@ interface MenuListProps {
 
 const MenuList: FunctionComponent<MenuListProps> = (props) => {
   return (
-    <List spacing={"1.5rem"}>
-      {props.items.map((m) => {
-        return (
-          <MenuItemRow
-            key={m.menuItemDesc}
-            menuItemID={0}
-            menuItemName={m.menuItemName}
-            menuItemDesc={m.menuItemDesc}
-            price={m.price}
-            menuItemImage={m.menuItemImage}
-            isValid={true}
-            vendorProfileID={m.vendorProfileID}
-          ></MenuItemRow>
-        );
-      })}
-    </List>
+    <TableContainer>
+      <Table variant="striped">
+        <TableCaption>Imperial to metric conversion factors</TableCaption>
+        <Thead>
+          <Tr>
+            <Th>Name</Th>
+            <Th width={"50%"}>Description</Th>
+            <Th width={"5%"} isNumeric>
+              Price
+            </Th>
+            <Th width={"10%"}></Th>
+            <Th width={"10%"}></Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {props.items.map((m) => {
+            return (
+              <MenuItemRow
+                key={m.menuItemDesc + m.menuItemName}
+                menuItemID={0}
+                menuItemName={m.menuItemName}
+                menuItemDesc={m.menuItemDesc}
+                price={m.price}
+                menuItemImage={m.menuItemImage}
+                isValid={true}
+                vendorProfileID={m.vendorProfileID}
+              ></MenuItemRow>
+            );
+          })}
+        </Tbody>
+        <Tfoot></Tfoot>
+      </Table>
+    </TableContainer>
   );
 };
 
 function MenuTab() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [description, setDescription] = useState<string>("");
+  const [itemName, setItemName] = useState<string>("");
+  const [imageUrl, setImageUrl] = useState<string>("");
   const [price, setprice] = useState<Number>(0);
-
   const user_id = 1;
-  const url = `${import.meta.env.VITE_API_BASE_URL}/menu_items/get/${user_id}`;
-
+  let url = `${import.meta.env.VITE_API_BASE_URL}/menu_items/get/${user_id}`;
+  const postUrl = `${import.meta.env.VITE_API_BASE_URL}/menu_items/create/`;
   const { data, error } = useFetch<MenuItem[]>(url);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetch(url);
+      const newData = await response.json();
+      setMenuItems(newData);
+    };
+  
+    fetchData();
+  }, []);
+  
 
   function onSubmit() {
-    console.log("submit new item with " + description + " " + price.toFixed(2));
+    let itemToAdd: MenuItem = {
+      menuItemID: 1, // temp id
+      menuItemName: itemName,
+      price: price,
+      menuItemImage: imageUrl,
+      menuItemDesc: description,
+      isValid: true,
+      vendorProfileID: user_id,
+    };
+    console.log(itemToAdd);
+    fetch(postUrl, {
+      // Adding method type
+      method: "POST",
+
+      // Adding body or contents to send
+      body: JSON.stringify(itemToAdd),
+
+      // Adding headers to the request
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    })
+      // Converting to JSON
+      .then((response) => response.json())
+
+      // Displaying results to console
+      .then((json) => {
+        console.log(json);
+        onClose();
+        setMenuItems([...menuItems, itemToAdd]);
+      });
   }
 
   function GetList() {
@@ -155,7 +222,6 @@ function MenuTab() {
     if (!data) {
       return <p>Loading...</p>;
     }
-    console.log(data);
     return <MenuList items={data}></MenuList>;
   }
   return (
@@ -169,7 +235,7 @@ function MenuTab() {
           icon={<AddIcon />}
         />
       </Flex>
-      {GetList()}
+      <MenuList items={menuItems}></MenuList>
       <Modal onClose={onClose} isOpen={isOpen} isCentered size={"xl"}>
         <ModalOverlay />
         <ModalContent>
@@ -181,6 +247,14 @@ function MenuTab() {
                 <FormLabel>Name / Description</FormLabel>
                 <Input
                   type="text"
+                  onChange={(e) => setItemName(e.target.value)}
+                  isRequired
+                />
+              </FormControl>
+              <FormControl id="description">
+                <FormLabel>Description</FormLabel>
+                <Input
+                  type="text"
                   onChange={(e) => setDescription(e.target.value)}
                   isRequired
                 />
@@ -190,6 +264,14 @@ function MenuTab() {
                 <Input
                   type="text"
                   onChange={(e) => setprice(Number(e.target.value))}
+                  isRequired
+                />
+              </FormControl>
+              <FormControl id="imageUrl">
+                <FormLabel>Image Url</FormLabel>
+                <Input
+                  type="text"
+                  onChange={(e) => setImageUrl(e.target.value)}
                   isRequired
                 />
               </FormControl>

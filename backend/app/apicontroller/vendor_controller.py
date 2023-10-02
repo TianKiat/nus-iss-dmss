@@ -27,22 +27,22 @@ class VendorController:
         return result
 
     def create_menu_item(db, menuItem : MenuItemModel):
-        orm = MenuItem(menuItem.menuItemID,
-                       menuItem.menuItemName,
-                       menuItem.price,
-                       menuItem.menuItemImage,
-                       menuItem.menuItemDesc,
-                       menuItem.vendorProfileID)
-        return MenuItemService.create_menu_item_for_vendor(db=db, menuItem=orm)
+        # orm = MenuItem(menuItem.menuItemID,
+        #                menuItem.menuItemName,
+        #                menuItem.price,
+        #                menuItem.menuItemImage,
+        #                menuItem.menuItemDesc,
+        #                menuItem.vendorProfileID)
+        return MenuItemService.create_menu_item_for_vendor(db=db, menuItem=menuItem)
     
     def update_menu_item(db, menuItem : MenuItemModel):
-        orm = MenuItem(menuItem.menuItemID,
-                       menuItem.menuItemName,
-                       menuItem.price,
-                       menuItem.menuItemImage,
-                       menuItem.menuItemDesc,
-                       menuItem.vendorProfileID)
-        return MenuItemService.update_menu_item_for_vendor(db=db, menuItem=orm)
+        # orm = MenuItem(menuItem.menuItemID,
+        #                menuItem.menuItemName,
+        #                menuItem.price,
+        #                menuItem.menuItemImage,
+        #                menuItem.menuItemDesc,
+        #                menuItem.vendorProfileID)
+        return MenuItemService.update_menu_item_for_vendor(db=db, menuItem=menuItem)
     
     def delete_menu_item(db, menuItemId : int):
         return MenuItemService.delete_menu_item_for_vendor(db=db, menuItemId=menuItemId)

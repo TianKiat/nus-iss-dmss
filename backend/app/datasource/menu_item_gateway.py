@@ -13,8 +13,16 @@ class MenuItemGateway():
 
     def create_menu_item(self, db: Session, menuItem: MenuItem):
         try:
-            # return db.__getstate__
-            db.add(menuItem)
+            item_data = {
+                'menuItemName' : menuItem.menuItemName,
+                'price' : menuItem.price,
+                'menuItemImage' : menuItem.menuItemImage,
+                'menuItemDesc' : menuItem.menuItemDesc,
+                'isValid' : menuItem.isValid,
+                'vendorProfileID' : menuItem.vendorProfileID,
+            }
+            item_table = MenuItem(**item_data)
+            db.add(item_table)
             db.commit()
 
             return {"id" : menuItem.menuItemID}
