@@ -22,9 +22,6 @@ export default function LoginCustomer() {
   
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  // const [userID, setUserID] = useState('');
-  // const [session, setSession] = useState('');
-  // const navigate = useNavigate();
 
   const handleSubmit = () => {
     fetch('http://127.0.0.1:8000/login_user', {
@@ -51,6 +48,7 @@ export default function LoginCustomer() {
             roleRedirect(data['roleID']);
           }
           else{ // Login fail
+            window.alert("Login failed!")
             window.location.href='../login';
           }
      })
@@ -64,17 +62,12 @@ export default function LoginCustomer() {
     return Object.keys(obj).length === 0;
   }
 
-  function roleRedirect(roleID: number) {
-    if(roleID == 1){ // Admin
-      window.location.href='../admin';
-    }
-    else if(roleID == 2){ // Vendor
-      window.location.href='../vendor';
-    }
-    else if(roleID == 3){ // Customer
-      window.location.href='../customer';
+  function roleRedirect(roleID: string) {
+    if(roleID != ''){ 
+      window.location.href='../';
     }
     else{ //No role, error
+      window.alert("Login failed!")
       window.location.href='../login';
     }
   }
