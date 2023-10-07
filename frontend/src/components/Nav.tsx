@@ -29,11 +29,11 @@ import {
 
 import { Link } from "react-router-dom";
 
-function navButtons(userID: number, username: string, userRole: string) {
-  if (userID != null) {
+function navButtons(cookies: any) {
+  if (cookies != null) {
     return (
       <Stack flex={{ base: 1, md: 0 }} justify={"flex-end"} direction={"row"} spacing={6}>
-        {userRole == "customer" ?
+        {cookies["roleID"] == 3 ?
           <Link to={"/basket"}>
             <Button
               as={"a"}
@@ -60,7 +60,7 @@ function navButtons(userID: number, username: string, userRole: string) {
             _hover={{textDecoration: "none", color: "black"}}>
             <Icon as={FaUserCircle} w={5} h={5} marginRight={2}/>
             <Text size={'sm'} fontWeight={600} alignSelf={'center'} whiteSpace={'nowrap'}>
-              {username}
+              {cookies["profileName"]}
             </Text>
           </Button>
         </Link>
@@ -87,9 +87,7 @@ function navButtons(userID: number, username: string, userRole: string) {
 }
 
 interface NavProps {
-  userID: number,
-  username: string,
-  userRole: string
+  cookies: any
 }
 
 export default function Nav(props: NavProps) {
@@ -136,7 +134,7 @@ export default function Nav(props: NavProps) {
           </Flex>
         </Flex>
 
-        {navButtons(props.userID, props.username, props.userRole)}
+        {navButtons(props.cookies)}
       </Flex>
 
       <Collapse in={isOpen} animateOpacity>

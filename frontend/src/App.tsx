@@ -9,28 +9,32 @@ import Register from "./pages/Register";
 import Error from "./pages/Error";
 import Dashboard from "./pages/Dashboard";
 import CustomerOrder from "./pages/CustomerOrder" ;
-import CustomerOrderMenuItem from "./pages/CustomerOrderMenuItem";
 import CustomerBasket from "./pages/CustomerBasket";
+import Cookies from "js-cookie";
+import { useEffect, useState } from "react";
 
 function App() {
-  const userID = 3;
-  const username = "Joe";
-  const userRole = "customer";
+  const [cookies, setCookies] = useState(Cookies.get("auth"));
+
+  useEffect(() => {
+    if (Cookies.get("auth")) {
+      setCookies(JSON.parse(Cookies.get("auth")));
+    } else {
+      setCookies(null);
+    }
+  }, [Cookies]);
 
   return (
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Layout userID={userID} username={username} userRole={userRole} />}>
-            <Route index element={userID != null ? <Dashboard userID={userID} userRole={userRole}/> : <Home />} />
+          <Route path="/" element={<Layout cookies={cookies} />}>
+            <Route index element={cookies != null ? <Dashboard userID={cookies["userID"]} roleID={cookies["roleID"]}/> : <Home />} />
             <Route path="login" element={<LoginCustomer />} />
             <Route path="vendor/login" element={<LoginVendor />} />
             <Route path="register" element={<Register />} />
-            <Route path="dashboard" element={<Dashboard userID={userID} userRole={userRole}/>} />
-            <Route path="order" element={<CustomerOrder userID={userID}/>} />
+            <Route path="order" element={<CustomerOrder userID={cookies != null ? cookies.userID : null}/>} />
             <Route path="basket" element={<CustomerBasket/>} />
-            {/* <Route path="vendor/dashboard" element={<VendorDashboard />} /> */}
-            {/* <Route path="vendor/register" element={<RegisterVendor />} /> */}
             <Route path="profile" element={<Profile />} />
             <Route path="*" element={<Error />} />
           </Route>

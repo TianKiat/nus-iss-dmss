@@ -7,11 +7,10 @@ import { Box, Container, Text } from '@chakra-ui/react'
 
 interface DashboardProps {
     userID : number
-    userRole : string
+    roleID : number
 }
 
 export default function Dashboard(props : DashboardProps) {
-    const [role, setRole] = useState(props.userRole);
 
     // useEffect(() => {
     //   const fetchAccess =async () => {
@@ -24,18 +23,8 @@ export default function Dashboard(props : DashboardProps) {
     // }, [props.userRole])
     
     return (
-        props.userID == null ?
-            // When userID is null aka not login
-            <Box p={4}>
-                <Container maxW={'5xl'} mt={12}>
-                    <Text>Not Login</Text>
-                </Container>
-            </Box>
-
-            // When userID is not null aka login
-            : (role !== 'vendor' ? 
-                <CustomerDashboard userID={props.userID}></CustomerDashboard>
-                : <VendorDashboard></VendorDashboard>
-        ) // for now until login and session is done
-    );
+        props.roleID !== 2 ? 
+            <CustomerDashboard userID={props.userID}></CustomerDashboard>
+            : <VendorDashboard></VendorDashboard>
+    ) // for now until login and session is done
 }
