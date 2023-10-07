@@ -3,13 +3,14 @@ import Nav from '../components/Nav'
 
 interface LayoutProps {
   userID: number,
-  username: string
+  username: string,
+  userRole: string
 }
 
 const Layout = (props: LayoutProps) => {
   return (
     <>
-      <Nav userID={props.userID} username={props.username} />
+      <Nav userID={props.userID} username={props.username} userRole={props.userRole} />
       <Outlet />
     </>
   )

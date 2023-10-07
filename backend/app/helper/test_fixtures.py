@@ -1,5 +1,5 @@
 import datetime
-from app.models import access, access_control, role, user, user_profile, vendor_profile, menuitem, invoice, order, promotion, otp
+from app.models import access, access_control, role, user, user_profile, vendor_profile, menu_item, invoice, order, promotion, otp
 
 def add_single_row_to_table(session, table_cls, values):
     new_row = table_cls(**values)
@@ -80,12 +80,12 @@ def setup_menuitem_table(session):
         {'menuItemName': 'Steam Egg', 'price': 1, 'menuItemImage': None, 'menuItemDesc': None, 'isValid': False, 'vendorProfileID': 1},
         {'menuItemName': 'Sweet and Sour Pork', 'price': 2, 'menuItemImage': None, 'menuItemDesc': 'meat', 'isValid': True, 'vendorProfileID': 1}
     ]
-    add_multiple_row_to_table(session, menuitem.MenuItem, values)
+    add_multiple_row_to_table(session, menu_item.MenuItem, values)
 
 def setup_invoice_table(session):
     values = [
-        {'date': datetime.datetime(2023, 10, 15), 'totalPrice': 20.5, 'discount': 10, 'status': 'PENDING', 'isFavorite': False, 'customerProfileID': 1, 'vendorProfileID': 1},
-        {'date': datetime.datetime(2023, 1, 12), 'totalPrice': 15, 'discount': 0, 'status': 'DONE', 'isFavorite': True, 'customerProfileID': 2, 'vendorProfileID': 1}
+        {'date': datetime.datetime(2023, 10, 15), 'totalPrice': 20.5, 'discount': 10, 'status': 'DONE', 'isFavorite': False, 'customerProfileID': 1, 'vendorProfileID': 1},
+        {'date': datetime.datetime(2023, 1, 12), 'totalPrice': 15, 'discount': 0, 'status': 'PENDING', 'isFavorite': True, 'customerProfileID': 2, 'vendorProfileID': 1}
     ]
     add_multiple_row_to_table(session, invoice.Invoice, values)
 

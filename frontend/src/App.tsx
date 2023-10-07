@@ -8,9 +8,12 @@ import Profile from "./pages/Profile";
 import Register from "./pages/Register";
 import Error from "./pages/Error";
 import Dashboard from "./pages/Dashboard";
+import CustomerOrder from "./pages/CustomerOrder" ;
+import CustomerOrderMenuItem from "./pages/CustomerOrderMenuItem";
+import CustomerBasket from "./pages/CustomerBasket";
 
 function App() {
-  const userID = 1;
+  const userID = 3;
   const username = "Joe";
   const userRole = "customer";
 
@@ -18,12 +21,14 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Layout userID={userID} username={username} />}>
-            <Route index element={<Home />} />
+          <Route path="/" element={<Layout userID={userID} username={username} userRole={userRole} />}>
+            <Route index element={userID != null ? <Dashboard userID={userID} userRole={userRole}/> : <Home />} />
             <Route path="login" element={<LoginCustomer />} />
             <Route path="vendor/login" element={<LoginVendor />} />
             <Route path="register" element={<Register />} />
             <Route path="dashboard" element={<Dashboard userID={userID} userRole={userRole}/>} />
+            <Route path="order" element={<CustomerOrder userID={userID}/>} />
+            <Route path="basket" element={<CustomerBasket/>} />
             {/* <Route path="vendor/dashboard" element={<VendorDashboard />} /> */}
             {/* <Route path="vendor/register" element={<RegisterVendor />} /> */}
             <Route path="profile" element={<Profile />} />

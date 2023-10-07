@@ -3,7 +3,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from app.models import base, invoice, vendor_profile, order
 from app.helper import test_fixtures
-from app.common.user_model import UserID, IsFavorite
+from app.common.user_model import UserID
+from app.common.invoice_model import IsFavorite
 from app.apicontroller.customer_controller import CustomerController
 
 class TestCustomerController(unittest.TestCase):
@@ -61,3 +62,8 @@ class TestCustomerController(unittest.TestCase):
         isFavorite = IsFavorite(invoiceID=0, isFavorite=True)
         result = CustomerController.update_favorite_order(self.session, isFavorite)
         self.assertEqual(None, result["invoiceID"])
+
+    def test_get_all_vendor_profile(self):
+        expected_result = self.session.query(vendor_profile.VendorProfile).all()
+        result = CustomerController.get_all_vendor_profile(self.session)
+        self.assertEqual(expected_result, result)

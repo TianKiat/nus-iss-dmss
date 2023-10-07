@@ -8,7 +8,7 @@ class InvoiceGateway():
 
     def get_invoice_by_customer(db: Session, customerProfileID: int):
         try:
-            return db.query(Invoice).filter(Invoice.customerProfileID == customerProfileID).all()
+            return db.query(Invoice).filter(Invoice.customerProfileID == customerProfileID, Invoice.status.in_(["COMPLETED", "DONE", "CANCELLED"])).all()
         except Exception as e:
             print(f"Error: {e}")
     

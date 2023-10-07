@@ -65,21 +65,22 @@ function dateStringFormatTransform(date: string) {
     return day + " " + month + " " + year;
 }
 
-interface LongCardProps {
-    userID: number
-    invoiceID: number
-    isFavorite: boolean
-    vendorName: string
-    date: string
-    menuitems: string[]
-    price: number
+interface OrderCardProps {
+    userID: number,
+    invoiceID: number,
+    isFavorite: boolean,
+    status: string,
+    vendorName: string,
+    date: string,
+    menuitems: string[],
+    price: number,
     updateOrderHistoryTriggerFunction: Function
 }
 
-const LongCard = (props: LongCardProps) => {
+const OrderCard = (props: OrderCardProps) => {
 
     const updateInvoiceIsFavorite = async() => {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/update_favorite_order`, {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/invoice/isFavorite/update`, {
             method: "POST",
             body: JSON.stringify({
                 invoiceID: props.invoiceID,
@@ -95,22 +96,38 @@ const LongCard = (props: LongCardProps) => {
     }
 
     return (
-        <Box
-            borderWidth="1px"
-            borderRadius="lg"
-            marginBottom={3}
-            p={3}>
-            <TableContainer>
+        <Button
+            w="full"
+            h="auto"
+            p={3}
+            variant="outline">
+            <TableContainer w="full">
                 <Table variant='unstyled'>
                     <Tbody>
                         <Tr>
                             <Td w={'68px'} p={'16px'} verticalAlign={'top'}>
                                 <Button variant={'link'} onClick={updateInvoiceIsFavorite}>
-                                    {/* {favoriteIcon(isFavoriteOrder)} */}
                                     {favoriteIcon(props.isFavorite)}
                                 </Button>
                             </Td>
                             <Td p={'16px'}>
+                                {
+                                    props.status == "COMPLETED" ?
+                                        <Text bgColor="blue.500" color="white" w="fit-content" p="0.25rem 1rem" borderRadius="0.5rem">Completed</Text>
+                                        : (props.status == "DONE" ?
+                                            <Text bgColor="green.500" color="white" w="fit-content" p="0.25rem 1rem" borderRadius="0.5rem">Ready to collect</Text>
+                                            : (props.status == "CANCELLED" ?
+                                                <Text bgColor="red.500" color="white" w="fit-content" p="0.25rem 1rem" borderRadius="0.5rem">Cancelled</Text>
+                                                : (props.status == "PENDING" ?
+                                                    <Text bgColor="orange.500" color="white" w="fit-content" p="0.25rem 1rem" borderRadius="0.5rem">Pending</Text>
+                                                    : (props.status == "DRAFT" ?
+                                                        <Text bgColor="gray.600" color="white" w="fit-content" p="0.25rem 1rem" borderRadius="0.5rem">Draft</Text>
+                                                        : null
+                                                    )
+                                                )
+                                            )
+                                        )
+                                }
                                 <Heading size="lg">{props.vendorName}</Heading>
                                 {props.date}
                                 <br/><br/>
@@ -128,7 +145,7 @@ const LongCard = (props: LongCardProps) => {
                     </Tbody>
                 </Table>
             </TableContainer>
-        </Box>
+        </Button>
     )
 }
 
@@ -140,29 +157,16 @@ interface CardProps {
 
 const Card = ({ heading, icon, link }: CardProps) => {
     return (
-        <Link href={link}>
-            <Box
-                maxW={{ base: 'full', md: '275px' }}
-                w={'full'}
-                borderWidth="1px"
-                borderRadius="lg"
-                overflow="hidden"
-                p={5}>
-                <Table variant={'unstyled'}>
-                    <Tbody>
-                        <Tr>
-                            <Td p={'16px'}>
-                                {icon}
-                            </Td>
-                            <Td p={'16px'}>
-                                <Button variant={'link'} colorScheme='blue'>
-                                    <Heading size={'md'}>{heading}</Heading>
-                                </Button>
-                            </Td>
-                        </Tr>
-                    </Tbody>
-                </Table>
-            </Box>
+        <Link href={link} _hover={{textDecor: "none"}}>
+            <Button
+                h="auto"
+                p="2rem"
+                variant="outline"
+                display="flex"
+                gap="1rem">
+                {icon}
+                <Heading size={'md'} color="blue.500">{heading}</Heading>
+            </Button>
         </Link>
     )
 }
@@ -181,7 +185,7 @@ export default function (props : CustomerDashboardProps) {
         const fetchAccess = async() => {
             setShowOrderList(false);
             
-            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/order_history`, {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/invoice/get`, {
                 method: 'POST',
                 body: JSON.stringify({userID: props.userID}),
                 headers: {
@@ -216,7 +220,7 @@ export default function (props : CustomerDashboardProps) {
                     <Card
                         heading={'Order Food'}
                         icon={<Icon as={FaBowlRice} w={10} h={10} color={'black'}/>}
-                        link={'#'}
+                        link={'/order'}
                     />
                 </Flex>
                 <br/>
@@ -227,50 +231,56 @@ export default function (props : CustomerDashboardProps) {
                     </TabList>
                     <TabPanels>
                         <TabPanel>
-                            {
-                                showOrderList ?
-                                    (
-                                        favoriteOrder.length > 0 ?
-                                            favoriteOrder.map((item) => (
-                                                <LongCard
-                                                    key={item["invoice"]["invoiceID"]}
-                                                    userID={props.userID}
-                                                    invoiceID={item["invoice"]["invoiceID"]}
-                                                    isFavorite={item["invoice"]["isFavorite"]}
-                                                    vendorName={item["vendor"]["profileName"]}
-                                                    date={dateStringFormatTransform(item["invoice"]["date"])}
-                                                    menuitems={ordersToMenuitemsList(item["orders"])}
-                                                    price={item["invoice"]["totalPrice"]}
-                                                    updateOrderHistoryTriggerFunction={setUpdateOrderHistoryTrigger}
-                                                />
-                                            ))
-                                            : <Text>No favorite order</Text>
-                                    )
-                                    : <Text>Loading ...</Text>
-                            }
+                            <Flex gap="1rem" flexDirection="column">
+                                {
+                                    showOrderList ?
+                                        (
+                                            favoriteOrder.length > 0 ?
+                                                favoriteOrder.map((item) => (
+                                                    <OrderCard
+                                                        key={item["invoice"]["invoiceID"]}
+                                                        userID={props.userID}
+                                                        invoiceID={item["invoice"]["invoiceID"]}
+                                                        isFavorite={item["invoice"]["isFavorite"]}
+                                                        status={item["invoice"]["status"]}
+                                                        vendorName={item["vendor"]["profileName"]}
+                                                        date={dateStringFormatTransform(item["invoice"]["date"])}
+                                                        menuitems={ordersToMenuitemsList(item["orders"])}
+                                                        price={item["invoice"]["totalPrice"]}
+                                                        updateOrderHistoryTriggerFunction={setUpdateOrderHistoryTrigger}
+                                                    />
+                                                ))
+                                                : <Text>No favorite order</Text>
+                                        )
+                                        : <Text>Loading ...</Text>
+                                }
+                            </Flex>
                         </TabPanel>
                         <TabPanel>
-                            {
-                                showOrderList ?
-                                    (
-                                        orderHistory.length > 0 ?
-                                            orderHistory.map((item) => (
-                                                <LongCard
-                                                    key={item["invoice"]["invoiceID"]}
-                                                    userID={props.userID}
-                                                    invoiceID={item["invoice"]["invoiceID"]}
-                                                    isFavorite={item["invoice"]["isFavorite"]}
-                                                    vendorName={item["vendor"]["profileName"]}
-                                                    date={dateStringFormatTransform(item["invoice"]["date"])}
-                                                    menuitems={ordersToMenuitemsList(item["orders"])}
-                                                    price={item["invoice"]["totalPrice"]}
-                                                    updateOrderHistoryTriggerFunction={setUpdateOrderHistoryTrigger}
-                                                />
-                                            ))
-                                            : <Text>No order history</Text>
-                                    )
-                                    : <Text>Loading ...</Text>
-                            }
+                            <Flex gap="1rem" flexDirection="column">
+                                {
+                                    showOrderList ?
+                                        (
+                                            orderHistory.length > 0 ?
+                                                orderHistory.map((item) => (
+                                                    <OrderCard
+                                                        key={item["invoice"]["invoiceID"]}
+                                                        userID={props.userID}
+                                                        invoiceID={item["invoice"]["invoiceID"]}
+                                                        isFavorite={item["invoice"]["isFavorite"]}
+                                                        status={item["invoice"]["status"]}
+                                                        vendorName={item["vendor"]["profileName"]}
+                                                        date={dateStringFormatTransform(item["invoice"]["date"])}
+                                                        menuitems={ordersToMenuitemsList(item["orders"])}
+                                                        price={item["invoice"]["totalPrice"]}
+                                                        updateOrderHistoryTriggerFunction={setUpdateOrderHistoryTrigger}
+                                                    />
+                                                ))
+                                                : <Text>No order history</Text>
+                                        )
+                                        : <Text>Loading ...</Text>
+                                }
+                            </Flex>
                         </TabPanel>
                     </TabPanels>
                 </Tabs>

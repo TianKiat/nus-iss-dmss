@@ -27,7 +27,3 @@ class Login(BaseModel):
     
 class UserID(BaseModel):
     userID: int
-
-class IsFavorite(BaseModel):
-    invoiceID: int
-    isFavorite: bool

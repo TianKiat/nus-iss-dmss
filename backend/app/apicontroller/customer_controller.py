@@ -2,6 +2,7 @@ from app.service.user_profile_service import UserProfileService
 from app.service.vendor_profile_service import VendorProfileService
 from app.service.order_service import OrderService
 from app.service.invoice_service import InvoiceService
+from app.service.vendor_profile_service import VendorProfileService
 
 class CustomerController:
     def __init__ (self):
@@ -26,3 +27,6 @@ class CustomerController:
 
     def update_favorite_order(db, isFavorite):
         return InvoiceService.update_isFavorite(db, isFavorite.invoiceID, isFavorite.isFavorite)
+    
+    def get_all_vendor_profile(db):
+        return VendorProfileService.get_all_vendor_profile(db)
