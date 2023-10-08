@@ -13,9 +13,9 @@ import CustomerOrderMenuItem from "./pages/CustomerOrderMenuItem";
 import CustomerBasket from "./pages/CustomerBasket";
 
 function App() {
-  const userID = 3;
-  const username = "Joe";
-  const userRole = "customer";
+  const userID = 2;
+  const username = "Amy";
+  const userRole = "vendor";
 
   return (
     <>

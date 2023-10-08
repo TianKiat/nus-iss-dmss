@@ -1,6 +1,10 @@
 "use client";
 
 import {
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionIcon,
   Box,
   Stack,
   Heading,
@@ -27,7 +31,6 @@ import {
   Tr,
   Th,
   Td,
-  TableCaption,
   TableContainer,
   IconButton,
   Button,
@@ -104,180 +107,111 @@ interface MenuItem {
   vendorProfileID: Number;
 }
 
-const MenuItemRow = (props: MenuItem) => (
-  <Tr>
-    <Td>{props.menuItemName}</Td>
-    <Td>{props.menuItemDesc === null ? "NA" : props.menuItemDesc}</Td>
-    <Td isNumeric>${props.price.toFixed(2)}</Td>
-    <Td>
-      <IconButton aria-label="Edit Menu Item" icon={<ViewIcon />} />
-    </Td>
-    <Td>
-      <IconButton aria-label="Search database" icon={<DeleteIcon />} />
-    </Td>
-  </Tr>
-);
-
 interface MenuListProps {
   items: MenuItem[];
+  onEditMenuItem: (menuItem: MenuItem) => void;
+  onDeleteMenuItem: (menuItemId: Number) => void;
 }
 
 const MenuList: FunctionComponent<MenuListProps> = (props) => {
-  // const { isOpen, onOpen, onClose } = useDisclosure();
-  // const [description, setDescription] = useState<string>("");
-  // const [itemName, setItemName] = useState<string>("");
-  // const [imageUrl, setImageUrl] = useState<string>("");
-  // const [price, setprice] = useState<Number>(0);
-  // const user_id = 1;
-  // const postUrl = `${import.meta.env.VITE_API_BASE_URL}/menu_items/update/`;
-
-  // function onEdit() {
-  //   let itemToAdd: MenuItem = {
-  //     menuItemID: 1, // temp id
-  //     menuItemName: itemName,
-  //     price: price,
-  //     menuItemImage: imageUrl,
-  //     menuItemDesc: description,
-  //     isValid: true,
-  //     vendorProfileID: user_id,
-  //   };
-  //   console.log(itemToAdd);
-  //   fetch(postUrl, {
-  //     // Adding method type
-  //     method: "POST",
-
-  //     // Adding body or contents to send
-  //     body: JSON.stringify(itemToAdd),
-
-  //     // Adding headers to the request
-  //     headers: {
-  //       "Content-type": "application/json; charset=UTF-8",
-  //     },
-  //   })
-  //     // Converting to JSON
-  //     .then((response) => response.json())
-
-  //     // Displaying results to console
-  //     .then((json) => {
-  //       console.log(json);
-  //       onClose();
-  //     });
-  // }
-
-  // function onEditClick(item: MenuItem) {
-  //   setItemName(item.menuItemName);
-  //   setDescription(item.menuItemDesc);
-  //   setprice(item.price);
-  //   setImageUrl(item.menuItemImage);
-  //   onOpen();
-  // }
-
   return (
     <>
-    <TableContainer>
-      <Table variant="striped">
-        <TableCaption>Imperial to metric conversion factors</TableCaption>
-        <Thead>
-          <Tr>
-            <Th>Name</Th>
-            <Th width={"50%"}>Description</Th>
-            <Th width={"5%"} isNumeric>
-              Price
-            </Th>
-            <Th width={"10%"}></Th>
-            <Th width={"10%"}></Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {props.items.map((m) => {
-            return (
-              <Tr>
-                <Td>{m.menuItemName}</Td>
-                <Td>{m.menuItemDesc === null ? "NA" : m.menuItemDesc}</Td>
-                <Td isNumeric>${m.price.toFixed(2)}</Td>
-                <Td>
-                  <IconButton aria-label="Edit Menu Item" icon={<ViewIcon />} />
-                </Td>
-                <Td>
-                  <IconButton
-                    aria-label="Delete item"
-                    icon={<DeleteIcon />}
-                  />
-                </Td>
-              </Tr>
-            );
-          })}
-        </Tbody>
-        <Tfoot></Tfoot>
-      </Table>
-    </TableContainer>
-    {/* <Modal onClose={onclose} isOpen={isOpen} isCentered size={"xl"}>
-    <ModalOverlay />
-    <ModalContent>
-      <ModalHeader>Edit Menu Item</ModalHeader>
-      <ModalCloseButton />
-      <ModalBody>
-        <Stack spacing={"1rem"}>
-          <FormControl id="name">
-            <FormLabel>Name / Description</FormLabel>
-            <Input
-              type="text"
-              onChange={(e) => setItemName(e.target.value)}
-              isRequired
-              value={itemName}
-            />
-          </FormControl>
-          <FormControl id="description">
-            <FormLabel>Description</FormLabel>
-            <Input
-              type="text"
-              onChange={(e) => setDescription(e.target.value)}
-              isRequired
-              value={description}
-            />
-          </FormControl>
-          <FormControl id="price">
-            <FormLabel>Price</FormLabel>
-            <Input
-              type="text"
-              onChange={(e) => setprice(Number(e.target.value))}
-              isRequired
-              value={price.toString()}
-            />
-          </FormControl>
-          <FormControl id="imageUrl">
-            <FormLabel>Image Url</FormLabel>
-            <Input
-              type="text"
-              onChange={(e) => setImageUrl(e.target.value)}
-              isRequired
-              value={imageUrl}
-            />
-          </FormControl>
-        </Stack>
-      </ModalBody>
-      <ModalFooter gap={"0.5rem"}>
-        <Button onClick={onEdit}>Edit</Button>
-        <Button onClick={onClose} variant="outline">
-          Close
-        </Button>
-      </ModalFooter>
-    </ModalContent>
-  </Modal> */}
-  </>
+      <TableContainer>
+        <Table variant="striped">
+          <Thead>
+            <Tr>
+              <Th>Name</Th>
+              <Th width={"50%"}>Description</Th>
+              <Th width={"5%"} isNumeric>
+                Price
+              </Th>
+              <Th width={"10%"}></Th>
+              <Th width={"10%"}></Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {props.items.map((m) => {
+              return (
+                m.isValid === true ?
+                <Tr key={m.menuItemID.toString() + m.menuItemName}>
+                  <Td>{m.menuItemName}</Td>
+                  <Td>{m.menuItemDesc === null ? "NA" : m.menuItemDesc}</Td>
+                  <Td isNumeric>${m.price.toFixed(2)}</Td>
+                  <Td>
+                    <IconButton
+                      aria-label="Edit Menu Item"
+                      icon={<ViewIcon />}
+                      onClick={() => {props.onEditMenuItem(m);}}
+                    />
+                  </Td>
+                  <Td>
+                    <IconButton
+                      aria-label="Delete item"
+                      icon={<DeleteIcon />}
+                      onClick={() => {props.onDeleteMenuItem(m.menuItemID);}}
+                    />
+                  </Td>
+                </Tr>
+                : null
+              );
+            })}
+          </Tbody>
+          <Tfoot></Tfoot>
+        </Table>
+      </TableContainer>
+    </>
   );
 };
 
-function MenuTab() {
+interface TabProps {
+  userID: Number;
+  profileID: Number;
+}
+
+function MenuTab(props: TabProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [description, setDescription] = useState<string>("");
   const [itemName, setItemName] = useState<string>("");
   const [imageUrl, setImageUrl] = useState<string>("");
-  const [price, setprice] = useState<Number>(0);
-  const user_id = 1;
-  let url = `${import.meta.env.VITE_API_BASE_URL}/menu_items/get/${user_id}`;
-  const postUrl = `${import.meta.env.VITE_API_BASE_URL}/menu_items/create/`;
+  const [price, setPrice] = useState<Number>(0);
+  let url = `${import.meta.env.VITE_API_BASE_URL}/menu_items/get/${
+    props.userID
+  }`;
+  const createUrl = `${import.meta.env.VITE_API_BASE_URL}/menu_items/create`;
+  const editUrl = `${import.meta.env.VITE_API_BASE_URL}/menu_items/update`;
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItem | null>(
+    null
+  );
+
+  function handleEditMenuItem(menuItem: MenuItem) {
+    setSelectedMenuItem(menuItem);
+    onOpen(); // Open the modal
+  }
+
+  async function handleDeleteMenuItem(menuItemID : Number) {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/menu_items/delete/?menu_item_id=${menuItemID}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+        }
+      );
+  
+      if (response.ok) {
+        // Remove the deleted item from the menuItems state
+        setMenuItems(menuItems.filter((item) => item.menuItemID !== menuItemID));
+      } else {
+        console.error("Failed to delete menu item.");
+      }
+    } catch (error) {
+      console.error("Error deleting menu item:", error);
+    }
+  }
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -289,39 +223,105 @@ function MenuTab() {
     fetchData();
   }, []);
 
-  function onSubmit() {
-    let itemToAdd: MenuItem = {
+  useEffect(() => {
+    if (selectedMenuItem) {
+      setItemName(selectedMenuItem.menuItemName || '');
+      setDescription(selectedMenuItem.menuItemDesc || '');
+      setImageUrl(selectedMenuItem.menuItemImage || '');
+      setPrice(selectedMenuItem.price || 0);
+    } else {
+      // If there is no selectedMenuItem, reset the fields
+      setItemName('');
+      setDescription('');
+      setImageUrl('');
+      setPrice(0);
+    }
+  }, [selectedMenuItem]);
+
+  async function onSubmit() {
+    const itemToAdd = {
       menuItemID: 1, // temp id
       menuItemName: itemName,
       price: price,
       menuItemImage: imageUrl,
       menuItemDesc: description,
       isValid: true,
-      vendorProfileID: user_id,
+      vendorProfileID: props.profileID,
     };
-    console.log(itemToAdd);
-    fetch(postUrl, {
-      // Adding method type
-      method: "POST",
-
-      // Adding body or contents to send
-      body: JSON.stringify(itemToAdd),
-
-      // Adding headers to the request
-      headers: {
-        "Content-type": "application/json; charset=UTF-8",
-      },
-    })
-      // Converting to JSON
-      .then((response) => response.json())
-
-      // Displaying results to console
-      .then((json) => {
-        console.log(json.id);
-        onClose();
-        itemToAdd.menuItemID = json.id
-        setMenuItems([...menuItems, itemToAdd]);
+    try {
+      const response = await fetch(createUrl, {
+        method: "POST",
+        body: JSON.stringify(itemToAdd),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
       });
+
+      if (response.ok) {
+        const newItem = await response.json();
+        itemToAdd.menuItemID = newItem.id;
+        setMenuItems([...menuItems, itemToAdd]);
+
+        // Reset form fields
+        setItemName("");
+        setPrice(0);
+        setImageUrl("");
+        setDescription("");
+
+      } else {
+        console.error("Failed to create a new menu item.");
+      }
+    } catch (error) {
+      console.error("Error creating a new menu item:", error);
+    }
+    onClose();
+    setSelectedMenuItem(null);
+  }
+
+  async function onEdit() {
+    const itemToedit = {
+      menuItemID: selectedMenuItem!.menuItemID, // temp id
+      menuItemName: itemName,
+      price: price,
+      menuItemImage: imageUrl,
+      menuItemDesc: description,
+      isValid: true,
+      vendorProfileID: props.profileID,
+    };
+    try {
+      const response = await fetch(editUrl, {
+        method: "POST",
+        body: JSON.stringify(itemToedit),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      });
+
+      if (response.ok) {
+        const newItem = await response.json();
+
+        setMenuItems((prevMenuItems) =>
+        prevMenuItems.map((menuItem) =>
+          menuItem.menuItemID === selectedMenuItem!.menuItemID
+            ? { ...menuItem, ...itemToedit, menuItemID: newItem.id }
+            : menuItem
+        )
+      );
+
+        // Reset form fields
+        setItemName("");
+        setPrice(0);
+        setImageUrl("");
+        setDescription("");
+
+      } else {
+        console.error("Failed to edit menu item.");
+      }
+    } catch (error) {
+      console.error("Error editing menu item:", error);
+    }
+    onClose();
+    setSelectedMenuItem(null);
   }
 
   return (
@@ -335,11 +335,25 @@ function MenuTab() {
           icon={<AddIcon />}
         />
       </Flex>
-      <MenuList items={menuItems}></MenuList>
-      <Modal onClose={onClose} isOpen={isOpen} isCentered size={"xl"}>
+      <MenuList
+        items={menuItems}
+        onEditMenuItem={handleEditMenuItem}
+        onDeleteMenuItem={handleDeleteMenuItem}
+      ></MenuList>
+      <Modal
+        onClose={() => {
+          setSelectedMenuItem(null);
+          onClose();
+        }}
+        isOpen={isOpen}
+        isCentered
+        size={"xl"}
+      >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Create a new Menu Item</ModalHeader>
+          <ModalHeader>
+            {selectedMenuItem ? "Edit Menu Item" : "Create a new Menu Item"}
+          </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Stack spacing={"1rem"}>
@@ -349,6 +363,9 @@ function MenuTab() {
                   type="text"
                   onChange={(e) => setItemName(e.target.value)}
                   isRequired
+                  defaultValue={
+                    selectedMenuItem ? selectedMenuItem.menuItemName : ""
+                  }
                 />
               </FormControl>
               <FormControl id="description">
@@ -357,14 +374,22 @@ function MenuTab() {
                   type="text"
                   onChange={(e) => setDescription(e.target.value)}
                   isRequired
+                  defaultValue={
+                    selectedMenuItem ? selectedMenuItem.menuItemDesc || "" : ""
+                  }
                 />
               </FormControl>
               <FormControl id="price">
                 <FormLabel>Price</FormLabel>
                 <Input
                   type="text"
-                  onChange={(e) => setprice(Number(e.target.value))}
+                  onChange={(e) => setPrice(Number(e.target.value))}
                   isRequired
+                  defaultValue={
+                    selectedMenuItem
+                      ? selectedMenuItem.price.toFixed(2)
+                      : "0.00"
+                  }
                 />
               </FormControl>
               <FormControl id="imageUrl">
@@ -373,115 +398,274 @@ function MenuTab() {
                   type="text"
                   onChange={(e) => setImageUrl(e.target.value)}
                   isRequired
+                  defaultValue={
+                    selectedMenuItem ? selectedMenuItem.menuItemImage || "" : ""
+                  }
                 />
               </FormControl>
             </Stack>
           </ModalBody>
           <ModalFooter gap={"0.5rem"}>
-            <Button onClick={onSubmit}>Submit</Button>
+            <Button onClick={() => (selectedMenuItem ? onEdit() : onSubmit())}>
+              {selectedMenuItem ? "Edit" : "Submit"}
+            </Button>
             <Button onClick={onClose} variant="outline">
               Close
             </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
-      
     </>
   );
 }
 
-export default function VendorDashboard() {
-  if (true)
-    //sessionStorage.getItem("token"))
+interface Invoice {
+  totalPrice: number;
+  status: string;
+  invoiceID: number;
+  isFavorite: boolean;
+  vendorProfileID: number;
+  discount: number;
+  date: string;
+  customerProfileID: number;
+}
 
-    return (
-      <Container maxW="6xl">
-        <Heading paddingBlock={"1.5rem"}>Dashboard</Heading>
-        <Stack direction={"row"}>
-          <DataCard
-            id="orders"
-            icon="orders"
-            data={0}
-            subtitle={"Total orders today"}
-          ></DataCard>
-          <DataCard
-            id="cancelled"
-            icon="cancelled"
-            data={0}
-            subtitle={"Cancelled orders today"}
-          ></DataCard>
-          <DataCard
-            id="closed"
-            icon="closed"
-            data={0}
-            subtitle={"Stalls closed today"}
-          ></DataCard>
-        </Stack>
-        <Heading paddingBlock={"1rem"} fontSize={"1.5rem"}>
-          Business Summary
-        </Heading>
-        <Stack direction={"row"}>
-          <Card width={"50%"}>
-            <CardHeader>
-              <Heading size="md">Orders Report</Heading>
-            </CardHeader>
-            <CardBody>
-              <Stack direction={"row"} spacing={"10rem"}>
-                <Box>
-                  <Stat>
-                    <StatLabel>Total</StatLabel>
-                    <StatNumber>100</StatNumber>
-                  </Stat>
-                </Box>
-                <Box>
-                  <Stat>
-                    <StatLabel>Cancelled</StatLabel>
-                    <StatNumber>12</StatNumber>
-                  </Stat>
-                </Box>
-              </Stack>
-            </CardBody>
-          </Card>
-          <Card width={"50%"}>
-            <CardHeader>
-              <Heading size="md">Sales Report</Heading>
-            </CardHeader>
-            <CardBody>
-              <Stack direction={"row"}>
-                <Box>
-                  <Stat>
-                    <StatLabel>Sales</StatLabel>
-                    <StatNumber>SGD $ 1,234.00</StatNumber>
-                  </Stat>
-                </Box>
-              </Stack>
-            </CardBody>
-          </Card>
-        </Stack>
-        <Tabs paddingBlock={"2rem"}>
-          <TabList>
-            <Tab>Orders History</Tab>
-            <Tab>Menu</Tab>
-            <Tab>Opening Times</Tab>
-            <Tab>Ratings and reviews</Tab>
-          </TabList>
+interface Order {
+  price: number;
+  quantity: number;
+  menuItemID: number;
+  orderID: number;
+  foodName: string;
+  invoiceID: number;
+}
 
-          <TabPanels>
-            <TabPanel>
-              <p>one!</p>
-            </TabPanel>
-            <TabPanel>
-              <MenuTab></MenuTab>
-            </TabPanel>
-            <TabPanel>
-              <p>three!</p>
-            </TabPanel>
-            <TabPanel>
-              <p>Four</p>
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-      </Container>
-    );
-  return <Error></Error>;
+interface InvoiceData {
+  invoice: Invoice;
+  orders: Order[];
+}
+
+function OrdersTab(props: TabProps) {
+  let url = `${import.meta.env.VITE_API_BASE_URL}/vendor/orders/get/${
+    props.userID
+  }`;
+  const [orders, setOrders] = useState<InvoiceData[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetch(url);
+      const newData = await response.json();
+      console.log(newData);
+      setOrders(newData);
+    };
+
+    fetchData();
+  }, []);
+
+  return (
+    <>
+    <Flex paddingBlock={"1rem"} align={"center"}>
+        <Heading fontSize={"md"}>Pending</Heading>
+      </Flex>
+      <TableContainer paddingBottom={"2rem"}>
+        <Table variant="striped">
+          <Thead>
+            <Tr>
+              <Th>Invoice No.</Th>
+              <Th>Date</Th>
+              <Th>Orders</Th>
+              <Th isNumeric>
+                Quantity
+              </Th>
+              <Th>
+                Status
+              </Th>
+              <Th isNumeric>Total</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {orders.map((o) => {
+              return (
+                o.invoice.status.toLowerCase() === 'pending' ?
+                <Tr key={o.invoice.invoiceID}>
+                  <Td>{o.invoice.invoiceID}</Td>
+                  <Td>{o.invoice.date}</Td>
+                  <Td>{o.orders.map(m => m.foodName).join(', ')}</Td>
+                  <Td isNumeric>{o.orders.length}</Td>
+                  <Td>{o.invoice.status}</Td>
+                  <Td isNumeric>${o.invoice.totalPrice.toFixed(2)}</Td>
+                </Tr> : null
+              );
+            })}
+          </Tbody>
+          <Tfoot></Tfoot>
+        </Table>
+      </TableContainer>
+      <Flex paddingBlock={"1rem"} align={"center"}>
+        <Heading fontSize={"md"}>Completed Orders</Heading>
+      </Flex>
+      <TableContainer>
+        <Table variant="striped">
+          <Thead>
+            <Tr>
+              <Th>Invoice No.</Th>
+              <Th>Date</Th>
+              <Th>Orders</Th>
+              <Th isNumeric>
+                Quantity
+              </Th>
+              <Th>
+                Status
+              </Th>
+              <Th isNumeric>Total</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {orders.map((o) => {
+              return (
+                o.invoice.status.toLowerCase() === 'done' ?
+                <Tr key={o.invoice.invoiceID}>
+                  <Td>{o.invoice.invoiceID}</Td>
+                  <Td>{o.invoice.date}</Td>
+                  <Td>{o.orders.map(m => m.foodName).join(', ')}</Td>
+                  <Td isNumeric>{o.orders.length}</Td>
+                  <Td>{o.invoice.status}</Td>
+                  <Td isNumeric>${o.invoice.totalPrice.toFixed(2)}</Td>
+                </Tr> : null
+              );
+            })}
+          </Tbody>
+          <Tfoot></Tfoot>
+        </Table>
+      </TableContainer>
+    </>
+  );
+}
+
+interface VendorProfile {
+  address: string;
+  email: string;
+  phone: string;
+  profileName: string;
+  shopDesc: string | null;
+  status: Boolean;
+  userID: Number;
+  vendorProfileID: Number;
+}
+
+interface VendorDashboardProps {
+  userID: number;
+}
+
+export default function VendorDashboard(props: VendorDashboardProps) {
+  const vendorPofileUrl = `${
+    import.meta.env.VITE_API_BASE_URL
+  }/vendor_profile/get/${props.userID}`;
+  const [vendorProfileId, setVendorProfileId] = useState<Number>(0);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetch(vendorPofileUrl);
+      const newData : VendorProfile = await response.json();
+      console.log(newData);
+      setVendorProfileId(newData.vendorProfileID);
+    };
+
+    fetchData();
+  }, []);
+
+  return (
+    <Container maxW="6xl">
+      <Heading paddingBlock={"1.5rem"}>Dashboard</Heading>
+      <Stack direction={"row"}>
+        <DataCard
+          id="orders"
+          icon="orders"
+          data={0}
+          subtitle={"Total orders today"}
+        ></DataCard>
+        <DataCard
+          id="cancelled"
+          icon="cancelled"
+          data={0}
+          subtitle={"Cancelled orders today"}
+        ></DataCard>
+        <DataCard
+          id="closed"
+          icon="closed"
+          data={0}
+          subtitle={"Stalls closed today"}
+        ></DataCard>
+      </Stack>
+      <Heading paddingBlock={"1rem"} fontSize={"1.5rem"}>
+        Business Summary
+      </Heading>
+      <Stack direction={"row"}>
+        <Card width={"50%"}>
+          <CardHeader>
+            <Heading size="md">Orders Report</Heading>
+          </CardHeader>
+          <CardBody>
+            <Stack direction={"row"} spacing={"10rem"}>
+              <Box>
+                <Stat>
+                  <StatLabel>Total</StatLabel>
+                  <StatNumber>100</StatNumber>
+                </Stat>
+              </Box>
+              <Box>
+                <Stat>
+                  <StatLabel>Cancelled</StatLabel>
+                  <StatNumber>12</StatNumber>
+                </Stat>
+              </Box>
+            </Stack>
+          </CardBody>
+        </Card>
+        <Card width={"50%"}>
+          <CardHeader>
+            <Heading size="md">Sales Report</Heading>
+          </CardHeader>
+          <CardBody>
+            <Stack direction={"row"}>
+              <Box>
+                <Stat>
+                  <StatLabel>Sales</StatLabel>
+                  <StatNumber>SGD $ 1,234.00</StatNumber>
+                </Stat>
+              </Box>
+            </Stack>
+          </CardBody>
+        </Card>
+      </Stack>
+      <Tabs paddingBlock={"2rem"}>
+        <TabList>
+          <Tab>All Orders</Tab>
+          <Tab>Menu</Tab>
+          <Tab>Opening Times</Tab>
+          <Tab>Ratings and reviews</Tab>
+        </TabList>
+
+        <TabPanels>
+          <TabPanel>
+          <OrdersTab
+              userID={props.userID}
+              profileID={vendorProfileId}
+            ></OrdersTab>
+          </TabPanel>
+          <TabPanel>
+            <MenuTab
+              userID={props.userID}
+              profileID={vendorProfileId}
+            ></MenuTab>
+          </TabPanel>
+          <TabPanel>
+            <p>three!</p>
+          </TabPanel>
+          <TabPanel>
+            <p>Four</p>
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
+    </Container>
+  );
 }

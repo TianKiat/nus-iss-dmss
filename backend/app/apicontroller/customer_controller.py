@@ -19,7 +19,7 @@ class CustomerController:
         
         order_history = []
         for invoice in invoices:
-            vendor = VendorProfileService.get_vendor_profile(db, invoice.vendorProfileID)
+            vendor = VendorProfileService.get_vendor_profile(db, userID.userID)
             orders = OrderService.get_order_by_invoice(db, invoice.invoiceID)
             order_history.append({"invoice": invoice, "vendor": vendor, "orders": orders})
 

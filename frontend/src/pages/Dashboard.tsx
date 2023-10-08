@@ -35,7 +35,7 @@ export default function Dashboard(props : DashboardProps) {
             // When userID is not null aka login
             : (role !== 'vendor' ? 
                 <CustomerDashboard userID={props.userID}></CustomerDashboard>
-                : <VendorDashboard></VendorDashboard>
+                : <VendorDashboard userID={props.userID}></VendorDashboard>
         ) // for now until login and session is done
     );
 }
