@@ -3,7 +3,6 @@
 import VendorDashboard from './VendorDashboard'
 import CustomerDashboard from './CustomerDashboard'
 import { useEffect, useState } from "react"
-import { Box, Container, Text } from '@chakra-ui/react'
 
 interface DashboardProps {
     userID : number
@@ -25,6 +24,6 @@ export default function Dashboard(props : DashboardProps) {
     return (
         props.roleID !== 2 ? 
             <CustomerDashboard userID={props.userID}></CustomerDashboard>
-            : <VendorDashboard></VendorDashboard>
-    ) // for now until login and session is done
+            : <VendorDashboard userID={props.userID}></VendorDashboard>
+    ); // for now until login and session is done
 }

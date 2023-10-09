@@ -7,5 +7,8 @@ class InvoiceService():
     def get_invoice_by_customer(db, customerProfileID):
         return InvoiceGateway.get_invoice_by_customer(db, customerProfileID)
     
+    def get_invoice_by_vendor(db, vendorProfileID):
+        return InvoiceGateway.get_invoice_by_vendor(db, vendorProfileID)
+    
     def update_isFavorite(db, invoiceID, isFavorite):
         return InvoiceGateway.update_isFavorite(db, invoiceID, isFavorite)

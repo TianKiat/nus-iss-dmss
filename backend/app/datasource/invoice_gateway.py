@@ -12,6 +12,12 @@ class InvoiceGateway():
         except Exception as e:
             print(f"Error: {e}")
     
+    def get_invoice_by_vendor(db: Session, vendorProfileID: int):
+        try:
+            return db.query(Invoice).filter(Invoice.vendorProfileID == vendorProfileID).all()
+        except Exception as e:
+            print(f"Error: {e}")
+    
     def update_isFavorite(db: Session, invoiceID: int, isFavorite: int):
         try:
             db.execute(
