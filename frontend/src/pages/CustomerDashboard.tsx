@@ -26,6 +26,23 @@ import { ReactElement, useEffect, useState } from 'react'
 import { FaBowlRice, FaStar } from 'react-icons/fa6'
 import { FaRegStar } from 'react-icons/fa'
 
+function orderStatusTag(status: string) {
+    switch(status) {
+        case "COMPLETED":
+            return <Text bgColor="blue.500" color="white" w="fit-content" p="0.25rem 1rem" borderRadius="0.5rem">Completed</Text>
+        case "DONE":
+            return <Text bgColor="green.500" color="white" w="fit-content" p="0.25rem 1rem" borderRadius="0.5rem">Ready to collect</Text>
+        case "CANCELLED":
+            return <Text bgColor="red.500" color="white" w="fit-content" p="0.25rem 1rem" borderRadius="0.5rem">Cancelled</Text>
+        case "PENDING":
+            return <Text bgColor="orange.500" color="white" w="fit-content" p="0.25rem 1rem" borderRadius="0.5rem">Pending</Text>
+        case "DRAFT":
+            return <Text bgColor="gray.600" color="white" w="fit-content" p="0.25rem 1rem" borderRadius="0.5rem">Draft</Text>
+        default:
+            return null
+    }
+}
+
 function ordersToMenuitemsList(orders: any[]): string[] {
     var menuitems = []
     for (var i = 0; i < orders.length; i++) {
@@ -95,45 +112,83 @@ const OrderCard = (props: OrderCardProps) => {
         props.updateOrderHistoryTriggerFunction(await response.json());
     }
 
+    const cancelInvoice = async() => {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/invoice/status/update`, {
+            method: "POST",
+            body: JSON.stringify({
+                invoiceID: props.invoiceID,
+                status: "CANCELLED"
+            }),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        props.updateOrderHistoryTriggerFunction(await response.json());
+    }
+
     return (
-        <Button
-            w="full"
-            h="auto"
-            p={3}
-            variant="outline">
+        props.isFavorite != null ?
+            <Button
+                w="full"
+                h="auto"
+                p={3}
+                fontWeight="normal"
+                variant="outline">
+                <TableContainer w="full">
+                    <Table variant='unstyled'>
+                        <Tbody>
+                            <Tr>
+                                <Td w={'68px'} p={'16px'} verticalAlign={'top'}>
+                                    <Button variant={'link'} onClick={updateInvoiceIsFavorite}>
+                                        {favoriteIcon(props.isFavorite)}
+                                    </Button>
+                                </Td>
+                                <Td p={'16px'}>
+                                    {orderStatusTag(props.status)}
+                                    <Heading size="lg">{props.vendorName}</Heading>
+                                    {dateStringFormatTransform(props.date)}
+                                    <br/><br/>
+                                    <Heading size="sm">Menu Items</Heading>
+                                    <UnorderedList>
+                                        {ordersToMenuitemsList(props.menuitems).map((value) => (
+                                            <ListItem key={value}>{value}</ListItem>
+                                        ))}
+                                    </UnorderedList>
+                                </Td>
+                                <Td w={'150px'} p={'16px'} verticalAlign={'top'} textAlign={'right'}>
+                                    <Heading size="lg">${props.price.toFixed(2)}</Heading>
+                                </Td>
+                            </Tr>
+                        </Tbody>
+                    </Table>
+                </TableContainer>
+            </Button>
+        : <Box
+            borderWidth="1px"
+            borderRadius="6px"
+            p={3}>
             <TableContainer w="full">
                 <Table variant='unstyled'>
                     <Tbody>
                         <Tr>
                             <Td w={'68px'} p={'16px'} verticalAlign={'top'}>
-                                <Button variant={'link'} onClick={updateInvoiceIsFavorite}>
-                                    {favoriteIcon(props.isFavorite)}
+                                <Button
+                                    colorScheme="red"
+                                    isDisabled={props.status == "DONE" ? true : false}
+                                    onClick={cancelInvoice}>
+                                    Cancel
                                 </Button>
                             </Td>
                             <Td p={'16px'}>
-                                {
-                                    props.status == "COMPLETED" ?
-                                        <Text bgColor="blue.500" color="white" w="fit-content" p="0.25rem 1rem" borderRadius="0.5rem">Completed</Text>
-                                        : (props.status == "DONE" ?
-                                            <Text bgColor="green.500" color="white" w="fit-content" p="0.25rem 1rem" borderRadius="0.5rem">Ready to collect</Text>
-                                            : (props.status == "CANCELLED" ?
-                                                <Text bgColor="red.500" color="white" w="fit-content" p="0.25rem 1rem" borderRadius="0.5rem">Cancelled</Text>
-                                                : (props.status == "PENDING" ?
-                                                    <Text bgColor="orange.500" color="white" w="fit-content" p="0.25rem 1rem" borderRadius="0.5rem">Pending</Text>
-                                                    : (props.status == "DRAFT" ?
-                                                        <Text bgColor="gray.600" color="white" w="fit-content" p="0.25rem 1rem" borderRadius="0.5rem">Draft</Text>
-                                                        : null
-                                                    )
-                                                )
-                                            )
-                                        )
-                                }
+                                {orderStatusTag(props.status)}
                                 <Heading size="lg">{props.vendorName}</Heading>
-                                {props.date}
+                                {dateStringFormatTransform(props.date)}
                                 <br/><br/>
                                 <Heading size="sm">Menu Items</Heading>
                                 <UnorderedList>
-                                    {props.menuitems.map((value) => (
+                                    {ordersToMenuitemsList(props.menuitems).map((value) => (
                                         <ListItem key={value}>{value}</ListItem>
                                     ))}
                                 </UnorderedList>
@@ -145,7 +200,7 @@ const OrderCard = (props: OrderCardProps) => {
                     </Tbody>
                 </Table>
             </TableContainer>
-        </Button>
+        </Box>
     )
 }
 
@@ -177,6 +232,7 @@ interface CustomerDashboardProps {
  
 export default function (props : CustomerDashboardProps) {
     const [showOrderList, setShowOrderList] = useState(false);
+    const [activeOrder, setActiveOrder] = useState([]);
     const [orderHistory, setOrderHistory] = useState([]);
     const [favoriteOrder, setFavoriteOrder] = useState([]);
     const [updateOrderHistoryTrigger, setUpdateOrderHistoryTrigger] = useState();
@@ -185,7 +241,7 @@ export default function (props : CustomerDashboardProps) {
         const fetchAccess = async() => {
             setShowOrderList(false);
             
-            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/invoice/get`, {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/invoice/get_history`, {
                 method: 'POST',
                 body: JSON.stringify({userID: props.userID}),
                 headers: {
@@ -194,7 +250,13 @@ export default function (props : CustomerDashboardProps) {
                 }
             });
             const result = await response.json();
-            setOrderHistory(result);
+
+            const activeOrderList: any = result.filter(
+                (item: { [x: string]: { [x: string]: any } }) => {
+                    return item["invoice"]["status"] == "PENDING" || item["invoice"]["status"] == "DONE"
+                }
+            );
+            setActiveOrder(activeOrderList);
 
             const favoriteOrderList: any = result.filter(
                 (item: { [x: string]: { [x: string]: any } }) => {
@@ -202,6 +264,13 @@ export default function (props : CustomerDashboardProps) {
                 }
             );
             setFavoriteOrder(favoriteOrderList);
+
+            const orderHistoryList: any = result.filter(
+                (item: { [x: string]: { [x: string]: any } }) => {
+                    return item["invoice"]["status"] == "COMPLETED" || item["invoice"]["status"] == "CANCELLED"
+                }
+            );
+            setOrderHistory(orderHistoryList);
 
             setShowOrderList(true);
         }
@@ -226,10 +295,37 @@ export default function (props : CustomerDashboardProps) {
                 <br/>
                 <Tabs>
                     <TabList>
+                        <Tab>Active Order</Tab>
                         <Tab>Favorite Order</Tab>
                         <Tab>Order History</Tab>
                     </TabList>
                     <TabPanels>
+                        <TabPanel>
+                        <Flex gap="1rem" flexDirection="column">
+                                {
+                                    showOrderList ?
+                                        (
+                                            activeOrder.length > 0 ?
+                                                activeOrder.map((item) => (
+                                                    <OrderCard
+                                                        key={item["invoice"]["invoiceID"]}
+                                                        userID={props.userID}
+                                                        invoiceID={item["invoice"]["invoiceID"]}
+                                                        isFavorite={null}
+                                                        status={item["invoice"]["status"]}
+                                                        vendorName={item["vendor"]["profileName"]}
+                                                        date={item["invoice"]["date"]}
+                                                        menuitems={item["orders"]}
+                                                        price={item["invoice"]["totalPrice"]}
+                                                        updateOrderHistoryTriggerFunction={setUpdateOrderHistoryTrigger}
+                                                    />
+                                                ))
+                                                : <Text>No active order</Text>
+                                        )
+                                        : <Text>Loading ...</Text>
+                                }
+                            </Flex>
+                        </TabPanel>
                         <TabPanel>
                             <Flex gap="1rem" flexDirection="column">
                                 {
@@ -244,8 +340,8 @@ export default function (props : CustomerDashboardProps) {
                                                         isFavorite={item["invoice"]["isFavorite"]}
                                                         status={item["invoice"]["status"]}
                                                         vendorName={item["vendor"]["profileName"]}
-                                                        date={dateStringFormatTransform(item["invoice"]["date"])}
-                                                        menuitems={ordersToMenuitemsList(item["orders"])}
+                                                        date={item["invoice"]["date"]}
+                                                        menuitems={item["orders"]}
                                                         price={item["invoice"]["totalPrice"]}
                                                         updateOrderHistoryTriggerFunction={setUpdateOrderHistoryTrigger}
                                                     />
@@ -270,8 +366,8 @@ export default function (props : CustomerDashboardProps) {
                                                         isFavorite={item["invoice"]["isFavorite"]}
                                                         status={item["invoice"]["status"]}
                                                         vendorName={item["vendor"]["profileName"]}
-                                                        date={dateStringFormatTransform(item["invoice"]["date"])}
-                                                        menuitems={ordersToMenuitemsList(item["orders"])}
+                                                        date={item["invoice"]["date"]}
+                                                        menuitems={item["orders"]}
                                                         price={item["invoice"]["totalPrice"]}
                                                         updateOrderHistoryTriggerFunction={setUpdateOrderHistoryTrigger}
                                                     />

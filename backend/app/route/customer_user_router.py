@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.apicontroller.customer_controller import CustomerController
 from app.common.user_model import UserID
-from app.common.invoice_model import IsFavorite
+from app.common.invoice_model import IsFavorite, InvoiceStatus
 from run import SessionLocal
 
 router = APIRouter()
@@ -14,10 +14,17 @@ def get_db():
     finally:
         db.close()
 
-@router.post("/invoice/get", description="Retrieve customer order history")
+@router.post("/invoice/get_history", description="Retrieve customer order history")
 def get_order_history(userID: UserID, db: Session = Depends(get_db)):
     try:
         return CustomerController.get_order_history(db, userID)
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail=str(ex)) from ex
+
+@router.post("/invoice/get_basket", description="Retrieve customer basket")
+def get_order_basket(userID: UserID, db: Session = Depends(get_db)):
+    try:
+        return CustomerController.get_order_basket(db, userID)
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex
 
@@ -25,6 +32,13 @@ def get_order_history(userID: UserID, db: Session = Depends(get_db)):
 def update_favorite_order(isFavorite: IsFavorite, db: Session = Depends(get_db)):
     try:
         return CustomerController.update_favorite_order(db, isFavorite)
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail=str(ex)) from ex
+
+@router.post("/invoice/status/update", description="Update order status in invoice table")
+def update_order_status(invoiceStatus: InvoiceStatus, db: Session = Depends(get_db)):
+    try:
+        return CustomerController.update_order_status(db, invoiceStatus)
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex
 

@@ -1,5 +1,37 @@
 import { Box, Button, Container, Flex, Heading, Icon, ListItem, Table, TableContainer, Tbody, Td, Tr, UnorderedList } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 import { MdDelete, MdEdit } from "react-icons/md"
+
+function ordersToMenuitemsList(orders: any[]): string[] {
+    var menuitems = []
+    for (var i = 0; i < orders.length; i++) {
+        menuitems.push(orders[i]["quantity"] + " x " + orders[i]["foodName"])
+    }
+    return menuitems
+}
+
+function dateStringFormatTransform(date: string) {
+    var year = date.slice(0, 4);
+    var month = date.slice(5, 7);
+    var day = date.slice(8, 10);
+
+    switch (month) {
+        case "01": month = "Jan"; break;
+        case "02": month = "Feb"; break;
+        case "03": month = "Mar"; break;
+        case "04": month = "Apr"; break;
+        case "05": month = "May"; break;
+        case "06": month = "Jun"; break;
+        case "07": month = "Jul"; break;
+        case "08": month = "Aug"; break;
+        case "09": month = "Sep"; break;
+        case "10": month = "Oct"; break;
+        case "11": month = "Nov"; break;
+        default: month = "Dec";
+    }
+
+    return day + " " + month + " " + year;
+}
 
 interface OrderCardProps {
     userID: number,
@@ -31,11 +63,11 @@ const OrderCard = (props: OrderCardProps) => {
                             </Td>
                             <Td p={'16px'}>
                                 <Heading size="lg">{props.vendorName}</Heading>
-                                {props.date}
+                                {dateStringFormatTransform(props.date)}
                                 <br/><br/>
                                 <Heading size="sm">Menu Items</Heading>
                                 <UnorderedList>
-                                    {props.menuitems.map((value) => (
+                                    {ordersToMenuitemsList(props.menuitems).map((value) => (
                                         <ListItem key={value}>{value}</ListItem>
                                     ))}
                                 </UnorderedList>
@@ -52,10 +84,29 @@ const OrderCard = (props: OrderCardProps) => {
 }
 
 interface CustomerBasketProps {
-
+    userID: number
 }
 
 export default function (props: CustomerBasketProps) {
+    const [orderBasket, setOrderBasket] = useState([]);
+    
+    useEffect(() => {
+        const fetchAccess = async() => {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/invoice/get_basket`, {
+                method: 'POST',
+                body: JSON.stringify({userID: props.userID}),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            });
+            const result = await response.json();
+            setOrderBasket(result);
+        }
+
+        fetchAccess();
+    }, []);
+
     return (
         <Box p={4}>
             <Container maxW={'5xl'} mt={12}>
@@ -64,20 +115,15 @@ export default function (props: CustomerBasketProps) {
                 </Heading>
                 <br/>
                 <Flex gap="1rem" flexDirection="column">
-                    <OrderCard
-                        userID={1}
-                        invoiceID={1}
-                        vendorName="Vendor Name"
-                        date="Date"
-                        menuitems={["quantity x menuitem"]}
-                        price={10}/>
-                    <OrderCard
-                        userID={1}
-                        invoiceID={1}
-                        vendorName="Vendor Name"
-                        date="Date"
-                        menuitems={["quantity x menuitem"]}
-                        price={10}/>
+                    {orderBasket.map((item) => (
+                        <OrderCard
+                            userID={props.userID}
+                            invoiceID={item["invoice"]["invoiceID"]}
+                            vendorName={item["vendor"]["profileName"]}
+                            date={item["invoice"]["date"]}
+                            menuitems={item["orders"]}
+                            price={item["invoice"]["totalPrice"]}/>
+                    ))}
                 </Flex>
             </Container>
         </Box>

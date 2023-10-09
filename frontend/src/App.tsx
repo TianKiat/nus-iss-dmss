@@ -33,8 +33,8 @@ function App() {
             <Route path="login" element={<LoginCustomer />} />
             <Route path="vendor/login" element={<LoginVendor />} />
             <Route path="register" element={<Register />} />
-            <Route path="order" element={<CustomerOrder userID={cookies != null ? cookies.userID : null}/>} />
-            <Route path="basket" element={<CustomerBasket/>} />
+            <Route path="order" element={<CustomerOrder userID={cookies != null ? cookies["userID"] : null}/>} />
+            <Route path="basket" element={<CustomerBasket userID={cookies != null ? cookies["userID"] : null}/>} />
             <Route path="profile" element={<Profile />} />
             <Route path="*" element={<Error />} />
           </Route>
