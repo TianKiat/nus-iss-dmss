@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.apicontroller.customer_controller import CustomerController
 from app.common.user_model import UserID
-from app.common.invoice_model import IsFavorite, InvoiceStatus
+from app.common.invoice_model import IsFavorite, InvoiceStatus, InvoiceID
 from run import SessionLocal
 
 router = APIRouter()
@@ -39,6 +39,13 @@ def update_favorite_order(isFavorite: IsFavorite, db: Session = Depends(get_db))
 def update_order_status(invoiceStatus: InvoiceStatus, db: Session = Depends(get_db)):
     try:
         return CustomerController.update_order_status(db, invoiceStatus)
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail=str(ex)) from ex
+
+@router.post("/invoice/delete", description='Delete order basket in invoice table')
+def delete_order(invoiceID: InvoiceID, db: Session = Depends(get_db)):
+    try:
+        return CustomerController.delete_order(db, invoiceID)
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex
 

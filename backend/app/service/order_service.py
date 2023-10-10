@@ -6,3 +6,6 @@ class OrderService:
 
     def get_order_by_invoice(db, invoiceID):
         return OrderGateway.get_order_by_invoice(db, invoiceID)
+    
+    def delete_order_by_invoice(db, invoiceID):
+        return OrderGateway.delete_order_by_invoice(db, invoiceID)

@@ -50,5 +50,9 @@ class CustomerController:
     def update_order_status(db, invoiceStatus):
         return InvoiceService.update_status(db, invoiceStatus.invoiceID, invoiceStatus.status)
     
+    def delete_order(db, invoiceID):
+        OrderService.delete_order_by_invoice(db, invoiceID.invoiceID)
+        return InvoiceService.delete_invoice(db, invoiceID.invoiceID)
+    
     def get_all_vendor_profile(db):
         return VendorProfileService.get_all_vendor_profile(db)

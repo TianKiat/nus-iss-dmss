@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import update
+from sqlalchemy import update, delete
 from app.models.invoice import Invoice
 
 class InvoiceGateway():
@@ -49,5 +49,17 @@ class InvoiceGateway():
                 return {"invoiceID": updated_invoice.invoiceID, "status": updated_invoice.status}
             else:
                 return {"invoiceID": None}
+        except Exception as e:
+            print(f"Error: {e}")
+
+    def delete_invoice(db: Session, invoiceID: int):
+        try:
+            db.execute(
+                delete(Invoice)
+                .where(Invoice.invoiceID == invoiceID)
+            )
+            db.commit()
+
+            return {"invoiceID": invoiceID}
         except Exception as e:
             print(f"Error: {e}")

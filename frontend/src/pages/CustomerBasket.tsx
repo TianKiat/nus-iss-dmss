@@ -39,10 +39,28 @@ interface OrderCardProps {
     vendorName: string,
     date: string,
     menuitems: string[],
-    price: number
+    price: number,
+    setUpdateOrderBasketTriggerFunction: Function
 }
 
 const OrderCard = (props: OrderCardProps) => {
+
+    const deleteInvoice = async() => {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/invoice/delete`, {
+            method: "POST",
+            body: JSON.stringify({invoiceID: props.invoiceID}),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const result = await response.json();
+        if (result != null) {
+            props.setUpdateOrderBasketTriggerFunction(result);
+        }
+    }
+
     return (
         <Box
             borderWidth="1px"
@@ -54,10 +72,19 @@ const OrderCard = (props: OrderCardProps) => {
                     <Tbody>
                         <Tr>
                             <Td w={'100px'} p={'16px'} verticalAlign={'top'}>
-                                <Button colorScheme="red" variant="ghost" size="lg" p={2}>
+                                <Button
+                                    colorScheme="red"
+                                    variant="ghost"
+                                    size="lg"
+                                    p={2}
+                                    onClick={deleteInvoice}>
                                     <Icon as={MdDelete} />
                                 </Button>
-                                <Button colorScheme="yellow" variant="ghost" size="lg" p={2}>
+                                <Button
+                                    colorScheme="yellow"
+                                    variant="ghost"
+                                    size="lg"
+                                    p={2}>
                                     <Icon as={MdEdit} />
                                 </Button>
                             </Td>
@@ -89,6 +116,7 @@ interface CustomerBasketProps {
 
 export default function (props: CustomerBasketProps) {
     const [orderBasket, setOrderBasket] = useState([]);
+    const [updateOrderBasketTrigger, setUpdateOrderBasketTrigger] = useState([]);
     
     useEffect(() => {
         const fetchAccess = async() => {
@@ -105,7 +133,7 @@ export default function (props: CustomerBasketProps) {
         }
 
         fetchAccess();
-    }, []);
+    }, [updateOrderBasketTrigger]);
 
     return (
         <Box p={4}>
@@ -117,12 +145,14 @@ export default function (props: CustomerBasketProps) {
                 <Flex gap="1rem" flexDirection="column">
                     {orderBasket.map((item) => (
                         <OrderCard
+                            key={item["invoice"]["invoiceID"]}
                             userID={props.userID}
                             invoiceID={item["invoice"]["invoiceID"]}
                             vendorName={item["vendor"]["profileName"]}
                             date={item["invoice"]["date"]}
                             menuitems={item["orders"]}
-                            price={item["invoice"]["totalPrice"]}/>
+                            price={item["invoice"]["totalPrice"]}
+                            setUpdateOrderBasketTriggerFunction={setUpdateOrderBasketTrigger}/>
                     ))}
                 </Flex>
             </Container>

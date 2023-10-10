@@ -15,3 +15,6 @@ class InvoiceService():
     
     def update_status(db, invoiceID, status):
         return InvoiceGateway.update_status(db, invoiceID, status)
+    
+    def delete_invoice(db, invoiceID):
+        return InvoiceGateway.delete_invoice(db, invoiceID)

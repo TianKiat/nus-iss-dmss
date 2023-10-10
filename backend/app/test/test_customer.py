@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from app.models import base, invoice, vendor_profile, order
 from app.helper import test_fixtures
 from app.common.user_model import UserID
-from app.common.invoice_model import IsFavorite, InvoiceStatus
+from app.common.invoice_model import IsFavorite, InvoiceStatus, InvoiceID
 from app.apicontroller.customer_controller import CustomerController
 
 class TestCustomerController(unittest.TestCase):
@@ -80,11 +80,11 @@ class TestCustomerController(unittest.TestCase):
         # Update invoice isFavorite with existing data
         isFavorite = IsFavorite(invoiceID=1, isFavorite=True)
         result = CustomerController.update_favorite_order(self.session, isFavorite)
-        self.assertEqual(1, result["invoiceID"])
+        self.assertEqual(isFavorite.invoiceID, result["invoiceID"])
         self.assertEqual(True, result["isFavorite"])
 
         # Check if it is updated in database
-        updated_invoice = self.session.query(invoice.Invoice).filter(invoice.Invoice.invoiceID == 1).first()
+        updated_invoice = self.session.query(invoice.Invoice).filter(invoice.Invoice.invoiceID == isFavorite.invoiceID).first()
         self.assertEqual(True, updated_invoice.isFavorite)
 
         # Update invoice isFavorite with non-existing data
@@ -96,17 +96,34 @@ class TestCustomerController(unittest.TestCase):
         # Update invoice status with existing data
         isFavorite = InvoiceStatus(invoiceID=1, status="CANCELLED")
         result = CustomerController.update_order_status(self.session, isFavorite)
-        self.assertEqual(1, result["invoiceID"])
+        self.assertEqual(isFavorite.invoiceID, result["invoiceID"])
         self.assertEqual("CANCELLED", result["status"])
 
         # Check if it is updated in database
-        updated_invoice = self.session.query(invoice.Invoice).filter(invoice.Invoice.invoiceID == 1).first()
+        updated_invoice = self.session.query(invoice.Invoice).filter(invoice.Invoice.invoiceID == isFavorite.invoiceID).first()
         self.assertEqual("CANCELLED", updated_invoice.status)
 
         # Update invoice status with non-existing data
         isFavorite = InvoiceStatus(invoiceID=0, status="CANCELLED")
         result = CustomerController.update_order_status(self.session, isFavorite)
         self.assertEqual(None, result["invoiceID"])
+
+    def test_delete_order(self):
+        # Delete invoice with existing data
+        invoiceID = InvoiceID(invoiceID=1)
+        result = CustomerController.delete_order(self.session, invoiceID)
+        self.assertEqual(invoiceID.invoiceID, result["invoiceID"])
+
+        # Check if it is updted in database
+        updated_order = self.session.query(order.Order).filter(order.Order.invoiceID == invoiceID.invoiceID).all()
+        updated_invoice = self.session.query(invoice.Invoice).filter(invoice.Invoice.invoiceID == invoiceID.invoiceID).first()
+        self.assertEqual([], updated_order)
+        self.assertEqual(None, updated_invoice)
+
+        # Delete invoice with non-existing data
+        invoiceID = InvoiceID(invoiceID=0)
+        result = CustomerController.delete_order(self.session, invoiceID)
+        self.assertEqual(invoiceID.invoiceID, result["invoiceID"])
 
     def test_get_all_vendor_profile(self):
         expected_result = self.session.query(vendor_profile.VendorProfile).all()
