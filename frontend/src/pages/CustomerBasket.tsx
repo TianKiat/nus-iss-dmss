@@ -1,4 +1,4 @@
-import { Box, Button, Container, Flex, Heading, Icon, ListItem, Table, TableContainer, Tbody, Td, Tr, UnorderedList } from "@chakra-ui/react";
+import { Box, Button, Container, Flex, Heading, Icon, ListItem, Table, TableContainer, Tbody, Td, Text, Tr, UnorderedList } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { MdDelete, MdEdit } from "react-icons/md"
 
@@ -143,17 +143,20 @@ export default function (props: CustomerBasketProps) {
                 </Heading>
                 <br/>
                 <Flex gap="1rem" flexDirection="column">
-                    {orderBasket.map((item) => (
-                        <OrderCard
-                            key={item["invoice"]["invoiceID"]}
-                            userID={props.userID}
-                            invoiceID={item["invoice"]["invoiceID"]}
-                            vendorName={item["vendor"]["profileName"]}
-                            date={item["invoice"]["date"]}
-                            menuitems={item["orders"]}
-                            price={item["invoice"]["totalPrice"]}
-                            setUpdateOrderBasketTriggerFunction={setUpdateOrderBasketTrigger}/>
-                    ))}
+                    {orderBasket.length > 0 ?
+                        orderBasket.map((item) => (
+                            <OrderCard
+                                key={item["invoice"]["invoiceID"]}
+                                userID={props.userID}
+                                invoiceID={item["invoice"]["invoiceID"]}
+                                vendorName={item["vendor"]["profileName"]}
+                                date={item["invoice"]["date"]}
+                                menuitems={item["orders"]}
+                                price={item["invoice"]["totalPrice"]}
+                                setUpdateOrderBasketTriggerFunction={setUpdateOrderBasketTrigger}/>
+                        ))
+                        : <Text>Empty basket</Text>
+                    }
                 </Flex>
             </Container>
         </Box>
