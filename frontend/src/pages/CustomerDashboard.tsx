@@ -13,13 +13,8 @@ import {
     TabList,
     TabPanel,
     TabPanels,
-    Table,
-    TableContainer,
     Tabs,
-    Tbody,
-    Td,
     Text,
-    Tr,
     UnorderedList
 } from '@chakra-ui/react'
 import { ReactElement, useEffect, useState } from 'react'
@@ -136,70 +131,58 @@ const OrderCard = (props: OrderCardProps) => {
                 p={3}
                 fontWeight="normal"
                 variant="outline">
-                <TableContainer w="full">
-                    <Table variant='unstyled'>
-                        <Tbody>
-                            <Tr>
-                                <Td w={'68px'} p={'16px'} verticalAlign={'top'}>
-                                    <Button variant={'link'} onClick={updateInvoiceIsFavorite}>
-                                        {favoriteIcon(props.isFavorite)}
-                                    </Button>
-                                </Td>
-                                <Td p={'16px'}>
-                                    {orderStatusTag(props.status)}
-                                    <Heading size="lg">{props.vendorName}</Heading>
-                                    {dateStringFormatTransform(props.date)}
-                                    <br/><br/>
-                                    <Heading size="sm">Menu Items</Heading>
-                                    <UnorderedList>
-                                        {ordersToMenuitemsList(props.menuitems).map((value) => (
-                                            <ListItem key={value}>{value}</ListItem>
-                                        ))}
-                                    </UnorderedList>
-                                </Td>
-                                <Td w={'150px'} p={'16px'} verticalAlign={'top'} textAlign={'right'}>
-                                    <Heading size="lg">${props.price.toFixed(2)}</Heading>
-                                </Td>
-                            </Tr>
-                        </Tbody>
-                    </Table>
-                </TableContainer>
+                <Flex w="full" flexDirection={{base: 'column', md: 'row'}}>
+                    <Box w={{base: 'full', md: '112px'}} p={'16px'} verticalAlign={'top'}>
+                        <Button variant={'link'} onClick={updateInvoiceIsFavorite}>
+                            {favoriteIcon(props.isFavorite)}
+                        </Button>
+                    </Box>
+                    <Box w={{base: 'full', md: 'calc(100% - 112px - 150px)'}} p={'16px'} textAlign="left">
+                        {orderStatusTag(props.status)}
+                        <Heading size="lg">{props.vendorName}</Heading>
+                        {dateStringFormatTransform(props.date)}
+                        <br/><br/>
+                        <Heading size="sm">Menu Items</Heading>
+                        <UnorderedList>
+                            {ordersToMenuitemsList(props.menuitems).map((value) => (
+                                <ListItem key={value}>{value}</ListItem>
+                            ))}
+                        </UnorderedList>
+                    </Box>
+                    <Box w={{base: 'full', md: '150px'}} p={'16px'} verticalAlign={'top'} textAlign={{base: 'center', md: 'right'}}>
+                        <Heading size="lg">${props.price.toFixed(2)}</Heading>
+                    </Box>
+                </Flex>
             </Button>
         : <Box
             borderWidth="1px"
             borderRadius="6px"
             p={3}>
-            <TableContainer w="full">
-                <Table variant='unstyled'>
-                    <Tbody>
-                        <Tr>
-                            <Td w={'68px'} p={'16px'} verticalAlign={'top'}>
-                                <Button
-                                    colorScheme="red"
-                                    isDisabled={props.status == "DONE" ? true : false}
-                                    onClick={cancelInvoice}>
-                                    Cancel
-                                </Button>
-                            </Td>
-                            <Td p={'16px'}>
-                                {orderStatusTag(props.status)}
-                                <Heading size="lg">{props.vendorName}</Heading>
-                                {dateStringFormatTransform(props.date)}
-                                <br/><br/>
-                                <Heading size="sm">Menu Items</Heading>
-                                <UnorderedList>
-                                    {ordersToMenuitemsList(props.menuitems).map((value) => (
-                                        <ListItem key={value}>{value}</ListItem>
-                                    ))}
-                                </UnorderedList>
-                            </Td>
-                            <Td w={'150px'} p={'16px'} verticalAlign={'top'} textAlign={'right'}>
-                                <Heading size="lg">${props.price.toFixed(2)}</Heading>
-                            </Td>
-                        </Tr>
-                    </Tbody>
-                </Table>
-            </TableContainer>
+            <Flex w="full" flexDirection={{base: 'column', md: 'row'}}>
+                <Box w={{base: 'full', md: '112px'}} p={'16px'} verticalAlign={'top'} textAlign={'center'}>
+                    <Button
+                        colorScheme="red"
+                        isDisabled={props.status == "DONE" ? true : false}
+                        onClick={cancelInvoice}>
+                        Cancel
+                    </Button>
+                </Box>
+                <Box w={{base: 'full', md: 'calc(100% - 112px - 150px)'}} p={'16px'}>
+                    {orderStatusTag(props.status)}
+                    <Heading size="lg">{props.vendorName}</Heading>
+                    {dateStringFormatTransform(props.date)}
+                    <br/><br/>
+                    <Heading size="sm">Menu Items</Heading>
+                    <UnorderedList>
+                        {ordersToMenuitemsList(props.menuitems).map((value) => (
+                            <ListItem key={value}>{value}</ListItem>
+                        ))}
+                    </UnorderedList>
+                </Box>
+                <Box w={{base: 'full', md: '150px'}} p={'16px'} verticalAlign={'top'} textAlign={{base: 'center', md: 'right'}}>
+                    <Heading size="lg">${props.price.toFixed(2)}</Heading>
+                </Box>
+            </Flex>
         </Box>
     )
 }

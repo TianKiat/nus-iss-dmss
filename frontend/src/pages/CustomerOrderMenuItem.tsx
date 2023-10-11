@@ -49,7 +49,8 @@ const MenuItemPopup = (props: MenuItemPopupProps) => {
             h="100%"
             bgColor="blackAlpha.500"
             display="flex"
-            alignItems="center">
+            alignItems="center"
+            overflow="auto">
             <Container maxW="5xl" p={5} bgColor="white">
                 <Button
                     colorScheme="red"
@@ -62,14 +63,15 @@ const MenuItemPopup = (props: MenuItemPopupProps) => {
                     <Box w={{base: "100%", md: "400px"}}>
                         <Image
                             src={props.menuItem["menuItemImage"]}
+                            alt={props.menuItem["menuItemName"]}
                             w="100%"
-                            maxW="500px"
+                            maxW={{base: "200px", md: "500px"}}
                             aspectRatio="1"/>
                     </Box>
                     <Box w={{base: "100%", md: "auto"}}>
-                        <Heading mb="1.5rem">{props.menuItem["menuItemName"]}</Heading>
-                        <Text mb="1.5rem">{props.menuItem["menuItemDesc"]}</Text>
-                        <Flex mb="1.5rem">
+                        <Heading mb={{base: "0.5rem", md: "1.5rem"}} size={{base: "md", md: "lg"}}>{props.menuItem["menuItemName"]}</Heading>
+                        <Text mb={{base: "0.5rem", md: "1.5rem"}}>{props.menuItem["menuItemDesc"]}</Text>
+                        <Flex mb={{base: "0.5rem", md: "1.5rem"}}>
                             <Text
                                 display="flex"
                                 alignItems="center"
@@ -97,7 +99,7 @@ const MenuItemPopup = (props: MenuItemPopupProps) => {
                                 <Icon as={MdAdd}/>
                             </Button>
                         </Flex>
-                        <Flex mb="1.5rem">
+                        <Flex mb={{base: "0.5rem", md: "1.5rem"}}>
                             <Text
                                 display="flex"
                                 alignItems="center"
@@ -156,8 +158,8 @@ const MenuItemCard = (props: MenuItemCardProps) => {
                     maxW={{ base: 'full', md: '200px' }}
                     w={'200px'}>
                     <Image
-                        src={""}
-                        alt={""}
+                        src={props.menuItem["menuItemImage"]}
+                        alt={props.menuItem["menuItemName"]}
                         boxSize="200px"
                         borderRadius="5px"
                         objectFit="cover"

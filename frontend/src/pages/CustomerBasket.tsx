@@ -1,6 +1,6 @@
-import { Box, Button, Container, Flex, Heading, Icon, ListItem, Table, TableContainer, Tbody, Td, Text, Tr, UnorderedList } from "@chakra-ui/react";
+import { Box, Button, Container, Flex, Heading, Icon, ListItem, Text, UnorderedList } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { MdAdd, MdDelete, MdRemove } from "react-icons/md"
+import { MdAdd, MdDelete, MdRemove, MdStore } from "react-icons/md"
 
 function dateStringFormatTransform(date: string) {
     var year = date.slice(0, 4);
@@ -78,37 +78,39 @@ const OrderCard = (props: OrderCardProps) => {
 
         return (
             <ListItem key={item["menuItemID"]}>
-                <Flex>
+                <Flex flexWrap={{base: 'wrap', md: 'unset'}}>
                     <Text
-                        w="200px"
+                        w="275px"
                         display="flex"
                         alignItems="center">
                         {item["foodName"]}
                     </Text>
-                    <Button
-                        isDisabled={item["quantity"] < 1 ? true : false}
-                        onClick={() => {updateInvoice(item["quantity"] - 1)}}>
-                        <Icon as={MdRemove}/>
-                    </Button>
-                    <Text
-                        w="50px"
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                        fontWeight="bold">
-                        {item["quantity"]}
-                    </Text>
-                    <Button onClick={() => {updateInvoice(item["quantity"] + 1)}}>
-                        <Icon as={MdAdd}/>
-                    </Button>
-                    <Text
-                        w="150px"
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                        fontWeight="bold">
-                        ${item["price"].toFixed(2)}
-                    </Text>
+                    <Flex>
+                        <Button
+                            isDisabled={item["quantity"] < 1 ? true : false}
+                            onClick={() => {updateInvoice(item["quantity"] - 1)}}>
+                            <Icon as={MdRemove}/>
+                        </Button>
+                        <Text
+                            w="50px"
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            fontWeight="bold">
+                            {item["quantity"]}
+                        </Text>
+                        <Button onClick={() => {updateInvoice(item["quantity"] + 1)}}>
+                            <Icon as={MdAdd}/>
+                        </Button>
+                        <Text
+                            w="75px"
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            fontWeight="bold">
+                            ${item["price"].toFixed(2)}
+                        </Text>
+                    </Flex>
                 </Flex>
             </ListItem>
         )
@@ -120,41 +122,54 @@ const OrderCard = (props: OrderCardProps) => {
             borderRadius="lg"
             w="full"
             p={3}>
-            <TableContainer>
-                <Table variant='unstyled'>
-                    <Tbody>
-                        <Tr>
-                            <Td w={'100px'} p={'16px'} verticalAlign={'top'}>
-                                <Button
-                                    colorScheme="red"
-                                    variant="ghost"
-                                    size="lg"
-                                    p={2}
-                                    onClick={deleteInvoice}>
-                                    <Icon as={MdDelete} />
-                                </Button>
-                            </Td>
-                            <Td p={'16px'}>
-                                <Heading size="lg">{props.vendorName}</Heading>
-                                {dateStringFormatTransform(props.date)}
-                                <br/><br/>
-                                <Heading size="sm">Menu Items</Heading>
-                                <UnorderedList
-                                    display="flex"
-                                    flexDirection="column"
-                                    gap="0.5rem">
-                                    {props.menuitems.map((item) => (
-                                        menuItemListItem(item)
-                                    ))}
-                                </UnorderedList>
-                            </Td>
-                            <Td w={'150px'} p={'16px'} verticalAlign={'top'} textAlign={'right'}>
-                                <Heading size="lg">${props.price.toFixed(2)}</Heading>
-                            </Td>
-                        </Tr>
-                    </Tbody>
-                </Table>
-            </TableContainer>
+            <Flex w="full" flexDirection={{base: 'column', md: 'row'}}>
+                <Box
+                    w={{base: 'full', md: '130px'}}
+                    p={'16px'}
+                    verticalAlign={'top'}
+                    display="flex"
+                    gap="0.5rem"
+                    flexWrap="wrap"
+                    justifyContent={'center'}
+                    alignContent={'flex-start'}>
+                    <Button
+                        colorScheme="red"
+                        variant="ghost"
+                        size="lg"
+                        p={2}
+                        w="130px"
+                        leftIcon={<MdDelete/>}
+                        onClick={deleteInvoice}>
+                        Delete
+                    </Button>
+                    <Button
+                        colorScheme="blue"
+                        variant="ghost"
+                        size="lg"
+                        p={2}
+                        w="130px"
+                        leftIcon={<MdStore/>}>
+                        Order
+                    </Button>
+                </Box>
+                <Box w={{base:'full', md: 'calc(100% - 130px - 150px)'}} p={'16px'}>
+                    <Heading size="lg">{props.vendorName}</Heading>
+                    {dateStringFormatTransform(props.date)}
+                    <br/><br/>
+                    <Heading size="sm" mb="0.5rem">Menu Items</Heading>
+                    <UnorderedList
+                        display="flex"
+                        flexDirection="column"
+                        gap="0.5rem">
+                        {props.menuitems.map((item) => (
+                            menuItemListItem(item)
+                        ))}
+                    </UnorderedList>
+                </Box>
+                <Box w={{base: 'full', md: '150px'}} p={'16px'} verticalAlign={'top'} textAlign={{base: 'center', md: 'right'}}>
+                    <Heading size="lg">${props.price.toFixed(2)}</Heading>
+                </Box>
+            </Flex>
         </Box>
     )
 }
