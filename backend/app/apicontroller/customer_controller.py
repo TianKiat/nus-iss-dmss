@@ -2,11 +2,33 @@ from app.service.user_profile_service import UserProfileService
 from app.service.vendor_profile_service import VendorProfileService
 from app.service.order_service import OrderService
 from app.service.invoice_service import InvoiceService
-from app.service.vendor_profile_service import VendorProfileService
+from app.service.menu_item_service import MenuItemService
 
 class CustomerController:
     def __init__ (self):
         pass
+
+    def create_order_basket(db, draftInvoice):
+        customerProfileID = UserProfileService.get_user_profile_by_user(db, draftInvoice.userID).userProfileID
+        menuitem = MenuItemService.get_menu_item(db, draftInvoice.menuItemID)
+
+        new_invoice = False
+        invoice = InvoiceService.get_invoice_by_customer_and_vendor_and_order_status(db, customerProfileID, draftInvoice.vendorProfileID, "DRAFT")
+        if (invoice is None):
+            new_invoice = True
+            totalPrice = draftInvoice.quantity * menuitem.price
+            invoice = InvoiceService.create_invoice(db, customerProfileID, draftInvoice.vendorProfileID, totalPrice)
+            
+        order = OrderService.get_order_by_invoice_and_menuitem(db, invoice.invoiceID, draftInvoice.menuItemID)
+        if (order is None):
+            order = OrderService.create_order(db, draftInvoice.menuItemID, menuitem.menuItemName, draftInvoice.quantity, draftInvoice.quantity * menuitem.price, invoice.invoiceID)
+        else:
+            OrderService.update_order(db, order.orderID, draftInvoice.menuItemID, menuitem.menuItemName, draftInvoice.quantity, draftInvoice.quantity * menuitem.price, invoice.invoiceID)
+
+        if (not new_invoice):
+            InvoiceService.update_totalPrice(db, invoice.invoiceID)
+        
+        return {"invoiceID": invoice.invoiceID, "orderID": order.orderID}
 
     def get_order_history(db, userID):
         user_profile = UserProfileService.get_user_profile_by_user(db, userID.userID)

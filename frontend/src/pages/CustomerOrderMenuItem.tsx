@@ -5,25 +5,39 @@ import { MdAdd, MdClose, MdEmail, MdPhone, MdRemove, MdStore } from "react-icons
 interface MenuItemPopupProps {
     userID: number,
     menuItem: any,
-    setMenuItemPopupFunction: Function
+    setMenuItemPopupFunction: Function,
+    setUpdateMenuItemsTriggerFunction: Function
 }
 
 const MenuItemPopup = (props: MenuItemPopupProps) => {
     const [quantity, setQuantity] = useState(1);
-
     const [totalPrice, setTotalPrice] = useState(0);
 
     useEffect(() => {
         setTotalPrice(quantity * props.menuItem["price"]);
     }, [quantity])
 
-    // useEffect(() => {
-    //     const fetchAccess = async() => {
-            
-    //     }
+    const addToBasket = async() => {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/invoice/create`, {
+            method: "POST",
+            body: JSON.stringify({
+                userID: props.userID,
+                vendorProfileID: props.menuItem.vendorProfileID,
+                menuItemID: props.menuItem.menuItemID,
+                quantity: quantity
+            }),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
 
-    //     fetchAccess();
-    // }, [])
+        const result = await response.json();
+        if (result != null) {
+            props.setMenuItemPopupFunction(null);
+            props.setUpdateMenuItemsTriggerFunction(result);
+        }
+    }
 
     return (
         <Box
@@ -45,80 +59,68 @@ const MenuItemPopup = (props: MenuItemPopupProps) => {
                     <Icon as={MdClose}/>
                 </Button>
                 <Flex mt="48px" gap={{base: "1rem", md: "2rem"}} flexDirection={{base: "column", md: "row"}}>
-                {/* <Table variant="unstyled">
-                    <Tbody>
-                        <Tr>
-                            <Td w="400px"> */}
-                            <Box w={{base: "100%", md: "400px"}}>
-                                <Image
-                                    src={props.menuItem["menuItemImage"]}
-                                    w="100%"
-                                    maxW="500px"
-                                    aspectRatio="1"/>
-                            </Box>
-                            {/* </Td>
-                            <Td verticalAlign="top"> */}
-                            <Box w={{base: "100%", md: "auto"}}>
-                                <Heading mb="1.5rem">{props.menuItem["menuItemName"]}</Heading>
-                                <Text mb="1.5rem">{props.menuItem["menuItemDesc"]}</Text>
-                                <Flex mb="1.5rem">
-                                    <Text
-                                        display="flex"
-                                        alignItems="center"
-                                        fontWeight="bold"
-                                        fontSize="lg"
-                                        w="150px">
-                                        Quantity
-                                    </Text>
-                                    <Button
-                                        onClick={() => {setQuantity(quantity - 1)}}
-                                        isDisabled={quantity > 0 ? false : true}>
-                                        <Icon as={MdRemove}/>
-                                    </Button>
-                                    <Text
-                                        display="flex"
-                                        alignItems="center"
-                                        justifyContent="center"
-                                        w="50px"
-                                        fontWeight="bold"
-                                        fontSize="lg">
-                                        {quantity}
-                                    </Text>
-                                    <Button
-                                        onClick={() => {setQuantity(quantity + 1)}}>
-                                        <Icon as={MdAdd}/>
-                                    </Button>
-                                </Flex>
-                                <Flex mb="1.5rem">
-                                    <Text
-                                        display="flex"
-                                        alignItems="center"
-                                        fontWeight="bold"
-                                        fontSize="lg"
-                                        w="150px">
-                                        Total Price
-                                    </Text>
-                                    <Text
-                                        display="flex"
-                                        alignItems="center"
-                                        fontWeight="bold"
-                                        fontSize="lg">
-                                        ${totalPrice.toFixed(2)}
-                                    </Text>
-                                </Flex>
-                                <Button
-                                    isDisabled={quantity > 0 ? false : true}
-                                    colorScheme="blue"
-                                    onClick={() => {
-                                        props.setMenuItemPopupFunction(null)
-                                    }}>
-                                    Add to Basket
-                                </Button>
-                            </Box>
-                            {/* </Td>
-                        </Tr>
-                    </Tbody>
-                </Table> */}
+                    <Box w={{base: "100%", md: "400px"}}>
+                        <Image
+                            src={props.menuItem["menuItemImage"]}
+                            w="100%"
+                            maxW="500px"
+                            aspectRatio="1"/>
+                    </Box>
+                    <Box w={{base: "100%", md: "auto"}}>
+                        <Heading mb="1.5rem">{props.menuItem["menuItemName"]}</Heading>
+                        <Text mb="1.5rem">{props.menuItem["menuItemDesc"]}</Text>
+                        <Flex mb="1.5rem">
+                            <Text
+                                display="flex"
+                                alignItems="center"
+                                fontWeight="bold"
+                                fontSize="lg"
+                                w="150px">
+                                Quantity
+                            </Text>
+                            <Button
+                                onClick={() => {setQuantity(quantity - 1)}}
+                                isDisabled={quantity > 0 ? false : true}>
+                                <Icon as={MdRemove}/>
+                            </Button>
+                            <Text
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                                w="50px"
+                                fontWeight="bold"
+                                fontSize="lg">
+                                {quantity}
+                            </Text>
+                            <Button
+                                onClick={() => {setQuantity(quantity + 1)}}>
+                                <Icon as={MdAdd}/>
+                            </Button>
+                        </Flex>
+                        <Flex mb="1.5rem">
+                            <Text
+                                display="flex"
+                                alignItems="center"
+                                fontWeight="bold"
+                                fontSize="lg"
+                                w="150px">
+                                Total Price
+                            </Text>
+                            <Text
+                                display="flex"
+                                alignItems="center"
+                                fontWeight="bold"
+                                fontSize="lg">
+                                ${totalPrice.toFixed(2)}
+                            </Text>
+                        </Flex>
+                        <Button
+                            isDisabled={quantity > 0 ? false : true}
+                            colorScheme="blue"
+                            onClick={addToBasket}>
+                            Confirm
+                        </Button>
+                    </Box>
                 </Flex>
             </Container>
         </Box>
@@ -127,7 +129,8 @@ const MenuItemPopup = (props: MenuItemPopupProps) => {
 
 interface MenuItemCardProps {
     userID: number,
-    menuItem: any
+    menuItem: any,
+    setUpdateMenuItemsTriggerFunction: Function
 }
 
 const MenuItemCard = (props: MenuItemCardProps) => {
@@ -137,7 +140,8 @@ const MenuItemCard = (props: MenuItemCardProps) => {
         <MenuItemPopup
             userID={props.userID}
             menuItem={props.menuItem}
-            setMenuItemPopupFunction={setMenuItemPopup}/>
+            setMenuItemPopupFunction={setMenuItemPopup}
+            setUpdateMenuItemsTriggerFunction={props.setUpdateMenuItemsTriggerFunction}/>
     );
 
     return (
@@ -175,6 +179,7 @@ interface CustomerOrderMenuItemProps {
 
 export default function(props: CustomerOrderMenuItemProps) {
     const [menuItems, setMenuItems] = useState([]);
+    const [updateMenuItemsTrigger, setUpdateMenuItemsTrigger] = useState();
 
     useEffect(() => {
         const fetchAccess = async() => {
@@ -184,7 +189,7 @@ export default function(props: CustomerOrderMenuItemProps) {
         }
 
         fetchAccess();
-    }, [])
+    }, [updateMenuItemsTrigger])
 
     return (
         <Box>
@@ -219,20 +224,13 @@ export default function(props: CustomerOrderMenuItemProps) {
                 </Text>
             </Flex>
             <br/>
-            <Flex gap="1rem">
+            <Flex gap="1rem" flexWrap="wrap">
                 {menuItems.map((item) => (
                     <MenuItemCard
                         userID={props.userID}
-                        menuItem={item}/>
+                        menuItem={item}
+                        setUpdateMenuItemsTriggerFunction={setUpdateMenuItemsTrigger}/>
                 ))}
-                {/* <MenuItemCard
-                    userID={props.userID}
-                    vendorProfileID={props.vendor["vendorProfileID"]}
-                    menuItemID={1}/>
-                <MenuItemCard
-                    userID={props.userID}
-                    vendorProfileID={props.vendor["vendorProfileID"]}
-                    menuItemID={2}/> */}
             </Flex>
         </Box>
     )

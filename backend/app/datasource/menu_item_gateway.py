@@ -44,6 +44,11 @@ class MenuItemGateway():
         except Exception as e:
             print(f"Error: {e}")
         
+    def get_menu_item(self, db: Session, menuItemID: int):
+        try:
+            return db.query(MenuItem).filter(MenuItem.menuItemID == menuItemID).first()
+        except Exception as e:
+            print(f"Error: {e}")
     
     def update_menu_item(self, db: Session, menuItem: MenuItem):
         try:

@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from datetime import datetime
 
 class InvoiceID(BaseModel):
     invoiceID: int
@@ -11,3 +10,9 @@ class IsFavorite(BaseModel):
 class InvoiceStatus(BaseModel):
     invoiceID: int
     status: str
+
+class DraftInvoice(BaseModel):
+    userID: int
+    vendorProfileID: int
+    menuItemID: int
+    quantity: int
