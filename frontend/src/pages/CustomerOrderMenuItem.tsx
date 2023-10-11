@@ -18,7 +18,7 @@ const MenuItemPopup = (props: MenuItemPopupProps) => {
     }, [quantity])
 
     const addToBasket = async() => {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/invoice/create`, {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/invoice/update`, {
             method: "POST",
             body: JSON.stringify({
                 userID: props.userID,

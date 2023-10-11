@@ -1,14 +1,6 @@
 import { Box, Button, Container, Flex, Heading, Icon, ListItem, Table, TableContainer, Tbody, Td, Text, Tr, UnorderedList } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { MdDelete, MdEdit } from "react-icons/md"
-
-function ordersToMenuitemsList(orders: any[]): string[] {
-    var menuitems = []
-    for (var i = 0; i < orders.length; i++) {
-        menuitems.push(orders[i]["quantity"] + " x " + orders[i]["foodName"])
-    }
-    return menuitems
-}
+import { MdAdd, MdDelete, MdRemove } from "react-icons/md"
 
 function dateStringFormatTransform(date: string) {
     var year = date.slice(0, 4);
@@ -36,6 +28,7 @@ function dateStringFormatTransform(date: string) {
 interface OrderCardProps {
     userID: number,
     invoiceID: number,
+    vendorProfileID: number,
     vendorName: string,
     date: string,
     menuitems: string[],
@@ -61,6 +54,66 @@ const OrderCard = (props: OrderCardProps) => {
         }
     }
 
+    const menuItemListItem = (item: any) => {
+        const updateInvoice = async(quantity: number) => {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/invoice/update`, {
+                method: "POST",
+                body: JSON.stringify({
+                    userID: props.userID,
+                    vendorProfileID: props.vendorProfileID,
+                    menuItemID: item["menuItemID"],
+                    quantity: quantity
+                }),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+    
+            const result = await response.json();
+            if (result != null) {
+                props.setUpdateOrderBasketTriggerFunction(result)
+            }
+        }
+
+        return (
+            <ListItem key={item["menuItemID"]}>
+                <Flex>
+                    <Text
+                        w="200px"
+                        display="flex"
+                        alignItems="center">
+                        {item["foodName"]}
+                    </Text>
+                    <Button
+                        isDisabled={item["quantity"] < 1 ? true : false}
+                        onClick={() => {updateInvoice(item["quantity"] - 1)}}>
+                        <Icon as={MdRemove}/>
+                    </Button>
+                    <Text
+                        w="50px"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        fontWeight="bold">
+                        {item["quantity"]}
+                    </Text>
+                    <Button onClick={() => {updateInvoice(item["quantity"] + 1)}}>
+                        <Icon as={MdAdd}/>
+                    </Button>
+                    <Text
+                        w="150px"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        fontWeight="bold">
+                        ${item["price"].toFixed(2)}
+                    </Text>
+                </Flex>
+            </ListItem>
+        )
+    }
+
     return (
         <Box
             borderWidth="1px"
@@ -80,22 +133,18 @@ const OrderCard = (props: OrderCardProps) => {
                                     onClick={deleteInvoice}>
                                     <Icon as={MdDelete} />
                                 </Button>
-                                <Button
-                                    colorScheme="yellow"
-                                    variant="ghost"
-                                    size="lg"
-                                    p={2}>
-                                    <Icon as={MdEdit} />
-                                </Button>
                             </Td>
                             <Td p={'16px'}>
                                 <Heading size="lg">{props.vendorName}</Heading>
                                 {dateStringFormatTransform(props.date)}
                                 <br/><br/>
                                 <Heading size="sm">Menu Items</Heading>
-                                <UnorderedList>
-                                    {ordersToMenuitemsList(props.menuitems).map((value) => (
-                                        <ListItem key={value}>{value}</ListItem>
+                                <UnorderedList
+                                    display="flex"
+                                    flexDirection="column"
+                                    gap="0.5rem">
+                                    {props.menuitems.map((item) => (
+                                        menuItemListItem(item)
                                     ))}
                                 </UnorderedList>
                             </Td>
@@ -149,6 +198,7 @@ export default function (props: CustomerBasketProps) {
                                 key={item["invoice"]["invoiceID"]}
                                 userID={props.userID}
                                 invoiceID={item["invoice"]["invoiceID"]}
+                                vendorProfileID={item["vendor"]["vendorProfileID"]}
                                 vendorName={item["vendor"]["profileName"]}
                                 date={item["invoice"]["date"]}
                                 menuitems={item["orders"]}

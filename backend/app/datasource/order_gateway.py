@@ -65,3 +65,15 @@ class OrderGateway():
             return {"invoiceID": invoiceID}
         except Exception as e:
             print(f"Error: {e}")
+    
+    def delete_order_by_invoice_and_menuitem(db: Session, invoiceID: int, menuItemID: int):
+        try:
+            db.execute(
+                delete(Order)
+                .where(Order.invoiceID == invoiceID, Order.menuItemID == menuItemID)
+            )
+            db.commit()
+
+            return db.query(Order.orderID).filter(Order.invoiceID == invoiceID).all()
+        except Exception as e:
+            print(f"Error: {e}")

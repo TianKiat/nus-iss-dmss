@@ -14,10 +14,10 @@ def get_db():
     finally:
         db.close()
 
-@router.post("/invoice/create", description="Create customer order basket")
-def create_order_basket(draftInvoice: DraftInvoice, db: Session = Depends(get_db)):
+@router.post("/invoice/update", description="Update customer order basket")
+def update_order_basket(draftInvoice: DraftInvoice, db: Session = Depends(get_db)):
     try:
-        return CustomerController.create_order_basket(db, draftInvoice)
+        return CustomerController.update_order_basket(db, draftInvoice)
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex
 
