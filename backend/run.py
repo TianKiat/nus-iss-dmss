@@ -10,15 +10,10 @@ import uvicorn
 
 # Get parameters from env file
 load_dotenv()
-DB_DIALECT = getenv('DB_DIALECT')
-DB_DRIVER = getenv('DB_DRIVER')
-DB_USERNAME = getenv('DB_USERNAME')
-DB_PASSWORD = getenv('DB_PASSWORD')
-DB_HOST = getenv('DB_HOST')
-DB_PORT = getenv('DB_PORT')
-DB_DATABASE = getenv('DB_DATABASE')
+FASTAPI_URL = getenv('FASTAPI_URL')
+FASTAPI_URL_PORT = int(getenv('FASTAPI_URL_PORT'))
 
-connectionString = DB_DIALECT+'+'+DB_DRIVER+'://'+DB_USERNAME+':'+DB_PASSWORD+'@'+DB_HOST+':'+DB_PORT+'/'+DB_DATABASE
+connectionString = getenv('DB_CONNECTION_STRING')
 
 # Create the engine
 engine = create_engine(connectionString)
@@ -39,4 +34,4 @@ command.upgrade(alembic_cfg, "head")
 
 # Uvicorn run main
 if __name__ == "__main__":
-    uvicorn.run("app.main:app", host = "127.0.0.1", port = 8000, reload = True)
+    uvicorn.run("app.main:app", host = FASTAPI_URL, port = FASTAPI_URL_PORT, reload = True)
