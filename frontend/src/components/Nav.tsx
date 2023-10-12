@@ -28,9 +28,15 @@ import {
 } from 'react-icons/fa'
 
 import { Link } from "react-router-dom";
+import Cookies from 'js-cookie';
 
 export default function Nav() {
   const { isOpen, onToggle } = useDisclosure();
+
+  function signOut() {
+    Cookies.remove('auth')
+    window.location.href='../login';
+  }
 
   return (
     <Box>
@@ -87,6 +93,15 @@ export default function Nav() {
             href={"/login"}
           >
             Sign In
+          </Button>
+          <Button
+            as={"a"}
+            fontSize={"sm"}
+            fontWeight={400}
+            variant={"link"}
+            onClick={signOut}
+          >
+            Sign Out
           </Button>
           <Button
             as={"a"}
