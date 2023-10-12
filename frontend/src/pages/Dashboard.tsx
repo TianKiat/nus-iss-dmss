@@ -22,8 +22,10 @@ export default function Dashboard(props : DashboardProps) {
     // }, [props.userRole])
     
     return (
-        props.roleID !== 2 ? 
-            <CustomerDashboard userID={props.userID}></CustomerDashboard>
-            : <VendorDashboard userID={props.userID}></VendorDashboard>
+        props.roleID === 2 ? 
+            <VendorDashboard userID={props.userID}></VendorDashboard>
+            : (props.roleID === 3 ?
+                <CustomerDashboard userID={props.userID}></CustomerDashboard>
+                : null)
     ); // for now until login and session is done
 }
