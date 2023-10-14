@@ -8,7 +8,7 @@ class MenuItem(Base):
     menuItemID = Column(Integer, primary_key=True)
     menuItemName = Column(String(50), nullable=False)
     price = Column(Double, nullable=False)
-    menuItemImage = Column(BLOB(500), nullable=True)
+    menuItemImage = Column(String(500), nullable=True)
     menuItemDesc = Column(String(250), nullable=True)
     isValid = Column(Boolean, nullable=False)
     vendorProfileID = Column(Integer, ForeignKey(VendorProfile.vendorProfileID))
