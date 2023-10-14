@@ -1,4 +1,5 @@
 import uuid, bcrypt
+import uuid, bcrypt
 from sqlalchemy.orm import Session
 from app.common.user_model import User, Vendor, Login
 from app.models import user, user_profile, vendor_profile, otp
@@ -120,7 +121,7 @@ class UserGateway():
             user_object = db.query(user.User).filter(user.User.username == login.username).first()
             if user_object:
                 checkpw = bcrypt.checkpw(login.password.encode('utf-8'), (user_object.userPassword).encode('utf-8'))
-            
+
             if user_object and checkpw:
                 if str(user_object.roleID) == '2': #vendor_profile
                     user_profile_object = db.query(vendor_profile.VendorProfile).filter(vendor_profile.VendorProfile.userID == user_object.userID).first()

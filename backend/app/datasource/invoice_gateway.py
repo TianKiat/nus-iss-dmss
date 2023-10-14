@@ -1,3 +1,4 @@
+from typing import List
 from sqlalchemy.orm import Session
 from sqlalchemy import select, insert, update, delete
 from sqlalchemy.sql.functions import sum
@@ -32,7 +33,7 @@ class InvoiceGateway():
         except Exception as e:
             print(f"Error: {e}")
 
-    def get_invoice_by_customer_and_order_status(db: Session, customerProfileID: int, orderStatus: list[str]):
+    def get_invoice_by_customer_and_order_status(db: Session, customerProfileID: int, orderStatus: List[str]):
         try:
             return db.query(Invoice).filter(
                 Invoice.customerProfileID == customerProfileID,
