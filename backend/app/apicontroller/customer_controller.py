@@ -84,10 +84,10 @@ class CustomerController:
         
         order_history = []
         for invoice in invoices:
-            vendor = VendorProfileService.get_vendor_profile(db, invoice.vendorProfileID)
+            vendor = VendorProfileService.get_vendor_profile_by_profile_ID(db, invoice.vendorProfileID)
             orders = OrderService.get_order_by_invoice(db, invoice.invoiceID)
             order_history.append({"invoice": invoice, "vendor": vendor, "orders": orders})
-
+        print(order_history)
         return order_history
 
     def get_order_basket(db, userID):
@@ -102,7 +102,7 @@ class CustomerController:
         
         order_history = []
         for invoice in invoices:
-            vendor = VendorProfileService.get_vendor_profile(db, invoice.vendorProfileID)
+            vendor = VendorProfileService.get_vendor_profile_by_profile_ID(db, invoice.vendorProfileID)
             orders = OrderService.get_order_by_invoice(db, invoice.invoiceID)
             order_history.append({"invoice": invoice, "vendor": vendor, "orders": orders})
 

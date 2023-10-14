@@ -16,3 +16,9 @@ class VendorProfileGateway():
             return db.query(VendorProfile).filter(VendorProfile.userID == userID).first()
         except Exception as e:
             print(f"Error: {e}")
+
+    def get_vendor_profile_by_profile_ID(db: Session, vendorProfileID: int):
+        try:
+            return db.query(VendorProfile).filter(VendorProfile.vendorProfileID == vendorProfileID).first()
+        except Exception as e:
+            print(f"Error: {e}")
