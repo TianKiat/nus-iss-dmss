@@ -49,6 +49,12 @@ class MenuItemGateway():
             return db.query(MenuItem).filter(MenuItem.menuItemID == menuItemID).first()
         except Exception as e:
             print(f"Error: {e}")
+
+    def get_valid_menu_item_for_vendor(self, db: Session, vendorProfileId: int):
+        try:
+            return db.query(MenuItem).filter(MenuItem.vendorProfileID == vendorProfileId, MenuItem.isValid).all()
+        except Exception as e:
+            print(f"Error: {e}")
     
     def update_menu_item(self, db: Session, menuItem: MenuItem):
         try:
