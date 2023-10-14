@@ -4,8 +4,8 @@ from sqlalchemy.orm import sessionmaker
 from app.models import base, invoice, user_profile, vendor_profile, order, menu_item, promotion
 from app.helper import test_fixtures
 from app.common.user_model import UserID
-from app.common.invoice_model import IsFavorite, InvoiceStatus, InvoiceID, DraftInvoice
-from app.common.vendor_profile_model import VendorProfileID
+from app.common.invoice_model import IsFavorite, InvoiceStatus, InvoiceID, DraftInvoiceMenuItem, DraftInvoice
+from app.common.vendor_profile_model import ProfileIDs
 from app.apicontroller.customer_controller import CustomerController
 
 class TestCustomerController(unittest.TestCase):
@@ -26,12 +26,11 @@ class TestCustomerController(unittest.TestCase):
         self.session.close()
 
     def test_update_order_basket(self):
-        # Update order basket with non-existing invoice
+        # Add new order
         draftInvoice = DraftInvoice(
             userID=3,
             vendorProfileID=1,
-            menuItemID=1,
-            quantity=1
+            menuItems=[DraftInvoiceMenuItem(menuItemID=1, quantity=1)]
         )
         result = CustomerController.update_order_basket(self.session, draftInvoice)
         self.assertIsNotNone(result)
@@ -44,8 +43,8 @@ class TestCustomerController(unittest.TestCase):
         updated_order = self.session.query(order.Order.orderID).filter(order.Order.orderID == result["orderID"]).first()
         self.assertIsNotNone(updated_order)
 
-        # Update order basket with existing invoice and non-existing order
-        draftInvoice.menuItemID = 2
+        # Add new order with existing invoice
+        draftInvoice.menuItems[0].menuItemID = 2
         result = CustomerController.update_order_basket(self.session, draftInvoice)
         self.assertIsNotNone(result)
         self.assertIsNotNone(result["invoiceID"])
@@ -55,8 +54,8 @@ class TestCustomerController(unittest.TestCase):
         updated_order = self.session.query(order.Order.orderID).filter(order.Order.orderID == result["orderID"]).first()
         self.assertIsNotNone(updated_order)
 
-        # Update order basket with existing invoice and existing order
-        draftInvoice.quantity = 5
+        # Update order with existing invoice and existing order
+        draftInvoice.menuItems[0].quantity = 5
         result = CustomerController.update_order_basket(self.session, draftInvoice)
         self.assertIsNotNone(result)
         self.assertIsNotNone(result["invoiceID"])
@@ -64,23 +63,23 @@ class TestCustomerController(unittest.TestCase):
 
         # Check if it is updated in database
         updated_order = self.session.query(order.Order.quantity).filter(order.Order.orderID == result["orderID"]).first()
-        self.assertIsNotNone(draftInvoice.quantity, updated_order.quantity)
+        self.assertIsNotNone(draftInvoice.menuItems[0].quantity, updated_order.quantity)
 
-        # Update order basket with quantity 0
-        draftInvoice.quantity = 0
+        # Update order basket with quantity 0 (delete order)
+        draftInvoice.menuItems[0].quantity = 0
         result = CustomerController.update_order_basket(self.session, draftInvoice)
         self.assertIsNotNone(result)
         self.assertIsNotNone(result["invoiceID"])
         self.assertIsNone(result["orderID"])
 
         # Check if it is updated in database
-        updated_order = self.session.query(order.Order).filter(order.Order.invoiceID == result["invoiceID"], order.Order.menuItemID == draftInvoice.menuItemID).first()
+        updated_order = self.session.query(order.Order).filter(order.Order.invoiceID == result["invoiceID"], order.Order.menuItemID == draftInvoice.menuItems[0].menuItemID).first()
         self.assertIsNone(updated_order)
         updated_invoice = self.session.query(invoice.Invoice.invoiceID).filter(invoice.Invoice.invoiceID == result["invoiceID"]).first()
         self.assertIsNotNone(updated_invoice)
 
-        # Update order basket with last menuitem quantity 0
-        draftInvoice.menuItemID = 1
+        # Update order basket with last menuitem quantity 0 (delete order and invoice)
+        draftInvoice.menuItems[0].menuItemID = 1
         result = CustomerController.update_order_basket(self.session, draftInvoice)
         self.assertIsNotNone(result)
         self.assertIsNone(result["invoiceID"])
@@ -93,6 +92,56 @@ class TestCustomerController(unittest.TestCase):
             invoice.Invoice.status == "DRAFT"
         ).first()
         self.assertIsNone(updated_invoice)
+
+        # Add order basket with multiple menu items, including valid and invalid menu items
+        draftInvoice = DraftInvoice(
+            userID=3,
+            vendorProfileID=1,
+            menuItems=[
+                DraftInvoiceMenuItem(menuItemID=1, quantity=1),
+                DraftInvoiceMenuItem(menuItemID=2, quantity=2),
+                DraftInvoiceMenuItem(menuItemID=3, quantity=3)
+            ]
+        )
+        result = CustomerController.update_order_basket(self.session, draftInvoice)
+        self.assertIsNotNone(result)
+        self.assertIsNotNone(result["invoiceID"])
+        self.assertIsNotNone(result["orderIDs"])
+
+        # Check if it is updated in database
+        updated_invoice = self.session.query(invoice.Invoice).filter(invoice.Invoice.invoiceID == result["invoiceID"]).first()
+        self.assertIsNotNone(updated_invoice)
+        updated_orders = self.session.query(order.Order).filter(order.Order.invoiceID == result["invoiceID"]).all()
+        self.assertIsNotNone(updated_orders)
+        self.assertEqual(2, len(updated_orders))
+        self.assertEqual(result["orderIDs"][0], updated_orders[0].orderID)
+        self.assertEqual(result["orderIDs"][1], updated_orders[1].orderID)
+
+        # Add order basket with all invalid menu items
+        draftInvoice = DraftInvoice(
+            userID=3,
+            vendorProfileID=1,
+            menuItems=[
+                DraftInvoiceMenuItem(menuItemID=2, quantity=2),
+                DraftInvoiceMenuItem(menuItemID=4, quantity=1)
+            ]
+        )
+        result = CustomerController.update_order_basket(self.session, draftInvoice)
+        self.assertIsNotNone(result)
+        self.assertIsNone(result["invoiceID"])
+
+        # Add order basket having an invoice with the same vendor
+        draftInvoice = DraftInvoice(
+            userID=3,
+            vendorProfileID=1,
+            menuItems=[
+                DraftInvoiceMenuItem(menuItemID=1, quantity=2),
+                DraftInvoiceMenuItem(menuItemID=2, quantity=1)
+            ]
+        )
+        result = CustomerController.update_order_basket(self.session, draftInvoice)
+        self.assertIsNotNone(result)
+        self.assertIsNone(result["invoiceID"])
 
     def test_get_order_history(self):
         # test with existing data
@@ -206,12 +255,26 @@ class TestCustomerController(unittest.TestCase):
         self.assertEqual(invoiceID.invoiceID, result["invoiceID"])
 
     def test_get_valid_menu_item(self):
-        vendorProfileID = VendorProfileID(vendorProfileID=1)
-        expected_result = self.session.query(menu_item.MenuItem).filter(
-            menu_item.MenuItem.isValid,
-            menu_item.MenuItem.vendorProfileID == vendorProfileID.vendorProfileID
-        ).all()
-        result = CustomerController.get_valid_menu_item(self.session, vendorProfileID)
+        # vendorProfileID = VendorProfileID(vendorProfileID=1)
+        # expected_result = self.session.query(menu_item.MenuItem).filter(
+        #     menu_item.MenuItem.isValid,
+        #     menu_item.MenuItem.vendorProfileID == vendorProfileID.vendorProfileID
+        # ).all()
+        # result = CustomerController.get_valid_menu_item(self.session, vendorProfileID)
+        # self.assertEqual(expected_result, result)
+
+        profileIDs = ProfileIDs(
+            userID=3,
+            vendorProfileID=1
+        )
+        expected_result = [{
+            "menuItem": self.session.query(menu_item.MenuItem).filter(menu_item.MenuItem.menuItemID == 1).first(),
+            "order": self.session.query(order.Order).filter(order.Order.menuItemID == 1, order.Order.invoiceID == 2).first()
+        }, {
+            "menuItem": self.session.query(menu_item.MenuItem).filter(menu_item.MenuItem.menuItemID == 3).first(),
+            "order": self.session.query(order.Order).filter(order.Order.menuItemID == 3, order.Order.invoiceID == 2).first()
+        }]
+        result = CustomerController.get_valid_menu_item(self.session, profileIDs)
         self.assertEqual(expected_result, result)
 
     def test_get_all_vendor_profile(self):

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.apicontroller.customer_controller import CustomerController
 from app.common.user_model import UserID
 from app.common.invoice_model import IsFavorite, InvoiceStatus, InvoiceID, DraftInvoice
-from app.common.vendor_profile_model import VendorProfileID
+from app.common.vendor_profile_model import ProfileIDs
 from run import SessionLocal
 
 router = APIRouter()
@@ -58,9 +58,9 @@ def delete_order(invoiceID: InvoiceID, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(ex)) from ex
 
 @router.post("/menu_items/get_valid", description="Retrieve valid menu items from a vendor")
-def get_valid_menu_item(vendorProfileID: VendorProfileID, db: Session = Depends(get_db)):
+def get_valid_menu_item(profileIDs: ProfileIDs, db: Session = Depends(get_db)):
     try:
-        return CustomerController.get_valid_menu_item(db, vendorProfileID)
+        return CustomerController.get_valid_menu_item(db, profileIDs)
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex
 

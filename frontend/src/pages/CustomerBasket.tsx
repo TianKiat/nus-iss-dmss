@@ -1,7 +1,7 @@
 import { Box, Button, Container, Flex, Heading, Icon, Input, ListItem, Text, UnorderedList } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { MdAdd, MdCancel, MdCheckCircle, MdClose, MdDelete, MdRemove, MdStore } from "react-icons/md"
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const verifyPromoCodeResult = (promoCode: any, totalPrice: number) => {
     if (promoCode != null) {
@@ -75,7 +75,7 @@ const PlaceOrderPopup = (props: PlaceOrderPopupProps) => {
         const result = await response.json();
 
         if (result != null) {
-            navigate("/");
+            navigate("/", {state: {popupMessage: "Your order has been sent to the store. Please wait until your order is ready"}});
         }
     }
 
@@ -201,7 +201,8 @@ interface OrderCardProps {
     date: string,
     menuitems: any[],
     price: number,
-    setUpdateOrderBasketTriggerFunction: Function
+    setUpdateOrderBasketTriggerFunction: Function,
+    isPopupOnPageLoad: boolean
 }
 
 const OrderCard = (props: OrderCardProps) => {
@@ -230,8 +231,10 @@ const OrderCard = (props: OrderCardProps) => {
                 body: JSON.stringify({
                     userID: props.userID,
                     vendorProfileID: props.vendorProfileID,
-                    menuItemID: item["menuItemID"],
-                    quantity: quantity
+                    menuItems: [{
+                        menuItemID: item["menuItemID"],
+                        quantity: quantity
+                    }]
                 }),
                 headers: {
                     'Accept': 'application/json',
@@ -293,6 +296,12 @@ const OrderCard = (props: OrderCardProps) => {
             price={props.price}
             setPlaceOrderPopupFunction={setPlaceOrderPopup}/>
     );
+
+    useEffect(() => {
+        if (props.isPopupOnPageLoad) {
+            setPlaceOrderPopup(placeOrderPopupTag);
+        }
+    }, []);
 
     return (
         <Box
@@ -361,6 +370,8 @@ interface CustomerBasketProps {
 export default function (props: CustomerBasketProps) {
     const [orderBasket, setOrderBasket] = useState([]);
     const [updateOrderBasketTrigger, setUpdateOrderBasketTrigger] = useState([]);
+    const location = useLocation();
+    const popUpInvoiceID = location != null && location.state != null && location.state.invoiceID != null ? location.state.invoiceID : null;
     
     useEffect(() => {
         const fetchAccess = async() => {
@@ -398,7 +409,8 @@ export default function (props: CustomerBasketProps) {
                                 date={item["invoice"]["date"]}
                                 menuitems={item["orders"]}
                                 price={item["invoice"]["totalPrice"]}
-                                setUpdateOrderBasketTriggerFunction={setUpdateOrderBasketTrigger}/>
+                                setUpdateOrderBasketTriggerFunction={setUpdateOrderBasketTrigger}
+                                isPopupOnPageLoad={item["invoice"]["invoiceID"] == popUpInvoiceID}/>
                         ))
                         : <Text>Empty basket</Text>
                     }
