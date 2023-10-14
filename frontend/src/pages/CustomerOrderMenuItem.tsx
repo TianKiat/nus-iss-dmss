@@ -137,6 +137,7 @@ const MenuItemPopup = (props: MenuItemPopupProps) => {
 interface MenuItemCardProps {
     userID: number,
     menuItem: any,
+    order: any,
     setUpdateMenuItemsTriggerFunction: Function,
     setPopupMessageFunction: Function
 }
@@ -153,29 +154,82 @@ const MenuItemCard = (props: MenuItemCardProps) => {
             setPopupMessageFunction={props.setPopupMessageFunction}/>
     );
 
+    const updateInvoice = async(quantity: number) => {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/invoice/update`, {
+            method: "POST",
+            body: JSON.stringify({
+                userID: props.userID,
+                vendorProfileID: props.menuItem["vendorProfileID"],
+                menuItems: [{
+                    menuItemID: props.menuItem["menuItemID"],
+                    quantity: quantity
+                }]
+            }),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+
+        const result = await response.json();
+        if (result != null) {
+            props.setUpdateMenuItemsTriggerFunction(result)
+        }
+    }
+
     return (
-        <Box>
-            <Button
-                w="fit-content"
-                h="auto"
-                p="1rem"
-                variant="outline"
-                onClick={() => {setMenuItemPopup(menuItemPopupTag)}}>
-                <Box
-                    maxW={{ base: 'full', md: '200px' }}
-                    w={'200px'}>
-                    <Image
-                        src={props.menuItem["menuItemImage"]}
-                        alt={props.menuItem["menuItemName"]}
-                        boxSize="200px"
-                        borderRadius="5px"
-                        objectFit="cover"
-                        mb="1rem"/>
-                    <Heading size="md" mb="0.5rem">{props.menuItem["menuItemName"]}</Heading>
-                    <Text mb="0.5rem">{props.menuItem["menuItemDesc"]}</Text>
-                    <Text fontSize="xs">${props.menuItem["price"].toFixed(2)}</Text>
-                </Box>
-            </Button>
+        <Box
+            w="fit-content"
+            h="auto"
+            p="1rem"
+            borderWidth={1}
+            borderRadius="0.5rem">
+            <Box
+                maxW={{ base: 'full', md: '200px' }}
+                w={'200px'}
+                textAlign="center">
+                <Image
+                    src={props.menuItem["menuItemImage"]}
+                    alt={props.menuItem["menuItemName"]}
+                    boxSize="200px"
+                    borderRadius="5px"
+                    objectFit="cover"
+                    mb="1rem"/>
+                <Heading size="md" mb="0.5rem">{props.menuItem["menuItemName"]}</Heading>
+                <Text mb="0.5rem">{props.menuItem["menuItemDesc"]}</Text>
+                <Text fontSize="xs" mb="1rem">${props.menuItem["price"].toFixed(2)}</Text>
+                {props.order != null ?
+                    <Flex>
+                        <Button
+                            size="sm"
+                            onClick={() => {updateInvoice(props.order["quantity"] - 1)}}>
+                            <Icon as={MdRemove}/>
+                        </Button>
+                        <Text
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            w="calc(100% - 76px)"
+                            fontWeight="bold"
+                            fontSize="md">
+                            {props.order["quantity"]}
+                        </Text>
+                        <Button
+                            size="sm"
+                            onClick={() => {updateInvoice(props.order["quantity"] + 1)}}>
+                            <Icon as={MdAdd}/>
+                        </Button>
+                    </Flex>
+                    :
+                    <Button
+                        w="full"
+                        colorScheme="green"
+                        size="sm"
+                        onClick={() => {setMenuItemPopup(menuItemPopupTag)}}>
+                        Add
+                    </Button>
+                }
+            </Box>
             {menuItemPopup}
         </Box>
     )
@@ -195,7 +249,10 @@ export default function(props: CustomerOrderMenuItemProps) {
         const fetchAccess = async() => {
             const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/menu_items/get_valid`, {
                 method: "POST",
-                body: JSON.stringify({vendorProfileID: props.vendor["vendorProfileID"]}),
+                body: JSON.stringify({
+                    userID: props.userID,
+                    vendorProfileID: props.vendor["vendorProfileID"]
+                }),
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
@@ -244,9 +301,10 @@ export default function(props: CustomerOrderMenuItemProps) {
             <Flex gap="1rem" flexWrap="wrap">
                 {menuItems.map((item) => (
                     <MenuItemCard
-                        key={item["menuItemID"]}
+                        key={item["menuItem"]["menuItemID"]}
                         userID={props.userID}
-                        menuItem={item}
+                        menuItem={item["menuItem"]}
+                        order={item["order"]}
                         setUpdateMenuItemsTriggerFunction={setUpdateMenuItemsTrigger}
                         setPopupMessageFunction={setPopupMessage}/>
                 ))}

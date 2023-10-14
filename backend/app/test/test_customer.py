@@ -5,7 +5,7 @@ from app.models import base, invoice, user_profile, vendor_profile, order, menu_
 from app.helper import test_fixtures
 from app.common.user_model import UserID
 from app.common.invoice_model import IsFavorite, InvoiceStatus, InvoiceID, DraftInvoiceMenuItem, DraftInvoice
-from app.common.vendor_profile_model import VendorProfileID
+from app.common.vendor_profile_model import ProfileIDs
 from app.apicontroller.customer_controller import CustomerController
 
 class TestCustomerController(unittest.TestCase):
@@ -255,12 +255,26 @@ class TestCustomerController(unittest.TestCase):
         self.assertEqual(invoiceID.invoiceID, result["invoiceID"])
 
     def test_get_valid_menu_item(self):
-        vendorProfileID = VendorProfileID(vendorProfileID=1)
-        expected_result = self.session.query(menu_item.MenuItem).filter(
-            menu_item.MenuItem.isValid,
-            menu_item.MenuItem.vendorProfileID == vendorProfileID.vendorProfileID
-        ).all()
-        result = CustomerController.get_valid_menu_item(self.session, vendorProfileID)
+        # vendorProfileID = VendorProfileID(vendorProfileID=1)
+        # expected_result = self.session.query(menu_item.MenuItem).filter(
+        #     menu_item.MenuItem.isValid,
+        #     menu_item.MenuItem.vendorProfileID == vendorProfileID.vendorProfileID
+        # ).all()
+        # result = CustomerController.get_valid_menu_item(self.session, vendorProfileID)
+        # self.assertEqual(expected_result, result)
+
+        profileIDs = ProfileIDs(
+            userID=3,
+            vendorProfileID=1
+        )
+        expected_result = [{
+            "menuItem": self.session.query(menu_item.MenuItem).filter(menu_item.MenuItem.menuItemID == 1).first(),
+            "order": self.session.query(order.Order).filter(order.Order.menuItemID == 1, order.Order.invoiceID == 2).first()
+        }, {
+            "menuItem": self.session.query(menu_item.MenuItem).filter(menu_item.MenuItem.menuItemID == 3).first(),
+            "order": self.session.query(order.Order).filter(order.Order.menuItemID == 3, order.Order.invoiceID == 2).first()
+        }]
+        result = CustomerController.get_valid_menu_item(self.session, profileIDs)
         self.assertEqual(expected_result, result)
 
     def test_get_all_vendor_profile(self):

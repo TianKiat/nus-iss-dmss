@@ -118,8 +118,19 @@ class CustomerController:
         OrderService.delete_order_by_invoice(db, invoiceID.invoiceID)
         return InvoiceService.delete_invoice(db, invoiceID.invoiceID)
     
-    def get_valid_menu_item(db, vendorProfileID):
-        return MenuItemService.get_valid_menu_item_for_vendor(db, vendorProfileID.vendorProfileID)
+    def get_valid_menu_item(db, profileIDs):
+        customerProfile = UserProfileService.get_user_profile_by_user(db, profileIDs.userID)
+
+        menuitems_orders = []
+        menuitems = MenuItemService.get_valid_menu_item_for_vendor(db, profileIDs.vendorProfileID)
+        invoice = InvoiceService.get_invoice_by_customer_and_vendor_and_order_status(db, customerProfile.userProfileID, profileIDs.vendorProfileID, "DRAFT")
+        for menuitem in menuitems:
+            if (invoice != None):
+                order = OrderService.get_order_by_invoice_and_menuitem(db, invoice.invoiceID, menuitem.menuItemID)
+                menuitems_orders.append({"menuItem": menuitem, "order": order})
+            else:
+                menuitems_orders.append({"menuItem": menuitem, "order": None})
+        return menuitems_orders
     
     def get_all_vendor_profile(db):
         return VendorProfileService.get_all_vendor_profile(db)

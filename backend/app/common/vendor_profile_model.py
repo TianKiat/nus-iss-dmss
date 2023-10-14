@@ -1,4 +1,5 @@
 from pydantic import BaseModel
 
-class VendorProfileID(BaseModel):
+class ProfileIDs(BaseModel):
+    userID: int
     vendorProfileID: int
