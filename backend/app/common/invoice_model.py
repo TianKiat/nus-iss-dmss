@@ -10,6 +10,7 @@ class IsFavorite(BaseModel):
 class InvoiceStatus(BaseModel):
     invoiceID: int
     status: str
+    discount: float = 0
 
 class DraftInvoice(BaseModel):
     userID: int

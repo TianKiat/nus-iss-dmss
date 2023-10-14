@@ -19,8 +19,8 @@ class InvoiceService():
     def update_isFavorite(db, invoiceID, isFavorite):
         return InvoiceGateway.update_isFavorite(db, invoiceID, isFavorite)
     
-    def update_status(db, invoiceID, status):
-        return InvoiceGateway.update_status(db, invoiceID, status)
+    def update_status(db, invoiceID, status, discount):
+        return InvoiceGateway.update_status(db, invoiceID, status, discount)
     
     def update_totalPrice(db, invoiceID):
         return InvoiceGateway.update_totalPrice(db, invoiceID)

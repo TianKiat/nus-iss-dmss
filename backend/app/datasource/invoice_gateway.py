@@ -74,13 +74,20 @@ class InvoiceGateway():
         except Exception as e:
             print(f"Error: {e}")
 
-    def update_status(db: Session, invoiceID: int, status: str):
+    def update_status(db: Session, invoiceID: int, status: str, discount: float = 0):
         try:
-            db.execute(
-                update(Invoice)
-                .where(Invoice.invoiceID == invoiceID)
-                .values(status=status)
-            )
+            if (status == "PENDING"):
+                db.execute(
+                    update(Invoice)
+                    .where(Invoice.invoiceID == invoiceID)
+                    .values(status=status, discount=discount, date=date.today())
+                )
+            else:
+                db.execute(
+                    update(Invoice)
+                    .where(Invoice.invoiceID == invoiceID)
+                    .values(status=status)
+                )
             db.commit()
 
             updated_invoice = db.query(Invoice).filter(Invoice.invoiceID == invoiceID).first()

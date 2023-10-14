@@ -20,6 +20,7 @@ import {
 import { ReactElement, useEffect, useState } from 'react'
 import { FaBowlRice, FaStar } from 'react-icons/fa6'
 import { FaRegStar } from 'react-icons/fa'
+import { useNavigate } from 'react-router-dom'
 
 function orderStatusTag(status: string) {
     switch(status) {
@@ -86,10 +87,12 @@ interface OrderCardProps {
     date: string,
     menuitems: string[],
     price: number,
+    discount: number,
     updateOrderHistoryTriggerFunction: Function
 }
 
 const OrderCard = (props: OrderCardProps) => {
+    const navigate = useNavigate();
 
     const updateInvoiceIsFavorite = async() => {
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/invoice/isFavorite/update`, {
@@ -108,7 +111,7 @@ const OrderCard = (props: OrderCardProps) => {
     }
 
     const cancelInvoice = async() => {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/invoice/status/update`, {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/invoice/status_discount/update`, {
             method: "POST",
             body: JSON.stringify({
                 invoiceID: props.invoiceID,
@@ -123,51 +126,45 @@ const OrderCard = (props: OrderCardProps) => {
         props.updateOrderHistoryTriggerFunction(await response.json());
     }
 
+    const reOrder = async() => {
+        navigate("/basket");
+    }
+
     return (
-        props.isFavorite != null ?
-            <Button
-                w="full"
-                h="auto"
-                p={3}
-                fontWeight="normal"
-                variant="outline">
-                <Flex w="full" flexDirection={{base: 'column', md: 'row'}}>
-                    <Box w={{base: 'full', md: '112px'}} p={'16px'} verticalAlign={'top'}>
-                        <Button variant={'link'} onClick={updateInvoiceIsFavorite}>
-                            {favoriteIcon(props.isFavorite)}
-                        </Button>
-                    </Box>
-                    <Box w={{base: 'full', md: 'calc(100% - 112px - 150px)'}} p={'16px'} textAlign="left">
-                        {orderStatusTag(props.status)}
-                        <Heading size="lg">{props.vendorName}</Heading>
-                        {dateStringFormatTransform(props.date)}
-                        <br/><br/>
-                        <Heading size="sm">Menu Items</Heading>
-                        <UnorderedList>
-                            {ordersToMenuitemsList(props.menuitems).map((value) => (
-                                <ListItem key={value}>{value}</ListItem>
-                            ))}
-                        </UnorderedList>
-                    </Box>
-                    <Box w={{base: 'full', md: '150px'}} p={'16px'} verticalAlign={'top'} textAlign={{base: 'center', md: 'right'}}>
-                        <Heading size="lg">${props.price.toFixed(2)}</Heading>
-                    </Box>
-                </Flex>
-            </Button>
-        : <Box
+        <Box
             borderWidth="1px"
             borderRadius="6px"
             p={3}>
             <Flex w="full" flexDirection={{base: 'column', md: 'row'}}>
-                <Box w={{base: 'full', md: '112px'}} p={'16px'} verticalAlign={'top'} textAlign={'center'}>
-                    <Button
-                        colorScheme="red"
-                        isDisabled={props.status == "DONE" ? true : false}
-                        onClick={cancelInvoice}>
-                        Cancel
-                    </Button>
+                <Box w={{base: 'full', md: '132px'}} p={'16px'} verticalAlign={'top'} textAlign={'center'}>
+                    {props.isFavorite == null ?
+                        <Button
+                            w="100px"
+                            colorScheme="red"
+                            isDisabled={props.status == "DONE" ? true : false}
+                            onClick={cancelInvoice}>
+                            Cancel
+                        </Button>
+                        :
+                        <Flex
+                            gap="1rem"
+                            flexWrap={"wrap"}
+                            justifyContent={"center"}>
+                            <Button variant={'link'} onClick={updateInvoiceIsFavorite}>
+                                {favoriteIcon(props.isFavorite)}
+                            </Button>
+                            <Button
+                                w="100px"
+                                colorScheme="green"
+                                variant="ghost"
+                                isDisabled={props.status == "DONE" ? true : false}
+                                onClick={reOrder}>
+                                Re-Order
+                            </Button>
+                        </Flex>
+                    }
                 </Box>
-                <Box w={{base: 'full', md: 'calc(100% - 112px - 150px)'}} p={'16px'}>
+                <Box w={{base: 'full', md: 'calc(100% - 132px - 200px)'}} p={'16px'}>
                     {orderStatusTag(props.status)}
                     <Heading size="lg">{props.vendorName}</Heading>
                     {dateStringFormatTransform(props.date)}
@@ -179,8 +176,10 @@ const OrderCard = (props: OrderCardProps) => {
                         ))}
                     </UnorderedList>
                 </Box>
-                <Box w={{base: 'full', md: '150px'}} p={'16px'} verticalAlign={'top'} textAlign={{base: 'center', md: 'right'}}>
-                    <Heading size="lg">${props.price.toFixed(2)}</Heading>
+                <Box w={{base: 'full', md: '200px'}} p={'16px'} verticalAlign={'top'} textAlign={{base: 'center', md: 'right'}}>
+                    <Text>Subtotal: ${props.price.toFixed(2)}</Text>
+                    <Text>Discount: -${props.discount.toFixed(2)}</Text>
+                    <Heading mt="1rem" size="md">Total: ${Number(props.price - props.discount).toFixed(2)}</Heading>
                 </Box>
             </Flex>
         </Box>
@@ -300,6 +299,7 @@ export default function (props : CustomerDashboardProps) {
                                                         date={item["invoice"]["date"]}
                                                         menuitems={item["orders"]}
                                                         price={item["invoice"]["totalPrice"]}
+                                                        discount={item["invoice"]["discount"]}
                                                         updateOrderHistoryTriggerFunction={setUpdateOrderHistoryTrigger}
                                                     />
                                                 ))
@@ -326,6 +326,7 @@ export default function (props : CustomerDashboardProps) {
                                                         date={item["invoice"]["date"]}
                                                         menuitems={item["orders"]}
                                                         price={item["invoice"]["totalPrice"]}
+                                                        discount={item["invoice"]["discount"]}
                                                         updateOrderHistoryTriggerFunction={setUpdateOrderHistoryTrigger}
                                                     />
                                                 ))
@@ -352,6 +353,7 @@ export default function (props : CustomerDashboardProps) {
                                                         date={item["invoice"]["date"]}
                                                         menuitems={item["orders"]}
                                                         price={item["invoice"]["totalPrice"]}
+                                                        discount={item["invoice"]["discount"]}
                                                         updateOrderHistoryTriggerFunction={setUpdateOrderHistoryTrigger}
                                                     />
                                                 ))

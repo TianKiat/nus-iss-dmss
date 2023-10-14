@@ -1,10 +1,11 @@
 import unittest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from app.models import base, invoice, user_profile, vendor_profile, order
+from app.models import base, invoice, user_profile, vendor_profile, order, menu_item, promotion
 from app.helper import test_fixtures
 from app.common.user_model import UserID
 from app.common.invoice_model import IsFavorite, InvoiceStatus, InvoiceID, DraftInvoice
+from app.common.vendor_profile_model import VendorProfileID
 from app.apicontroller.customer_controller import CustomerController
 
 class TestCustomerController(unittest.TestCase):
@@ -163,19 +164,29 @@ class TestCustomerController(unittest.TestCase):
     
     def test_update_order_status(self):
         # Update invoice status with existing data
-        isFavorite = InvoiceStatus(invoiceID=1, status="CANCELLED")
-        result = CustomerController.update_order_status(self.session, isFavorite)
-        self.assertEqual(isFavorite.invoiceID, result["invoiceID"])
-        self.assertEqual("CANCELLED", result["status"])
+        invoiceStatus = InvoiceStatus(invoiceID=1, status="CANCELLED")
+        result = CustomerController.update_order_status(self.session, invoiceStatus)
+        self.assertEqual(invoiceStatus.invoiceID, result["invoiceID"])
+        self.assertEqual(invoiceStatus.status, result["status"])
 
         # Check if it is updated in database
-        updated_invoice = self.session.query(invoice.Invoice).filter(invoice.Invoice.invoiceID == isFavorite.invoiceID).first()
-        self.assertEqual("CANCELLED", updated_invoice.status)
+        updated_invoice = self.session.query(invoice.Invoice).filter(invoice.Invoice.invoiceID == invoiceStatus.invoiceID).first()
+        self.assertEqual(invoiceStatus.status, updated_invoice.status)
 
         # Update invoice status with non-existing data
-        isFavorite = InvoiceStatus(invoiceID=0, status="CANCELLED")
-        result = CustomerController.update_order_status(self.session, isFavorite)
+        invoiceStatus = InvoiceStatus(invoiceID=0, status="CANCELLED")
+        result = CustomerController.update_order_status(self.session, invoiceStatus)
         self.assertEqual(None, result["invoiceID"])
+
+        # Update invoice status and discount with existing data
+        invoiceStatus = InvoiceStatus(invoiceID=2, status="PENDING", discount=5)
+        result = CustomerController.update_order_status(self.session, invoiceStatus)
+        self.assertEqual("PENDING", result["status"])
+
+        # Check if it is updated in database
+        updated_invoice = self.session.query(invoice.Invoice).filter(invoice.Invoice.invoiceID == invoiceStatus.invoiceID).first()
+        self.assertEqual(invoiceStatus.status, updated_invoice.status)
+        self.assertEqual(invoiceStatus.discount, updated_invoice.discount)
 
     def test_delete_order(self):
         # Delete invoice with existing data
@@ -194,7 +205,38 @@ class TestCustomerController(unittest.TestCase):
         result = CustomerController.delete_order(self.session, invoiceID)
         self.assertEqual(invoiceID.invoiceID, result["invoiceID"])
 
+    def test_get_valid_menu_item(self):
+        vendorProfileID = VendorProfileID(vendorProfileID=1)
+        expected_result = self.session.query(menu_item.MenuItem).filter(
+            menu_item.MenuItem.isValid,
+            menu_item.MenuItem.vendorProfileID == vendorProfileID.vendorProfileID
+        ).all()
+        result = CustomerController.get_valid_menu_item(self.session, vendorProfileID)
+        self.assertEqual(expected_result, result)
+
     def test_get_all_vendor_profile(self):
         expected_result = self.session.query(vendor_profile.VendorProfile).all()
         result = CustomerController.get_all_vendor_profile(self.session)
+        self.assertEqual(expected_result, result)
+
+    def test_get_promotion_verify(self):
+        # test with existing valid promo code
+        promoCode = "NDP2023"
+        expected_result = self.session.query(promotion.Promotion).filter(
+            promotion.Promotion.promoCode == promoCode,
+            promotion.Promotion.isValid
+        ).first()
+        result = CustomerController.get_promotion_verify(self.session, promoCode)
+        self.assertEqual(expected_result, result)
+
+        # test with existing invalid promo code
+        promoCode = "CNY2023"
+        expected_result = None
+        result = CustomerController.get_promotion_verify(self.session, promoCode)
+        self.assertEqual(expected_result, result)
+
+        # test with non-existing promo code
+        promoCode = "ANYTHING123"
+        expected_result = None
+        result = CustomerController.get_promotion_verify(self.session, promoCode)
         self.assertEqual(expected_result, result)

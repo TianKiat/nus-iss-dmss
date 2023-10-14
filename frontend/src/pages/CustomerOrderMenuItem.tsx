@@ -185,7 +185,14 @@ export default function(props: CustomerOrderMenuItemProps) {
 
     useEffect(() => {
         const fetchAccess = async() => {
-            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/menu_items/get/${props.vendor["vendorProfileID"]}`);
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/menu_items/get_valid`, {
+                method: "POST",
+                body: JSON.stringify({vendorProfileID: props.vendor["vendorProfileID"]}),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            });
             const result = await response.json();
             setMenuItems(result)
         }
@@ -229,6 +236,7 @@ export default function(props: CustomerOrderMenuItemProps) {
             <Flex gap="1rem" flexWrap="wrap">
                 {menuItems.map((item) => (
                     <MenuItemCard
+                        key={item["menuItemID"]}
                         userID={props.userID}
                         menuItem={item}
                         setUpdateMenuItemsTriggerFunction={setUpdateMenuItemsTrigger}/>

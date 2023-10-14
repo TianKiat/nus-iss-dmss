@@ -3,6 +3,7 @@ from app.service.vendor_profile_service import VendorProfileService
 from app.service.order_service import OrderService
 from app.service.invoice_service import InvoiceService
 from app.service.menu_item_service import MenuItemService
+from app.service.promotion_service import PromotionService
 
 class CustomerController:
     def __init__ (self):
@@ -80,11 +81,17 @@ class CustomerController:
         return InvoiceService.update_isFavorite(db, isFavorite.invoiceID, isFavorite.isFavorite)
 
     def update_order_status(db, invoiceStatus):
-        return InvoiceService.update_status(db, invoiceStatus.invoiceID, invoiceStatus.status)
+        return InvoiceService.update_status(db, invoiceStatus.invoiceID, invoiceStatus.status, invoiceStatus.discount)
     
     def delete_order(db, invoiceID):
         OrderService.delete_order_by_invoice(db, invoiceID.invoiceID)
         return InvoiceService.delete_invoice(db, invoiceID.invoiceID)
     
+    def get_valid_menu_item(db, vendorProfileID):
+        return MenuItemService.get_valid_menu_item_for_vendor(db, vendorProfileID.vendorProfileID)
+    
     def get_all_vendor_profile(db):
         return VendorProfileService.get_all_vendor_profile(db)
+    
+    def get_promotion_verify(db, promoCode):
+        return PromotionService.get_promotion_verify(db, promoCode)
