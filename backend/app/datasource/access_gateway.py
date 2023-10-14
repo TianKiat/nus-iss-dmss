@@ -6,4 +6,7 @@ class AccessGateway():
         pass
 
     def get_access(db: Session, accessID: int):
-        return db.query(Access).filter(Access.accessID == accessID).first()
+        try:
+            return db.query(Access).filter(Access.accessID == accessID).first()
+        except Exception as e:
+            print(f"Error: {e}")

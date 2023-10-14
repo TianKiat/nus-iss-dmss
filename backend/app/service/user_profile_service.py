@@ -1,12 +1,8 @@
 from app.datasource.user_profile_gateway import UserProfileGateway
-# import service class needed
-# import gateway class needed
 
 class UserProfileService():
     def __init__(self):
         pass
 
-    def retrive_profile(self, db, userId):
-        # retrive customer data
-        return UserProfileGateway().retrive_profile(db, userId)
-
+    def get_user_profile_by_user(db, userID):
+        return UserProfileGateway.get_user_profile_by_user(db, userID)

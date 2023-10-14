@@ -1,16 +1,12 @@
-import mysql.connector
-from app.models.user_profile import UserProfile
 from sqlalchemy.orm import Session
-from app.common.constants import DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE
-
-sqldb = mysql.connector.connect(host = DB_HOST, user = DB_USERNAME, password = DB_PASSWORD, database = DB_DATABASE)
+from app.models.user_profile import UserProfile
 
 class UserProfileGateway():
-    def __init__(self):
+    def __init__():
         pass
 
-    def retrive_profile(self, db: Session, userId):
+    def get_user_profile_by_user(db: Session, userID: int):
         try:
-            return db.query(UserProfile).filter(UserProfile.userID == userId).first()
-        except RuntimeError as exception:
-            print(f"Error: {exception}")
+            return db.query(UserProfile).filter(UserProfile.userID == userID).first()
+        except Exception as e:
+            print(f"Error: {e}")

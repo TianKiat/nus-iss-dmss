@@ -9,5 +9,7 @@ class AccessControlContoller:
         accessControl = AccessControlService.get_access_control(db, roleID)
         if (accessControl is None):
             return []
-        access = AccessService.get_access(db, accessControl.accessID)
+        access = []
+        for acl in accessControl:
+            access.append(AccessService.get_access(db, acl.accessID))
         return access
