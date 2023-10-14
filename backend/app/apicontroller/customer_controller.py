@@ -11,35 +11,66 @@ class CustomerController:
 
     def update_order_basket(db, draftInvoice):
         customerProfileID = UserProfileService.get_user_profile_by_user(db, draftInvoice.userID).userProfileID
-        if (draftInvoice.quantity > 0):
-            menuitem = MenuItemService.get_menu_item(db, draftInvoice.menuItemID)
+        if (len(draftInvoice.menuItems) == 1 and draftInvoice.menuItems[0].quantity > 0):
+            menuitem = MenuItemService.get_menu_item(db, draftInvoice.menuItems[0].menuItemID)
 
             new_invoice = False
             invoice = InvoiceService.get_invoice_by_customer_and_vendor_and_order_status(db, customerProfileID, draftInvoice.vendorProfileID, "DRAFT")
             if (invoice is None):
                 new_invoice = True
-                totalPrice = draftInvoice.quantity * menuitem.price
+                totalPrice = draftInvoice.menuItems[0].quantity * menuitem.price
                 invoice = InvoiceService.create_invoice(db, customerProfileID, draftInvoice.vendorProfileID, totalPrice)
                 
-            order = OrderService.get_order_by_invoice_and_menuitem(db, invoice.invoiceID, draftInvoice.menuItemID)
+            order = OrderService.get_order_by_invoice_and_menuitem(db, invoice.invoiceID, draftInvoice.menuItems[0].menuItemID)
             if (order is None):
-                order = OrderService.create_order(db, draftInvoice.menuItemID, menuitem.menuItemName, draftInvoice.quantity, draftInvoice.quantity * menuitem.price, invoice.invoiceID)
+                order = OrderService.create_order(db, draftInvoice.menuItems[0].menuItemID, menuitem.menuItemName, draftInvoice.menuItems[0].quantity, draftInvoice.menuItems[0].quantity * menuitem.price, invoice.invoiceID)
             else:
-                OrderService.update_order(db, order.orderID, draftInvoice.menuItemID, menuitem.menuItemName, draftInvoice.quantity, draftInvoice.quantity * menuitem.price, invoice.invoiceID)
+                OrderService.update_order(db, order.orderID, draftInvoice.menuItems[0].menuItemID, menuitem.menuItemName, draftInvoice.menuItems[0].quantity, draftInvoice.menuItems[0].quantity * menuitem.price, invoice.invoiceID)
 
             if (not new_invoice):
                 InvoiceService.update_totalPrice(db, invoice.invoiceID)
             
             return {"invoiceID": invoice.invoiceID, "orderID": order.orderID}
         
-        else:
+        elif (len(draftInvoice.menuItems) == 1):
             invoice = InvoiceService.get_invoice_by_customer_and_vendor_and_order_status(db, customerProfileID, draftInvoice.vendorProfileID, "DRAFT")
-            orders = OrderService.delete_order_by_invoice_and_menuitem(db, invoice.invoiceID, draftInvoice.menuItemID)
+            orders = OrderService.delete_order_by_invoice_and_menuitem(db, invoice.invoiceID, draftInvoice.menuItems[0].menuItemID)
             if (len(orders) < 1):
                 InvoiceService.delete_invoice(db, invoice.invoiceID)
                 return {"invoiceID": None}
             else:
                 return {"invoiceID": invoice.invoiceID, "orderID": None}
+        
+        else:
+            invoice = InvoiceService.get_invoice_by_customer_and_vendor_and_order_status(db, customerProfileID, draftInvoice.vendorProfileID, "DRAFT")
+            if (invoice is None):
+                menuItems = []
+                menuItemsDetails = []
+                totalPrice = 0
+                for menuItemDetails in draftInvoice.menuItems:
+                    menuItem = MenuItemService.get_menu_item(db, menuItemDetails.menuItemID)
+                    if (menuItem.isValid):
+                        totalPrice += (menuItem.price * menuItemDetails.quantity)
+                        menuItems.append(menuItem)
+                        menuItemsDetails.append(menuItemDetails)
+
+                if (len(menuItems) > 1):
+                    invoice = InvoiceService.create_invoice(db, customerProfileID, draftInvoice.vendorProfileID, totalPrice)
+                    
+                    orderIDs = []
+                    for i in range(len(menuItems)):
+                        menuItem = menuItems[i]
+                        menuItemDetails = menuItemsDetails[i]
+                        order = OrderService.create_order(db, menuItem.menuItemID, menuItem.menuItemName, menuItemDetails.quantity, menuItemDetails.quantity * menuItem.price, invoice.invoiceID)
+                        orderIDs.append(order.orderID)
+
+                    return {"invoiceID": invoice.invoiceID, "orderIDs": orderIDs}
+                
+                else:
+                    return {"invoiceID": None, "response": "All stated menu items have been removed. Please order manually."}
+                
+            else:
+                return {"invoiceID": None, "response": "There is an order under the same store inside the basket. Please remove the order before re-order again."}
 
     def get_order_history(db, userID):
         user_profile = UserProfileService.get_user_profile_by_user(db, userID.userID)

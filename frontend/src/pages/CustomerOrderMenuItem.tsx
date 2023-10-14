@@ -6,7 +6,8 @@ interface MenuItemPopupProps {
     userID: number,
     menuItem: any,
     setMenuItemPopupFunction: Function,
-    setUpdateMenuItemsTriggerFunction: Function
+    setUpdateMenuItemsTriggerFunction: Function,
+    setPopupMessageFunction: Function
 }
 
 const MenuItemPopup = (props: MenuItemPopupProps) => {
@@ -23,8 +24,7 @@ const MenuItemPopup = (props: MenuItemPopupProps) => {
             body: JSON.stringify({
                 userID: props.userID,
                 vendorProfileID: props.menuItem.vendorProfileID,
-                menuItemID: props.menuItem.menuItemID,
-                quantity: quantity
+                menuItems: [{menuItemID: props.menuItem.menuItemID, quantity: quantity}]
             }),
             headers: {
                 'Accept': 'application/json',
@@ -36,6 +36,11 @@ const MenuItemPopup = (props: MenuItemPopupProps) => {
         if (result != null) {
             props.setMenuItemPopupFunction(null);
             props.setUpdateMenuItemsTriggerFunction(result);
+
+            props.setPopupMessageFunction("Successfully added to the basket");
+            setTimeout(() => {
+                props.setPopupMessageFunction(null);
+            }, 5000);
         }
     }
 
@@ -132,7 +137,8 @@ const MenuItemPopup = (props: MenuItemPopupProps) => {
 interface MenuItemCardProps {
     userID: number,
     menuItem: any,
-    setUpdateMenuItemsTriggerFunction: Function
+    setUpdateMenuItemsTriggerFunction: Function,
+    setPopupMessageFunction: Function
 }
 
 const MenuItemCard = (props: MenuItemCardProps) => {
@@ -143,7 +149,8 @@ const MenuItemCard = (props: MenuItemCardProps) => {
             userID={props.userID}
             menuItem={props.menuItem}
             setMenuItemPopupFunction={setMenuItemPopup}
-            setUpdateMenuItemsTriggerFunction={props.setUpdateMenuItemsTriggerFunction}/>
+            setUpdateMenuItemsTriggerFunction={props.setUpdateMenuItemsTriggerFunction}
+            setPopupMessageFunction={props.setPopupMessageFunction}/>
     );
 
     return (
@@ -182,6 +189,7 @@ interface CustomerOrderMenuItemProps {
 export default function(props: CustomerOrderMenuItemProps) {
     const [menuItems, setMenuItems] = useState([]);
     const [updateMenuItemsTrigger, setUpdateMenuItemsTrigger] = useState();
+    const [popupMessage, setPopupMessage]: any = useState();
 
     useEffect(() => {
         const fetchAccess = async() => {
@@ -239,9 +247,34 @@ export default function(props: CustomerOrderMenuItemProps) {
                         key={item["menuItemID"]}
                         userID={props.userID}
                         menuItem={item}
-                        setUpdateMenuItemsTriggerFunction={setUpdateMenuItemsTrigger}/>
+                        setUpdateMenuItemsTriggerFunction={setUpdateMenuItemsTrigger}
+                        setPopupMessageFunction={setPopupMessage}/>
                 ))}
             </Flex>
+            {popupMessage != null ?
+                <Box
+                    position="fixed"
+                    top="0"
+                    left="0"
+                    w="full"
+                    display="flex"
+                    justifyContent="center"
+                    pt={{base: "1rem", md: "2rem"}}>
+                    <Text
+                        maxW={{base: "300px", md: "500px"}}
+                        pt={1.5}
+                        pb={1.5}
+                        pl={3}
+                        pr={3}
+                        backgroundColor="green.100"
+                        color="green"
+                        borderRadius="0.5rem"
+                        textAlign="center">
+                        {popupMessage}
+                    </Text>
+                </Box>
+                : null
+            }
         </Box>
     )
 }

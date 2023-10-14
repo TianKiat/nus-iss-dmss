@@ -78,7 +78,8 @@ def setup_menuitem_table(session):
     values = [
         {'menuItemName': 'Eggplant Mala', 'price': 1.20, 'menuItemImage': None, 'menuItemDesc': 'veggie', 'isValid': True, 'vendorProfileID': 1},
         {'menuItemName': 'Steam Egg', 'price': 1, 'menuItemImage': None, 'menuItemDesc': None, 'isValid': False, 'vendorProfileID': 1},
-        {'menuItemName': 'Sweet and Sour Pork', 'price': 2, 'menuItemImage': None, 'menuItemDesc': 'meat', 'isValid': True, 'vendorProfileID': 1}
+        {'menuItemName': 'Sweet and Sour Pork', 'price': 2, 'menuItemImage': None, 'menuItemDesc': 'meat', 'isValid': True, 'vendorProfileID': 1},
+        {'menuItemName': 'Potato', 'price': 0.5, 'menuItemImage': None, 'menuItemDesc': None, 'isValid': False, 'vendorProfileID': 1},
     ]
     add_multiple_row_to_table(session, menu_item.MenuItem, values)
 
