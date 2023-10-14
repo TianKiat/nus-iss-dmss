@@ -28,8 +28,15 @@ import {
 } from 'react-icons/fa'
 
 import { Link } from "react-router-dom";
+import Cookies from 'js-cookie';
 
 function navButtons(cookies: any) {
+
+  function signOut() {
+    Cookies.remove('auth')
+    window.location.href='../login';
+  }
+
   if (cookies != null) {
     return (
       <Stack flex={{ base: 1, md: 0 }} justify={"flex-end"} direction={"row"} spacing={6}>
@@ -64,9 +71,12 @@ function navButtons(cookies: any) {
             </Text>
           </Button>
         </Link>
+        {/* <Button as={"a"} fontSize={"sm"} fontWeight={400} variant={"link"} onClick={signOut}>
+          Sign Out
+        </Button> */}
         <Button as={"a"} display={{ base: "none", md: "inline-flex" }} fontSize={"sm"}
                 fontWeight={600} color={"white"} bg={"blue.400"} href={"/login"}
-                _hover={{ bg: "blue.300" }}>
+                _hover={{ bg: "blue.300" }} onClick={signOut}>
           Sign Out
         </Button>
       </Stack>);
@@ -92,6 +102,8 @@ interface NavProps {
 
 export default function Nav(props: NavProps) {
   const { isOpen, onToggle } = useDisclosure();
+
+  
 
   return (
     <Box>
