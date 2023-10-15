@@ -50,6 +50,7 @@ import {
   NotAllowedIcon,
   DeleteIcon,
   ViewIcon,
+  CheckIcon,
 } from "@chakra-ui/icons";
 import { FunctionComponent, useState, useEffect } from "react";
 import OrderStatusBadge from "../components/OrderStatusBadge";
@@ -490,7 +491,6 @@ function OrdersTab(props: TabProps) {
     const fetchData = async () => {
       const response = await fetch(url);
       const newData = await response.json();
-      console.log(newData);
       setOrders(newData);
     };
 
@@ -516,27 +516,22 @@ function OrdersTab(props: TabProps) {
 }
 
 interface OpeningTime {
+  openTime: string;
+  vendorProfileID: Number;
+  isOpen: Boolean;
   day: Number; // between 1 to 7
-  // start and end time is between 0-24 hours
-  startTime: Date;
-  endTime: Date;
-  isOpening : Boolean;
-}
-
-interface OpeningTimes {
-  times: OpeningTime[7];
+  openingHoursID: Number;
+  closingtTime: string;
 }
 
 function OpeningTimesTab(props: TabProps) {
-  let getUrl = `${import.meta.env.VITE_API_BASE_URL}/vendor/openingtimes/get/${
+  let getUrl = `${import.meta.env.VITE_API_BASE_URL}/opening_hours/get/${
     props.userID
   }`;
-  let postUrl = `${import.meta.env.VITE_API_BASE_URL}/vendor/openingtimes/set/${
-    props.userID
-  }`;
-  const [openingTimes, setOpeningTimes] = useState<OpeningTimes>();
+  let postUrl = `${import.meta.env.VITE_API_BASE_URL}/opening_hours/update/`;
+  const [openingTimes, setOpeningTimes] = useState<OpeningTime[]>([]);
 
-  const days: string[] = [
+  const days: readonly string[] = [
     "Monday",
     "Tuesday",
     "Wednesday",
@@ -550,21 +545,85 @@ function OpeningTimesTab(props: TabProps) {
     const fetchData = async () => {
       const response = await fetch(getUrl);
       const newData = await response.json();
-      setOpeningTimes(newData);
+      setOpeningTimes([...newData]);
     };
 
-    // fetchData();
+    fetchData();
   }, []);
+
+  function handleCheckboxChange(index: number) {
+    const updatedOpeningTimes = [...openingTimes];
+    updatedOpeningTimes[index].isOpen = !updatedOpeningTimes[index].isOpen;
+    setOpeningTimes(updatedOpeningTimes);
+    console.log(updatedOpeningTimes);
+  }
+
+  function handleStartTimeChange(index: number, startTime: string) {
+    // Create a new date object with the same date and the new start time
+    const currentDate = new Date(); // Use the date from the existing openingTime
+    const timeParts = startTime.split(":");
+    currentDate.setUTCHours(Number(timeParts[0]), Number(timeParts[1]), 0, 0);
+
+    // Update the openingTimes state
+    const updatedOpeningTimes = [...openingTimes];
+    updatedOpeningTimes[index].openTime = currentDate.toISOString();
+    setOpeningTimes(updatedOpeningTimes);
+    console.log(updatedOpeningTimes);
+  }
+
+  function handleEndTimeChange(index: number, endTime: string) {
+    const currentDate = new Date(); // Use the date from the existing openingTime
+    const timeParts = endTime.split(":");
+    currentDate.setUTCHours(Number(timeParts[0]), Number(timeParts[1]), 0, 0);
+
+    // Update the openingTimes state
+    const updatedOpeningTimes = [...openingTimes];
+    updatedOpeningTimes[index].closingtTime = currentDate.toISOString();
+    setOpeningTimes(updatedOpeningTimes);
+    console.log(updatedOpeningTimes);
+  }
+
+  function onSave() {
+    console.log(openingTimes);
+    const updateOpeningHours = async () => {
+      const response = await fetch(postUrl, {
+        method: "POST",
+        body: JSON.stringify(openingTimes),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      });
+
+      if (response.ok) {
+      } else {
+        console.error("Failed to update opening hours.");
+      }
+    };
+
+    updateOpeningHours();
+  }
 
   return (
     <>
-      <Heading fontSize={"md"} paddingBlock={"1rem"}>Select your Opening Times</Heading>
-      <Box>
-        {days.map((d) => {
+      <Heading fontSize={"md"} paddingBlock={"1rem"}>
+        Set your opening hours
+      </Heading>
+      <Box id={"openingTimeTabBox"}>
+        {openingTimes?.map((t, index) => {
           return (
-            <Flex direction={"row"} id={d} paddingBottom={"1rem"}>
+            <Flex
+              direction={"row"}
+              id={t.openingHoursID.toString() + t.day.toString()}
+              paddingBottom={"1rem"}
+            >
               <Center gap={"2rem"}>
-                <Checkbox width={"10rem"}>{d}</Checkbox>
+                <Checkbox
+                  width={"10rem"}
+                  defaultChecked={t.isOpen ? true : false}
+                  onChange={() => handleCheckboxChange(index)}
+                >
+                  {days[(t.day as number) - 1]}
+                </Checkbox>
                 <Text fontSize="md" fontWeight={"semibold"}>
                   Start Time
                 </Text>
@@ -573,7 +632,10 @@ function OpeningTimesTab(props: TabProps) {
                   size="md"
                   type="time"
                   width={"15rem"}
-                  value={"10:00"}
+                  defaultValue={
+                    new Date(t.openTime).toTimeString().split(" ")[0]
+                  }
+                  onChange={(e) => handleStartTimeChange(index, e.target.value)}
                 />
                 <Text fontSize="md" fontWeight={"semibold"}>
                   End Time
@@ -582,14 +644,20 @@ function OpeningTimesTab(props: TabProps) {
                   placeholder="Select End Time"
                   size="md"
                   type="time"
-                  value={"18:00"}
                   width={"15rem"}
+                  defaultValue={
+                    new Date(t.closingtTime).toTimeString().split(" ")[0]
+                  }
+                  onChange={(e) => handleEndTimeChange(index, e.target.value)}
                 />
               </Center>
             </Flex>
           );
         })}
       </Box>
+      <Button aria-label="save" onClick={onSave}>
+        Save
+      </Button>
     </>
   );
 }
@@ -615,15 +683,36 @@ export default function VendorDashboard(props: VendorDashboardProps) {
   }/vendor_profile/get/${props.userID}`;
   const [vendorProfileId, setVendorProfileId] = useState<Number>(0);
 
+  let ordersUrl = `${import.meta.env.VITE_API_BASE_URL}/vendor/orders/get/${
+    props.userID
+  }`;
+  const [orders, setOrders] = useState<InvoiceData[]>([]);
+
+  const currentMonth = new Date().getUTCMonth() + 1;
+  const currentDate = new Date().toISOString().split("T")[0];
+
   useEffect(() => {
-    const fetchData = async () => {
-      console.log(props.userID);
+    const fetchProfile = async () => {
       const response = await fetch(vendorPofileUrl);
       const newData: VendorProfile = await response.json();
       setVendorProfileId(newData.vendorProfileID);
     };
 
-    fetchData();
+    const fetchOrders = async () => {
+      const response = await fetch(ordersUrl);
+      const newData = await response.json();
+      const currentMonthInvoices = newData.filter(
+        (invoiceData: InvoiceData) => {
+          const invoiceDate = new Date(invoiceData.invoice.date);
+          const invoiceMonth = invoiceDate.getMonth() + 1; // Adding 1 to get 1-based index
+          return invoiceMonth === currentMonth;
+        }
+      );
+      setOrders([...currentMonthInvoices]);
+    };
+
+    fetchProfile();
+    fetchOrders();
   }, []);
 
   return (
@@ -633,20 +722,24 @@ export default function VendorDashboard(props: VendorDashboardProps) {
         <DataCard
           id="orders"
           icon="orders"
-          data={0}
+          data={
+            orders.filter(
+              (invoiceData) => invoiceData.invoice.date === currentDate
+            ).length
+          }
           subtitle={"Total orders today"}
         ></DataCard>
         <DataCard
           id="cancelled"
           icon="cancelled"
-          data={0}
+          data={
+            orders.filter(
+              (invoiceData) =>
+                invoiceData.invoice.date === currentDate &&
+                invoiceData.invoice.status === "CANCELLED"
+            ).length
+          }
           subtitle={"Cancelled orders today"}
-        ></DataCard>
-        <DataCard
-          id="closed"
-          icon="closed"
-          data={0}
-          subtitle={"Stalls closed today"}
         ></DataCard>
       </Stack>
       <Heading paddingBlock={"1rem"} fontSize={"1.5rem"}>
@@ -662,13 +755,20 @@ export default function VendorDashboard(props: VendorDashboardProps) {
               <Box>
                 <Stat>
                   <StatLabel>Total</StatLabel>
-                  <StatNumber>100</StatNumber>
+                  <StatNumber>{orders.length}</StatNumber>
                 </Stat>
               </Box>
               <Box>
                 <Stat>
                   <StatLabel>Cancelled</StatLabel>
-                  <StatNumber>12</StatNumber>
+                  <StatNumber>
+                    {
+                      orders.filter(
+                        (invoiceData) =>
+                          invoiceData.invoice.status === "CANCELLED"
+                      ).length
+                    }
+                  </StatNumber>
                 </Stat>
               </Box>
             </Stack>
@@ -683,7 +783,24 @@ export default function VendorDashboard(props: VendorDashboardProps) {
               <Box>
                 <Stat>
                   <StatLabel>Sales</StatLabel>
-                  <StatNumber>SGD $ 1,234.00</StatNumber>
+                  <StatNumber>
+                    SGD $
+                    {orders
+                      .filter(
+                        (invoiceData) => invoiceData.invoice.status === "DONE"
+                      )
+                      .reduce(
+                        (total, invoiceData) =>
+                          total +
+                          invoiceData.invoice.totalPrice -
+                          invoiceData.invoice.discount,
+                        0
+                      )
+                      .toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                  </StatNumber>
                 </Stat>
               </Box>
             </Stack>
@@ -694,8 +811,8 @@ export default function VendorDashboard(props: VendorDashboardProps) {
         <TabList>
           <Tab>All Orders</Tab>
           <Tab>Menu</Tab>
-          <Tab>Opening Times</Tab>
-          <Tab>Ratings and reviews</Tab>
+          <Tab>Opening Hours</Tab>
+          <Tab>Promotion Manager</Tab>
         </TabList>
 
         <TabPanels>

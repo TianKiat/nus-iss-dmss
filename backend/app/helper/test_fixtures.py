@@ -78,7 +78,8 @@ def setup_menuitem_table(session):
     values = [
         {'menuItemName': 'Eggplant Mala', 'price': 1.20, 'menuItemImage': None, 'menuItemDesc': 'veggie', 'isValid': True, 'vendorProfileID': 1},
         {'menuItemName': 'Steam Egg', 'price': 1, 'menuItemImage': None, 'menuItemDesc': None, 'isValid': False, 'vendorProfileID': 1},
-        {'menuItemName': 'Sweet and Sour Pork', 'price': 2, 'menuItemImage': None, 'menuItemDesc': 'meat', 'isValid': True, 'vendorProfileID': 1}
+        {'menuItemName': 'Sweet and Sour Pork', 'price': 2, 'menuItemImage': None, 'menuItemDesc': 'meat', 'isValid': True, 'vendorProfileID': 1},
+        {'menuItemName': 'Potato', 'price': 0.5, 'menuItemImage': None, 'menuItemDesc': None, 'isValid': False, 'vendorProfileID': 1},
     ]
     add_multiple_row_to_table(session, menu_item.MenuItem, values)
 
@@ -100,8 +101,9 @@ def setup_order_table(session):
 
 def setup_promotion_table(session):
     values = [
-        {'promoCode': 'CNY2023', 'discount': 5, 'minimumSpending': 10, 'isValid': False},
-        {'promoCode': 'NDP2023', 'discount': 25, 'minimumSpending': 75, 'isValid': True}
+        {'promoCode': 'CNY2023', 'discount': 5, 'discountType': 'FIXEDVALUE', 'minimumSpending': 10, 'isValid': False, 'vendorProfileID': 1},
+        {'promoCode': 'NDP2023', 'discount': 25, 'discountType': 'PERCENTAGE', 'minimumSpending': 75, 'isValid': True, 'vendorProfileID': 1},
+        {'promoCode': 'BLACKFRIDAY23', 'discount': 0, 'discountType': 'ONEFORONE', 'minimumSpending': 75, 'isValid': True, 'vendorProfileID': 1}
     ]
     add_multiple_row_to_table(session, promotion.Promotion, values)
 
