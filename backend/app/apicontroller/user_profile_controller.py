@@ -8,4 +8,8 @@ class UserProfileController():
         pass
 
     def get_user_profile(self, db: Session, userId: str):
-        return UserProfileService().retrive_profile(db, userId)
+        return UserProfileService.get_user_profile_by_user(db, userId)
+    
+    def get_user_name(self, db: Session, userId: str):
+        return UserProfileService.get_user_name_by_user(db, userId)
+    

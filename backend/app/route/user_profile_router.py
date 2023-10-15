@@ -1,5 +1,5 @@
 from app.apicontroller.user_profile_controller import UserProfileController
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from run import SessionLocal
 from sqlalchemy.orm import Session
 
@@ -13,5 +13,15 @@ def get_db():
         db.close()
 
 @router.get("/user_profile/{userId}")
-def get_user_profile(userId:str, db: Session = Depends(get_db)):
-    return UserProfileController().get_user_profile(db, userId)
+def get_user_profile(userId: str, db: Session = Depends(get_db)):
+    try:
+        return UserProfileController().get_user_profile(db, userId)
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail=str(ex)) from ex
+
+@router.get("/user_name/{userId}")
+def get_user_name(userId: str, db: Session = Depends(get_db)):
+    try:
+        return UserProfileController().get_user_name(db, userId)
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail=str(ex)) from ex
