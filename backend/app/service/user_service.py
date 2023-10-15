@@ -9,7 +9,7 @@ import bcrypt
 from typing_extensions import override
 from app.datasource.user_gateway import UserGateway
 from app.common.user_model import User, Vendor, Login
-
+from app.service.access_control_service import AccessControlService
 
 # Get parameters from env file
 load_dotenv()
@@ -71,7 +71,12 @@ class UserService():
         return False
 
     def login_user(self, db, user: Login):
-        return UserGateway().auth(db, user)
+        auth_user = UserGateway().auth(db, user)
+        if (auth_user):
+            access_control_list = AccessControlService.get_access_control_list(db,auth_user['roleID'])
+            auth_user["access"] = access_control_list
+
+        return auth_user
 
 class Register:
     def register(self):

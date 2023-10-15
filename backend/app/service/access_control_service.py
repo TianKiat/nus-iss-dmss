@@ -6,3 +6,6 @@ class AccessControlService():
     
     def get_access_control(db, roleID):
         return AccessControlGateway.get_access_control(db, roleID)
+    
+    def get_access_control_list(db, roleID):
+        return AccessControlGateway.get_access_control_list(db, roleID)

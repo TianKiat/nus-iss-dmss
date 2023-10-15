@@ -1,13 +1,12 @@
-from app.models.user_profile import UserProfile
 from sqlalchemy.orm import Session
+from app.models.user_profile import UserProfile
 
 class UserProfileGateway():
-    def __init__(self):
+    def __init__():
         pass
 
-    def retrive_profile(self, db: Session, userId):
+    def get_user_profile_by_user(db: Session, userID: int):
         try:
-            return db.query(UserProfile).filter(UserProfile.userID == userId).first()
-        except RuntimeError as exception:
-            print(f"Error: {exception}")
-            
+            return db.query(UserProfile).filter(UserProfile.userID == userID).first()
+        except Exception as e:
+            print(f"Error: {e}")

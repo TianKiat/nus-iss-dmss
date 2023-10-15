@@ -27,7 +27,7 @@ if not database_exists(engine.url):
 
 # Alembic configurations
 alembic_cfg = Config()
-alembic_cfg.set_main_option("script_location", r"app/alembic")
+alembic_cfg.set_main_option("script_location", "app/alembic")
 
 # Apply all pending migrations
 command.upgrade(alembic_cfg, "head")

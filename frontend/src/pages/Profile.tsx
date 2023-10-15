@@ -21,7 +21,7 @@ interface UserData {
 }
 export default function Profile() {
   const [userData, setUserData] = useState<UserData | null>(null); // Provide type annotation
-  const userId = '4';
+  const userId = '1';
   const apiUrl = `http://127.0.0.1:8000/user_profile/${userId}`;
   useEffect(() => {
     // Make a GET request to your backend API using Python (e.g., Flask)

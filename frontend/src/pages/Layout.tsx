@@ -1,9 +1,14 @@
 import { Outlet, Link } from "react-router-dom";
 import Nav from '../components/Nav'
-const Layout = () => {
+
+interface LayoutProps {
+  cookies: any
+}
+
+const Layout = (props: LayoutProps) => {
   return (
     <>
-      <Nav />
+      <Nav cookies={props.cookies} />
       <Outlet />
     </>
   )

@@ -24,13 +24,86 @@ import {
 } from "@chakra-ui/icons";
 
 import {
-  FaHamburger
+  FaHamburger, FaShoppingBasket, FaUserCircle
 } from 'react-icons/fa'
 
 import { Link } from "react-router-dom";
+import Cookies from 'js-cookie';
 
-export default function Nav() {
+function navButtons(cookies: any) {
+
+  function signOut() {
+    Cookies.remove('auth')
+    window.location.href='../login';
+  }
+
+  if (cookies != null) {
+    return (
+      <Stack flex={{ base: 1, md: 0 }} justify={"flex-end"} direction={"row"} spacing={6}>
+        {cookies["roleID"] == 3 ?
+          <Link to={"/basket"}>
+            <Button
+              as={"a"}
+              p={2}
+              fontSize={"sm"}
+              fontWeight={400}
+              variant={"link"}
+              _hover={{textDecoration: "none", color: "black"}}>
+              <Icon as={FaShoppingBasket} w={5} h={5} marginRight={2}/>
+              <Text size={'sm'} fontWeight={600} alignSelf={'center'} whiteSpace={'nowrap'}>
+                Basket
+              </Text>
+            </Button>
+          </Link>
+          : null
+        }
+        <Link to={"./profile"}>
+          <Button
+            as={"a"}
+            p={2}
+            fontSize={"sm"}
+            fontWeight={400}
+            variant={"link"}
+            _hover={{textDecoration: "none", color: "black"}}>
+            <Icon as={FaUserCircle} w={5} h={5} marginRight={2}/>
+            <Text size={'sm'} fontWeight={600} alignSelf={'center'} whiteSpace={'nowrap'}>
+              {cookies["profileName"]}
+            </Text>
+          </Button>
+        </Link>
+        {/* <Button as={"a"} fontSize={"sm"} fontWeight={400} variant={"link"} onClick={signOut}>
+          Sign Out
+        </Button> */}
+        <Button as={"a"} display={{ base: "none", md: "inline-flex" }} fontSize={"sm"}
+                fontWeight={600} color={"white"} bg={"blue.400"} href={"/login"}
+                _hover={{ bg: "blue.300" }} onClick={signOut}>
+          Sign Out
+        </Button>
+      </Stack>);
+  } else {
+    return (
+      <Stack flex={{ base: 1, md: 0 }} justify={"flex-end"} direction={"row"} spacing={6}>
+        <Button as={"a"} fontSize={"sm"} fontWeight={400} variant={"link"} href={"/login"}>
+          Sign In
+        </Button>
+        <Button as={"a"} display={{ base: "none", md: "inline-flex" }} fontSize={"sm"}
+                fontWeight={600} color={"white"} bg={"blue.400"} href={"register"}
+                _hover={{ bg: "blue.300" }}>
+          Sign Up
+        </Button>
+      </Stack>
+    )
+  }
+}
+
+interface NavProps {
+  cookies: any
+}
+
+export default function Nav(props: NavProps) {
   const { isOpen, onToggle } = useDisclosure();
+
+  
 
   return (
     <Box>
@@ -73,36 +146,7 @@ export default function Nav() {
           </Flex>
         </Flex>
 
-        <Stack
-          flex={{ base: 1, md: 0 }}
-          justify={"flex-end"}
-          direction={"row"}
-          spacing={6}
-        >
-          <Button
-            as={"a"}
-            fontSize={"sm"}
-            fontWeight={400}
-            variant={"link"}
-            href={"/login"}
-          >
-            Sign In
-          </Button>
-          <Button
-            as={"a"}
-            display={{ base: "none", md: "inline-flex" }}
-            fontSize={"sm"}
-            fontWeight={600}
-            color={"white"}
-            bg={"blue.400"}
-            href={"register"}
-            _hover={{
-              bg: "blue.300",
-            }}
-          >
-            Sign Up
-          </Button>
-        </Stack>
+        {navButtons(props.cookies)}
       </Flex>
 
       <Collapse in={isOpen} animateOpacity>
