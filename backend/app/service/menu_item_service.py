@@ -10,6 +10,9 @@ class MenuItemService:
     def get_menu_item(db, menuItemID):
         return MenuItemGateway().get_menu_item(db=db, menuItemID=menuItemID)
     
+    def get_valid_menu_item_for_vendor(db, vendorProfileId : int):
+        return MenuItemGateway().get_valid_menu_item_for_vendor(db=db, vendorProfileId=vendorProfileId)
+    
     def create_menu_item_for_vendor(db, menuItem):
         return MenuItemGateway().create_menu_item(db=db, menuItem=menuItem)
     

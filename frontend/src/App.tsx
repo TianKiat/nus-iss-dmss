@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Home from "./pages/Home";
 import Layout from "./pages/Layout";
-import LoginCustomer from "./pages/LoginCustomer";
+import Login from "./pages/Login";
 import LoginVendor from "./pages/LoginVendor";
 import Profile from "./pages/Profile";
 import Register from "./pages/Register";
@@ -30,7 +30,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout cookies={cookies} />}>
             <Route index element={cookies != null ? <Dashboard userID={cookies["userID"]} roleID={cookies["roleID"]}/> : <Home />} />
-            <Route path="login" element={<LoginCustomer />} />
+            <Route path="login" element={<Login />} />
             <Route path="vendor/login" element={<LoginVendor />} />
             <Route path="register" element={<Register />} />
             <Route path="order" element={<CustomerOrder userID={cookies != null ? cookies["userID"] : null}/>} />
