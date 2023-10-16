@@ -13,14 +13,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DB_DIALECT = getenv('DB_DIALECT')
-DB_DRIVER = getenv('DB_DRIVER')
-DB_USERNAME = getenv('DB_USERNAME')
-DB_PASSWORD = getenv('DB_PASSWORD')
-DB_HOST = getenv('DB_HOST')
-DB_PORT = getenv('DB_PORT')
-DB_DATABASE = getenv('DB_DATABASE')
-
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -40,8 +32,7 @@ target_metadata = [Base.metadata]
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-
-connectionString = DB_DIALECT+'+'+DB_DRIVER+'://'+DB_USERNAME+':'+DB_PASSWORD+'@'+DB_HOST+':'+DB_PORT+'/'+DB_DATABASE
+connectionString = getenv('DB_CONNECTION_STRING')
 config.set_main_option('sqlalchemy.url', connectionString)
 
 def run_migrations_offline() -> None:
