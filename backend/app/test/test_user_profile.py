@@ -5,7 +5,6 @@ from app.models import user
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-
 class TestRegisterController(unittest.TestCase):
 
     def setUp(self):
