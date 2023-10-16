@@ -2,10 +2,11 @@
 from os import getenv
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy_utils import create_database, database_exists
-from sqlalchemy.orm import sessionmaker
 from alembic.config import Config
 from alembic import command
+
 import uvicorn
 
 # Get parameters from env file
@@ -18,8 +19,11 @@ connectionString = getenv('DB_CONNECTION_STRING')
 # Create the engine
 engine = create_engine(connectionString)
 
-# Create the db session
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# Create the db session factory
+SessionFactory = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Create the scoped session
+SessionLocal = scoped_session(SessionFactory)
 
 # Check if the database exists, and if not, create it
 if not database_exists(engine.url):
