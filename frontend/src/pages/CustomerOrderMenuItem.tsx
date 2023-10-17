@@ -310,27 +310,22 @@ export default function(props: CustomerOrderMenuItemProps) {
                 ))}
             </Flex>
             {popupMessage != null ?
-                <Box
+                <Text
                     position="fixed"
-                    top="0"
-                    left="0"
-                    w="full"
-                    display="flex"
-                    justifyContent="center"
-                    pt={{base: "1rem", md: "2rem"}}>
-                    <Text
-                        maxW={{base: "300px", md: "500px"}}
-                        pt={1.5}
-                        pb={1.5}
-                        pl={3}
-                        pr={3}
-                        backgroundColor="green.100"
-                        color="green"
-                        borderRadius="0.5rem"
-                        textAlign="center">
-                        {popupMessage}
-                    </Text>
-                </Box>
+                    top={{base: "1rem", md: "2rem"}}
+                    left="50%"
+                    transform="translateX(-50%)"
+                    maxW={{base: "300px", md: "500px"}}
+                    pt={1.5}
+                    pb={1.5}
+                    pl={3}
+                    pr={3}
+                    backgroundColor="green.100"
+                    color="green"
+                    borderRadius="0.5rem"
+                    textAlign="center">
+                    {popupMessage}
+                </Text>
                 : null
             }
         </Box>

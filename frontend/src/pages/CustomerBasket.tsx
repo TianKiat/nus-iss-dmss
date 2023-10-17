@@ -35,7 +35,9 @@ const verifyPromoCodeResult = (promoCode: any, totalPrice: number) => {
 }
 
 interface PlaceOrderPopupProps {
+    userID: number,
     invoiceID: number,
+    vendorProfileID: number,
     vendorName: string,
     menuitems: any[],
     price: number,
@@ -51,7 +53,7 @@ const PlaceOrderPopup = (props: PlaceOrderPopupProps) => {
         event.preventDefault();
         
         const fetchAccess = async() => {
-            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/promotion/get/${promoCodeInput}`);
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/promotion/get/${props.vendorProfileID}/${promoCodeInput}`);
             const result = await response.json();
             setPromoCode(result == null ? {"promoCode": null} : result);
         }
@@ -60,12 +62,64 @@ const PlaceOrderPopup = (props: PlaceOrderPopupProps) => {
     }
 
     const placeOrder = async() => {
+        var newInvoiceID = null;
+        if (promoCode != null && promoCode["minimumSpending"] <= props.price && promoCode["discountType"] == "ONEFORONE") {
+            let response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/invoice/delete`, {
+                method: "POST",
+                body: JSON.stringify({invoiceID: props.invoiceID}),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            });
+    
+            let result = await response.json();
+            if (result == null) {
+                return;
+            }
+
+            let menuItems = []
+            for (var i = 0; i < props.menuitems.length; i++) {
+                menuItems.push({
+                    menuItemID: props.menuitems[i]["menuItemID"],
+                    quantity: props.menuitems[i]["quantity"] * 2
+                })
+            }
+        
+            response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/invoice/update`, {
+                method: "POST",
+                body: JSON.stringify({
+                    userID: props.userID,
+                    vendorProfileID: props.vendorProfileID,
+                    menuItems: menuItems
+                }),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+    
+            result = await response.json();
+            if (result == null) {
+                return;
+            }
+
+            newInvoiceID = result["invoiceID"] 
+        }
+
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/invoice/status_discount/update`, {
             method: 'POST',
             body: JSON.stringify({
-                invoiceID: props.invoiceID,
+                invoiceID: newInvoiceID != null ? newInvoiceID : props.invoiceID,
                 status: "PENDING",
-                discount: promoCode != null && promoCode["minimumSpending"] <= props.price ? promoCode["discount"] : 0
+                discount: 
+                    promoCode != null && promoCode["minimumSpending"] <= props.price ?
+                        promoCode["discountType"] == "PERCENTAGE" ?
+                            Number((promoCode["discount"] * props.price) / 100)
+                            : promoCode["discountType"] == "FIXEDVALUE" ?
+                                promoCode["discount"]
+                                : props.price
+                        : 0
             }),
             headers: {
                 'Accept': 'application/json',
@@ -106,14 +160,26 @@ const PlaceOrderPopup = (props: PlaceOrderPopupProps) => {
                             {props.menuitems.map((item) => (
                                 <ListItem key={item["menuItemID"]} display="flex">
                                     <Text w="250px">{item["foodName"]}</Text>
-                                    <Text w="50px">X {item["quantity"]}</Text>
-                                    <Text w="100px" textAlign="right">${item["price"].toFixed(2)}</Text>
+                                    <Text w="50px">
+                                        X {promoCode != null && promoCode["minimumSpending"] <= props.price && promoCode["discountType"] == "ONEFORONE"?
+                                            item["quantity"] * 2 : item["quantity"]
+                                        }
+                                    </Text>
+                                    <Text w="100px" textAlign="right">
+                                        ${promoCode != null && promoCode["minimumSpending"] <= props.price && promoCode["discountType"] == "ONEFORONE"?
+                                            Number(item["price"] * 2) : item["price"].toFixed(2)
+                                        }
+                                    </Text>
                                 </ListItem>
                             ))}
                         </UnorderedList>
                         <Flex>
                             <Heading size="sm" w="300px">Sub-total</Heading>
-                            <Heading size="sm" w="100px" textAlign="right">${props.price.toFixed(2)}</Heading>
+                            <Heading size="sm" w="100px" textAlign="right">
+                                ${promoCode != null && promoCode["minimumSpending"] <= props.price && promoCode["discountType"] == "ONEFORONE"?
+                                    Number(props.price * 2).toFixed(2) : props.price.toFixed(2)
+                                }
+                            </Heading>
                         </Flex>
                     </Box>
                     <Heading mb={{base: "0.5rem", md: "1rem"}} size="lg">Discounts</Heading>
@@ -139,22 +205,49 @@ const PlaceOrderPopup = (props: PlaceOrderPopupProps) => {
                     <Box mb={{base: "1.5rem", md: "3rem"}} pl={{base: "1rem", sm: "3rem"}}>
                         <Flex>
                             <Text w="100px">Sub-total</Text>
-                            <Text w="100px" textAlign="right">${props.price.toFixed(2)}</Text>
+                            <Text w="100px" textAlign="right">
+                                ${promoCode != null && promoCode["minimumSpending"] <= props.price && promoCode["discountType"] == "ONEFORONE"?
+                                    Number(props.price * 2).toFixed(2) : props.price.toFixed(2)
+                                }
+                            </Text>
                         </Flex>
                         <Flex>
                             <Text w="100px">Discount</Text>
                             <Text w="100px" textAlign="right">-${
-                                promoCode != null && promoCode["minimumSpending"] <= props.price ? 
-                                    promoCode["discount"].toFixed(2)
+                                promoCode != null && promoCode["minimumSpending"] <= props.price ?
+                                    promoCode["discountType"] == "PERCENTAGE" ?
+                                        Number((promoCode["discount"] * props.price) / 100).toFixed(2)
+                                        : promoCode["discountType"] == "FIXEDVALUE" ?
+                                            promoCode["discount"].toFixed(2)
+                                            : props.price.toFixed(2)
                                     : Number(0).toFixed(2)
                             }</Text>
+                            {promoCode != null && promoCode["minimumSpending"] <= props.price ?
+                                promoCode["discountType"] == "PERCENTAGE" ?
+                                    <Text p="0rem 0.5rem" ml="0.5rem" backgroundColor="gray.200" borderRadius="5px">
+                                        {promoCode["discount"]}% OFF
+                                    </Text>
+                                    : promoCode["discountType"] == "ONEFORONE" ?
+                                        <Text p="0rem 0.5rem" ml="1rem" backgroundColor="gray.200" borderRadius="5px">
+                                            1-FOR-1
+                                        </Text>
+                                        :
+                                        <Text p="0rem 0.5rem" ml="0.5rem" backgroundColor="gray.200" borderRadius="5px">
+                                            ${promoCode["discount"]} OFF
+                                        </Text>
+                                : null
+                            }
                         </Flex>
                         <Flex>
                             <Text w="100px" fontWeight="bold">Total</Text>
                             <Text w="100px" fontWeight="bold" textAlign="right">${
-                                promoCode != null && promoCode["minimumSpending"] <= props.price ? 
-                                    Number(props.price - promoCode["discount"]).toFixed(2)
-                                    : props.price.toFixed(2)
+                                promoCode != null && promoCode["minimumSpending"] <= props.price ?
+                                promoCode["discountType"] == "PERCENTAGE" ?
+                                    Number(props.price - ((promoCode["discount"] * props.price) / 100)).toFixed(2)
+                                    : promoCode["discountType"] == "FIXEDVALUE" ?
+                                        Number(props.price - promoCode["discount"]).toFixed(2)
+                                        : Number(props.price).toFixed(2)
+                                : Number(props.price).toFixed(2)
                             }</Text>
                         </Flex>
                     </Box>
@@ -290,7 +383,9 @@ const OrderCard = (props: OrderCardProps) => {
 
     const placeOrderPopupTag = (
         <PlaceOrderPopup
+            userID={props.userID}
             invoiceID={props.invoiceID}
+            vendorProfileID={props.vendorProfileID}
             vendorName={props.vendorName}
             menuitems={props.menuitems}
             price={props.price}

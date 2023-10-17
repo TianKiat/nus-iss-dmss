@@ -5,5 +5,5 @@ class PromotionService:
     def __init__(self):
         pass
 
-    def get_promotion_verify(db, promoCode):
-        return PromotionGateway.get_promotion_verify(db, promoCode)
+    def get_promotion_verify(db, vendorProfileID, promoCode):
+        return PromotionGateway.get_promotion_verify(db, vendorProfileID, promoCode)

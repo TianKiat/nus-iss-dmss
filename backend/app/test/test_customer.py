@@ -255,14 +255,6 @@ class TestCustomerController(unittest.TestCase):
         self.assertEqual(invoiceID.invoiceID, result["invoiceID"])
 
     def test_get_valid_menu_item(self):
-        # vendorProfileID = VendorProfileID(vendorProfileID=1)
-        # expected_result = self.session.query(menu_item.MenuItem).filter(
-        #     menu_item.MenuItem.isValid,
-        #     menu_item.MenuItem.vendorProfileID == vendorProfileID.vendorProfileID
-        # ).all()
-        # result = CustomerController.get_valid_menu_item(self.session, vendorProfileID)
-        # self.assertEqual(expected_result, result)
-
         profileIDs = ProfileIDs(
             userID=3,
             vendorProfileID=1
@@ -284,22 +276,24 @@ class TestCustomerController(unittest.TestCase):
 
     def test_get_promotion_verify(self):
         # test with existing valid promo code
+        vendorProfileID = 1
         promoCode = "NDP2023"
         expected_result = self.session.query(promotion.Promotion).filter(
+            promotion.Promotion.vendorProfileID == vendorProfileID,
             promotion.Promotion.promoCode == promoCode,
             promotion.Promotion.isValid
         ).first()
-        result = CustomerController.get_promotion_verify(self.session, promoCode)
+        result = CustomerController.get_promotion_verify(self.session, vendorProfileID, promoCode)
         self.assertEqual(expected_result, result)
 
         # test with existing invalid promo code
         promoCode = "CNY2023"
         expected_result = None
-        result = CustomerController.get_promotion_verify(self.session, promoCode)
+        result = CustomerController.get_promotion_verify(self.session, vendorProfileID, promoCode)
         self.assertEqual(expected_result, result)
 
         # test with non-existing promo code
         promoCode = "ANYTHING123"
         expected_result = None
-        result = CustomerController.get_promotion_verify(self.session, promoCode)
+        result = CustomerController.get_promotion_verify(self.session, vendorProfileID, promoCode)
         self.assertEqual(expected_result, result)

@@ -5,9 +5,10 @@ class PromotionGateway:
     def __init__():
         pass
 
-    def get_promotion_verify(db: Session, promoCode: str):
+    def get_promotion_verify(db: Session, vendorProfileID: int, promoCode: str):
         try:
             return db.query(Promotion).filter(
+                Promotion.vendorProfileID == vendorProfileID,
                 Promotion.promoCode == promoCode.upper(),
                 Promotion.isValid
             ).first()
