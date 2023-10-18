@@ -4,6 +4,7 @@ from app.service.order_service import OrderService
 from app.service.invoice_service import InvoiceService
 from app.service.menu_item_service import MenuItemService
 from app.service.promotion_service import PromotionService
+from app.apicontroller.vendor_controller import VendorController
 
 class CustomerController:
     def __init__ (self):
@@ -133,7 +134,14 @@ class CustomerController:
         return menuitems_orders
     
     def get_all_vendor_profile(db):
-        return VendorProfileService.get_all_vendor_profile(db)
+        vendor_openingHours = []
+
+        vendors = VendorProfileService.get_all_vendor_profile(db)
+        for vendor in vendors:
+            opening_hours = VendorController.get_opening_hours(db, vendor.userID)
+            vendor_openingHours.append({"vendor": vendor, "opening_hours": opening_hours})
+
+        return vendor_openingHours
     
     def get_promotion_verify(db, vendorProfileID, promoCode):
         return PromotionService.get_promotion_verify(db, vendorProfileID, promoCode)

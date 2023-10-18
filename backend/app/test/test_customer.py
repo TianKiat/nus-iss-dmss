@@ -1,12 +1,13 @@
 import unittest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from app.models import base, invoice, user_profile, vendor_profile, order, menu_item, promotion
+from app.models import base, invoice, user_profile, vendor_profile, order, menu_item, promotion, opening_hours
 from app.helper import test_fixtures
 from app.common.user_model import UserID
 from app.common.invoice_model import IsFavorite, InvoiceStatus, InvoiceID, DraftInvoiceMenuItem, DraftInvoice
 from app.common.vendor_profile_model import ProfileIDs
 from app.apicontroller.customer_controller import CustomerController
+from app.apicontroller.vendor_controller import VendorController
 
 class TestCustomerController(unittest.TestCase):
 
@@ -270,7 +271,13 @@ class TestCustomerController(unittest.TestCase):
         self.assertEqual(expected_result, result)
 
     def test_get_all_vendor_profile(self):
-        expected_result = self.session.query(vendor_profile.VendorProfile).all()
+        expected_result = []
+        vendors = self.session.query(vendor_profile.VendorProfile).all()
+        for vendor in vendors:
+            expected_result.append({
+                "vendor": vendor,
+                "opening_hours": VendorController.get_opening_hours(self.session, vendor.userID)
+            })
         result = CustomerController.get_all_vendor_profile(self.session)
         self.assertEqual(expected_result, result)
 
