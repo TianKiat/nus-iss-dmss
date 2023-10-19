@@ -48,6 +48,10 @@ interface ISubmitFormStatus{
     isSuccessful: boolean
 }
 
+interface ISubmitButtonCheck{
+    isClicked: boolean
+}
+
 // function ComplaintForm({title, error, onChange}:{
 //     title: string,
 //     error: boolean;
@@ -131,10 +135,11 @@ export default function CreateComplaint(props: ComplaintProps){
     const [error, setError] = useState<IFormChecker>({title:false, description:false});
     const [complaints, setComplaints] = useState([]);
     const [status, setStatus] = useState<ISubmitFormStatus>({isSuccessful: false})
+    const [isSubmitted, setSubmittedCheck] = useState<ISubmitButtonCheck>({isClicked: false})
     
     //set field to remove message
     const handleTitleChange = (e) => {
-        console.log(complaintData);
+        setSubmittedCheck({isClicked: false})
         
         if (complaintData.title !== '') {
             setError({title: false});
@@ -147,6 +152,7 @@ export default function CreateComplaint(props: ComplaintProps){
     };
 
     const handleDescriptionChange = (e) => {
+        setSubmittedCheck({isClicked: false})
         if (complaintData.description !== '') {
             setError({description: false});
         }
@@ -157,7 +163,8 @@ export default function CreateComplaint(props: ComplaintProps){
         });
     };
 
-    const handleCommentChange = (e) => {        
+    const handleCommentChange = (e) => {    
+        setSubmittedCheck({isClicked: false})    
         setComplaintData({
             ...complaintData,
             comment: e.target.value
@@ -191,6 +198,7 @@ export default function CreateComplaint(props: ComplaintProps){
             setError({description: true});
             return;
         }
+        setSubmittedCheck({isClicked: true})
         try{
             const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/complaint`, {
                 method: 'POST',
@@ -203,11 +211,13 @@ export default function CreateComplaint(props: ComplaintProps){
                 const complaint = await response.json();
                 //setComplaints([...complaints, complaint])
                 setStatus({isSuccessful: true})
+            }else{
+                setStatus({isSuccessful: false})
+                
             }
 
         }catch (error){
             setStatus({isSuccessful: false})
-            console.log("got here error")
         }
     }
 
@@ -237,13 +247,19 @@ export default function CreateComplaint(props: ComplaintProps){
                         role={props.roleID}
                     />
                 </Box>
-                {status.isSuccessful ? 
-                    <Alert status = 'success' rounded='lg' padding='2'>
-                        <AlertIcon />
-                        Your Complaint has succesfully been submitted!
-                    </Alert>
-                    : ""
+                {isSubmitted.isClicked ?
+                    status.isSuccessful ? 
+                        <Alert status = 'success' rounded='lg' padding='2'>
+                            <AlertIcon />
+                                Your Complaint has succesfully been submitted!
+                            </Alert>
+                        : <Alert status = 'error' rounded='lg' padding='2'>
+                            <AlertIcon />
+                            Your Complaint has not been submitted! Please check your input again!
+                            </Alert>
+                    :""
                 }
+                
             </Container>
             {/* <Container>
                 {complaints.map((complaintData) => (<div key = {complaintData.id} onClick={() => handleOnClick(complaintData.title)}>{complaintData.title}</div>))}              
