@@ -28,3 +28,19 @@ class ComplaintGateway():
 
         except Exception as e:
             print(f"Error: {e}")
+
+    def get_complaint_list(self, db: Session):
+        try:
+            return db.query(complaint.Complaint).filter().all()
+        except Exception as e:
+            print(f"Error: {e}")
+
+    def get_complaint(self, db: Session, complaintID: int):
+        try:
+            complaint_id_object = db.query(complaint.Complaint).filter(complaint.Complaint.complaintID == complaintID).first()
+            if complaint_id_object:
+                return complaint_id_object
+            else:
+                return "not found"
+        except Exception as e:
+            print(f"Error: {e}")

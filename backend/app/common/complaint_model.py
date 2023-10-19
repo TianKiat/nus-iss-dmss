@@ -7,3 +7,6 @@ class Complaint(BaseModel):
     userID: int
     roleID: int
     status: str = 'pending'
+
+class ComplaintID(BaseModel):
+    complaintID: int

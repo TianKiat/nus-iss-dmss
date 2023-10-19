@@ -7,3 +7,9 @@ class ComplaintController():
 
     def create_complaint(self, db, complaint_input: Complaint):
         return ComplaintService().create_complaint(db, complaint_input)
+    
+    def get_complaint_list(self, db):
+        return ComplaintService().get_complaint_list(db)
+    
+    def get_complaint(self, db, complaintID: int):
+        return ComplaintService().get_complaint(db, complaintID)

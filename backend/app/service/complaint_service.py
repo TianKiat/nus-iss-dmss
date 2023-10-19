@@ -8,3 +8,9 @@ class ComplaintService():
     def create_complaint(self, db, complaint_input: Complaint):
         complaint_status = ComplaintGateway().create_complaint_data(db, complaint_input)
         return {"status": complaint_status}
+    
+    def get_complaint_list(self, db):
+        return ComplaintGateway().get_complaint_list(db)
+    
+    def get_complaint(self, db, complaintID: int):
+        return ComplaintGateway().get_complaint(db, complaintID)
