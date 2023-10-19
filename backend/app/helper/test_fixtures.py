@@ -71,7 +71,7 @@ def setup_user_profile_table(session):
     add_multiple_row_to_table(session, user_profile.UserProfile, values)
 
 def setup_vendor_profile_table(session):
-    value = {'profileName': 'Amy ABC', 'address': 'Road 1, Singapore 123456', 'email': 'amy@example.com', 'phone': '90123456', 'status': False, 'userID': 2, 'shopDesc': 'Some short description'}
+    value = {'profileName': 'Amy ABC', 'address': 'Road 1, Singapore 123456', 'email': 'amy@example.com', 'phone': '90123456', 'status': True, 'userID': 2, 'shopDesc': 'Some short description'}
     add_single_row_to_table(session, vendor_profile.VendorProfile, value)
 
 def setup_menuitem_table(session):

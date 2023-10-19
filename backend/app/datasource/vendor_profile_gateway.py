@@ -7,7 +7,7 @@ class VendorProfileGateway():
 
     def get_all_vendor_profile(db: Session):
         try:
-            return db.query(VendorProfile).all()
+            return db.query(VendorProfile).filter(VendorProfile.status).all()
         except Exception as e:
             print(f"Error: {e}")
 

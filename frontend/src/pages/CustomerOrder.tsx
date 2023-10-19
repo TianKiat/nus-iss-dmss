@@ -128,13 +128,16 @@ export default function(props: CustomerOrderProps) {
                         </Heading>
                         <br/>
                         <Flex gap="1rem" flexWrap="wrap" justifyContent="center">
-                            {vendorList.map((item) => (
-                                <StoreCard
-                                    key={item["vendor"]["vendorProfileID"]}
-                                    vendor={item["vendor"]}
-                                    openingHours={item["opening_hours"]}
-                                    setVendorProfileIDFunction={setVendor}/>
-                            ))}
+                            {vendorList.length > 0 ?
+                                vendorList.map((item) => (
+                                    <StoreCard
+                                        key={item["vendor"]["vendorProfileID"]}
+                                        vendor={item["vendor"]}
+                                        openingHours={item["opening_hours"]}
+                                        setVendorProfileIDFunction={setVendor}/>
+                                ))
+                                : <Text w="full">There is no store available</Text>
+                            }
                         </Flex>
                     </Box>
                     : <CustomerOrderMenuItem userID={props.userID} vendor={vendor} />
