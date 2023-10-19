@@ -8,6 +8,7 @@ from app.models.menu_item import MenuItem
 from app.common.menu_item_model import MenuItemModel
 from app.common.opening_hours_model import OpeningHoursModel
 from sqlalchemy import func
+from datetime import datetime
 from typing import List
 class VendorController:
     def __init__ (self):
@@ -71,16 +72,11 @@ class VendorController:
         hours = OpeningHoursService.get_opening_hours_for_vendor(db=db, vendorProfileId=user_profile.vendorProfileID)
 
         # if hours is zero we initialize 
-        if len(hours) == 0:
+        if all(h is None for h in hours):
             opening_hours = []
-            for i in range(1,7):
-                opening_hours.append(                {
-                    vendorProfileID : user_profile.vendorProfileID,
-                    day : i,
-                    openTime : func.str_to_date("2023-10-10 10:00:00", '%Y-%m-%d %H:%i:%s'),
-                    closingtTime : func.str_to_date("2023-10-10 18:00:00", '%Y-%m-%d %H:%i:%s'),
-                    isOpen : i < 6
-                })
+            for i in range(1,8):
+                opening_hour = OpeningHoursModel(openingHoursID=1, vendorProfileID=user_profile.vendorProfileID, day=i,openTime=datetime(2023,10,10,10,0,0),closingtTime=datetime(2023,10,10,18,0,0),isOpen=i < 6)
+                opening_hours.append(opening_hour)
             
             hours = OpeningHoursService.update_opening_hours_for_vendor(db, openingHours=opening_hours)
 
