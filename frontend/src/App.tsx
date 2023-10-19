@@ -10,6 +10,7 @@ import Error from "./pages/Error";
 import Dashboard from "./pages/Dashboard";
 import CustomerOrder from "./pages/CustomerOrder" ;
 import CustomerBasket from "./pages/CustomerBasket";
+import Complaint from "./pages/Complaint";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 
@@ -37,6 +38,7 @@ function App() {
             <Route path="basket" element={<CustomerBasket userID={cookies != null ? cookies["userID"] : null}/>} />
             <Route path="profile" element={<Profile />} />
             <Route path="*" element={<Error />} />
+            <Route path="complaint" element={<Complaint/>}/>
           </Route>
         </Routes>
       </BrowserRouter>
