@@ -114,11 +114,9 @@ const PlaceOrderPopup = (props: PlaceOrderPopupProps) => {
                 status: "PENDING",
                 discount: 
                     promoCode != null && promoCode["minimumSpending"] <= props.price ?
-                        promoCode["discountType"] == "PERCENTAGE" ?
+                        promoCode["discountType"] == "DISCOUNT" ?
                             Number((promoCode["discount"] * props.price) / 100)
-                            : promoCode["discountType"] == "FIXEDVALUE" ?
-                                promoCode["discount"]
-                                : props.price
+                            : props.price
                         : 0
             }),
             headers: {
@@ -215,26 +213,20 @@ const PlaceOrderPopup = (props: PlaceOrderPopupProps) => {
                             <Text w="100px">Discount</Text>
                             <Text w="100px" textAlign="right">-${
                                 promoCode != null && promoCode["minimumSpending"] <= props.price ?
-                                    promoCode["discountType"] == "PERCENTAGE" ?
+                                    promoCode["discountType"] == "DISCOUNT" ?
                                         Number((promoCode["discount"] * props.price) / 100).toFixed(2)
-                                        : promoCode["discountType"] == "FIXEDVALUE" ?
-                                            promoCode["discount"].toFixed(2)
-                                            : props.price.toFixed(2)
+                                        : props.price.toFixed(2)
                                     : Number(0).toFixed(2)
                             }</Text>
                             {promoCode != null && promoCode["minimumSpending"] <= props.price ?
-                                promoCode["discountType"] == "PERCENTAGE" ?
+                                promoCode["discountType"] == "ONEFORONE" ?
+                                    <Text p="0rem 0.5rem" ml="1rem" backgroundColor="gray.200" borderRadius="5px">
+                                        1-FOR-1
+                                    </Text>
+                                    :
                                     <Text p="0rem 0.5rem" ml="0.5rem" backgroundColor="gray.200" borderRadius="5px">
                                         {promoCode["discount"]}% OFF
                                     </Text>
-                                    : promoCode["discountType"] == "ONEFORONE" ?
-                                        <Text p="0rem 0.5rem" ml="1rem" backgroundColor="gray.200" borderRadius="5px">
-                                            1-FOR-1
-                                        </Text>
-                                        :
-                                        <Text p="0rem 0.5rem" ml="0.5rem" backgroundColor="gray.200" borderRadius="5px">
-                                            ${promoCode["discount"]} OFF
-                                        </Text>
                                 : null
                             }
                         </Flex>
@@ -242,11 +234,9 @@ const PlaceOrderPopup = (props: PlaceOrderPopupProps) => {
                             <Text w="100px" fontWeight="bold">Total</Text>
                             <Text w="100px" fontWeight="bold" textAlign="right">${
                                 promoCode != null && promoCode["minimumSpending"] <= props.price ?
-                                promoCode["discountType"] == "PERCENTAGE" ?
+                                promoCode["discountType"] == "DISCOUNT" ?
                                     Number(props.price - ((promoCode["discount"] * props.price) / 100)).toFixed(2)
-                                    : promoCode["discountType"] == "FIXEDVALUE" ?
-                                        Number(props.price - promoCode["discount"]).toFixed(2)
-                                        : Number(props.price).toFixed(2)
+                                    : Number(props.price).toFixed(2)
                                 : Number(props.price).toFixed(2)
                             }</Text>
                         </Flex>
