@@ -3,10 +3,13 @@ from app.service.vendor_profile_service import VendorProfileService
 from app.service.order_service import OrderService
 from app.service.invoice_service import InvoiceService
 from app.service.opening_hours_service import OpeningHoursService
+from app.service.promotion_service import PromotionService
 from app.common.user_model import UserID
 from app.models.menu_item import MenuItem
+from app.models.promotion import Promotion
 from app.common.menu_item_model import MenuItemModel
 from app.common.opening_hours_model import OpeningHoursModel
+from app.common.promotion_model import PromotionModel
 from sqlalchemy import func
 from datetime import datetime
 from typing import List
@@ -63,6 +66,28 @@ class VendorController:
     
     def delete_menu_item(db, menuItemId : int):
         return MenuItemService.delete_menu_item_for_vendor(db=db, menuItemId=menuItemId)
+    
+    def get_promotions(db, userId: UserID):
+        user_profile = VendorProfileService.get_vendor_profile(db, userId)
+        if (user_profile is None):
+            return []
+
+        promos = PromotionService.get_promotions_for_vendor(db=db, vendorProfileID=user_profile.vendorProfileID)
+        if len(promos) < 1:
+            return []
+
+        # result = []
+
+        # for i in promos:
+        #     item : Promotion = i
+        #     result.append(item)
+        return promos
+    
+    def create_promotion(db, promotion : PromotionModel):
+        return PromotionService.create_promotion_for_vendor(db=db, promotion=promotion)
+    
+    def delete_promotion(db, promotionId : int):
+        return PromotionService.delete_promotion_for_vendor(db=db, promotionId=promotionId)
     
     def get_opening_hours(db, userId: UserID):
         user_profile = VendorProfileService.get_vendor_profile(db, userId)

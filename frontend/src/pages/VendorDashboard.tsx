@@ -14,6 +14,7 @@ import {
   Stat,
   StatLabel,
   StatNumber,
+  Select,
   Tab,
   TabList,
   TabPanel,
@@ -420,6 +421,200 @@ function MenuTab(props: TabProps) {
   );
 }
 
+interface Promotion {
+  promotionID: Number;
+  promoCode: string;
+  discount: Number;
+  discountType: String;
+  minimumSpending: Number;
+  isValid: Boolean;
+  vendorProfileID: Number;
+}
+
+function PromotionTab(props: TabProps) {
+  const [discount, setDiscount] = useState<Number>(0);
+  const [discountType, setDiscountType] = useState<string>("discount");
+  const [minimumSpending, setMinimumSpending] = useState<Number>(0);
+  const [promoCode, setPromoCode] = useState<string>("");
+  let url = `${import.meta.env.VITE_API_BASE_URL}/vendor/promotion/get/${
+    props.userID
+  }`;
+  const createUrl = `${import.meta.env.VITE_API_BASE_URL}/promotion/create`;
+  const deleteUrl = `${import.meta.env.VITE_API_BASE_URL}/promotion/delete`;
+  const [promotions, setPromotions] = useState<Promotion[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetch(url);
+      const newData = await response.json();
+      console.log(newData);
+      setPromotions(newData);
+    };
+
+    fetchData();
+  }, []);
+
+  async function submitPromo() {
+    const itemToAdd = {
+      promotionID: 1, // temp id
+      promoCode: promoCode,
+      discount: discount,
+      discountType: discountType,
+      minimumSpending: minimumSpending,
+      isValid: true,
+      vendorProfileID: props.profileID,
+    };
+    try {
+      const response = await fetch(createUrl, {
+        method: "POST",
+        body: JSON.stringify(itemToAdd),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      });
+
+      if (response.ok) {
+        const newItem = await response.json();
+        itemToAdd.promotionID = newItem.id;
+
+        setPromotions([...promotions, itemToAdd]);
+
+        // Reset form fields
+        setDiscount(0);
+        setDiscountType("");
+        setMinimumSpending(0);
+        setPromoCode("");
+      } else {
+        console.error("Failed to create promotion.");
+      }
+    } catch (error) {
+      console.error("Error creating a new promotion:", error);
+    }
+  }
+
+  async function onDeletePromo(promoID: Number) {
+    try {
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/promotion/delete/?promotion_id=${promoID}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+        }
+      );
+
+      if (response.ok) {
+        // Remove the deleted item from the menuItems state
+        setPromotions(
+          promotions.filter((item) => item.promotionID !== promoID)
+        );
+      } else {
+        console.error("Failed to delete menu item.");
+      }
+    } catch (error) {
+      console.error("Error deleting menu item:", error);
+    }
+  }
+
+  return (
+    <>
+      <Stack paddingBlock={"1rem"} align={"left"} direction={"column"}>
+        <Heading fontSize={"md"}>Create New Promotion</Heading>
+        <Stack direction={"row"}>
+          <FormControl>
+            <FormLabel>Discount Type</FormLabel>
+            <Select
+              onChange={(e) => setDiscountType(e.target.value)}
+              isRequired
+            >
+              <option value="discount" selected>Discount</option>
+            </Select>
+          </FormControl>
+          <FormControl>
+            <FormLabel>Discount</FormLabel>
+            <Input
+              onChange={(e) => setDiscount(Number(e.target.value))}
+              isRequired
+              placeholder="Set discount in % off"
+              type={"number"}
+            ></Input>
+          </FormControl>
+          <FormControl>
+            <FormLabel>Minumum Spend</FormLabel>
+            <Input
+              onChange={(e) => setMinimumSpending(Number(e.target.value))}
+              isRequired
+              placeholder="Set min. spend in dollars ($)"
+              type={"number"}
+            ></Input>
+          </FormControl>
+          <FormControl>
+            <FormLabel>Promo Code</FormLabel>
+            <Input
+              onChange={(e) => setPromoCode(e.target.value)}
+              isRequired
+              placeholder="Set promo code"
+              minLength={5}
+              maxLength={8}
+              type={"text"}
+            ></Input>
+          </FormControl>
+          <IconButton
+            aria-label="Add Item"
+            marginLeft={"auto"}
+            marginTop={"auto"}
+            icon={<AddIcon />}
+            onClick={() => submitPromo()}
+          />
+        </Stack>
+        <Heading fontSize={"md"} paddingTop={"1rem"}>Active Promotions</Heading>
+        <TableContainer>
+        <Table variant="striped">
+          <Thead>
+            <Tr>
+              <Th>Promo Code</Th>
+              <Th width={"50%"}>Discount Type</Th>
+              <Th width={"5%"} isNumeric>
+              discount
+              </Th>
+              <Th width={"5%"} isNumeric>
+              Min. Spending
+              </Th>
+              <Th width={"10%"}></Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {promotions.map((m) => {
+              return m.isValid === true ? (
+                <Tr key={m.promotionID.toString() + m.promoCode}>
+                  <Td>{m.promoCode}</Td>
+                  <Td>{m.discountType}</Td>
+                  <Td isNumeric>${m.discount.toFixed(2)}</Td>
+                  <Td>{m.minimumSpending === 0 ? "NA" : m.minimumSpending.toFixed(2)}</Td>
+                  <Td>
+                    <IconButton
+                      aria-label="Delete item"
+                      icon={<DeleteIcon />}
+                      onClick={() => {
+                        onDeletePromo(m.promotionID);
+                      }}
+                    />
+                  </Td>
+                </Tr>
+              ) : null;
+            })}
+          </Tbody>
+          <Tfoot></Tfoot>
+        </Table>
+      </TableContainer>
+      </Stack>
+    </>
+  );
+}
+
 interface Invoice {
   totalPrice: number;
   status: string;
@@ -584,7 +779,6 @@ function OpeningTimesTab(props: TabProps) {
   }
 
   function onSave() {
-    console.log(openingTimes);
     const updateOpeningHours = async () => {
       const response = await fetch(postUrl, {
         method: "POST",
@@ -613,7 +807,7 @@ function OpeningTimesTab(props: TabProps) {
           return (
             <Flex
               direction={"row"}
-              id={t.openingHoursID.toString() + t.day.toString()}
+              key={t.openingHoursID.toString() + t.day.toString()}
               paddingBottom={"1rem"}
             >
               <Center gap={"2rem"}>
@@ -835,7 +1029,10 @@ export default function VendorDashboard(props: VendorDashboardProps) {
             ></OpeningTimesTab>
           </TabPanel>
           <TabPanel>
-            <p>Four</p>
+            <PromotionTab
+              userID={props.userID}
+              profileID={vendorProfileId}
+            ></PromotionTab>
           </TabPanel>
         </TabPanels>
       </Tabs>
