@@ -458,12 +458,13 @@ function PromotionTab(props: TabProps) {
     const itemToAdd = {
       promotionID: 1, // temp id
       promoCode: promoCode,
-      discount: discount,
+      discount: discountType === 'ONEFORONE' ? 50 : discount,
       discountType: discountType,
       minimumSpending: minimumSpending,
       isValid: true,
       vendorProfileID: props.profileID,
     };
+    console.log(discountType);
     try {
       const response = await fetch(createUrl, {
         method: "POST",
@@ -478,12 +479,7 @@ function PromotionTab(props: TabProps) {
         itemToAdd.promotionID = newItem.id;
 
         setPromotions([...promotions, itemToAdd]);
-
-        // Reset form fields
-        setDiscount(0);
-        setDiscountType("");
-        setMinimumSpending(0);
-        setPromoCode("");
+        
       } else {
         console.error("Failed to create promotion.");
       }
@@ -530,25 +526,28 @@ function PromotionTab(props: TabProps) {
               onChange={(e) => setDiscountType(e.target.value)}
               isRequired
             >
-              <option value="discount" selected>Discount</option>
+              <option value="DISCOUNT" selected>Discount</option>
+              <option value="ONEFORONE">One-for-one</option>
             </Select>
           </FormControl>
           <FormControl>
-            <FormLabel>Discount</FormLabel>
+            <FormLabel>Discount (%)</FormLabel>
             <Input
               onChange={(e) => setDiscount(Number(e.target.value))}
               isRequired
               placeholder="Set discount in % off"
               type={"number"}
+              defaultValue={discount.toFixed(2)}
             ></Input>
           </FormControl>
           <FormControl>
-            <FormLabel>Minumum Spend</FormLabel>
+            <FormLabel>Minumum Spend ($)</FormLabel>
             <Input
               onChange={(e) => setMinimumSpending(Number(e.target.value))}
               isRequired
               placeholder="Set min. spend in dollars ($)"
               type={"number"}
+              defaultValue={minimumSpending.toFixed(2)}
             ></Input>
           </FormControl>
           <FormControl>
@@ -560,6 +559,7 @@ function PromotionTab(props: TabProps) {
               minLength={5}
               maxLength={8}
               type={"text"}
+              defaultValue={""}
             ></Input>
           </FormControl>
           <IconButton
@@ -592,7 +592,7 @@ function PromotionTab(props: TabProps) {
                 <Tr key={m.promotionID.toString() + m.promoCode}>
                   <Td>{m.promoCode}</Td>
                   <Td>{m.discountType}</Td>
-                  <Td isNumeric>${m.discount.toFixed(2)}</Td>
+                  <Td isNumeric>{m.discount.toFixed(2)}%</Td>
                   <Td>{m.minimumSpending === 0 ? "NA" : m.minimumSpending.toFixed(2)}</Td>
                   <Td>
                     <IconButton

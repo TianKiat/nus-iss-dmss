@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.models.promotion import Promotion
-from sqlalchemy import and_
+from sqlalchemy import and_, delete
 
 class PromotionGateway:
     def __init__():
@@ -44,7 +44,10 @@ class PromotionGateway:
         try:
             itemToUpdate = db.query(Promotion).filter(Promotion.promotionID == promotionId).first()
             if itemToUpdate:
-                itemToUpdate.isValid = False
+                db.execute(
+                delete(Promotion)
+                .where(Promotion.promotionID == promotionId)
+                )
                 db.commit()
 
             return {"id" : promotionId}
