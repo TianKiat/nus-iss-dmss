@@ -66,12 +66,27 @@ const MenuItemPopup = (props: MenuItemPopupProps) => {
                 </Button>
                 <Flex mt="48px" gap={{base: "1rem", md: "2rem"}} flexDirection={{base: "column", md: "row"}}>
                     <Box w={{base: "100%", md: "400px"}}>
-                        <Image
-                            src={props.menuItem["menuItemImage"]}
-                            alt={props.menuItem["menuItemName"]}
-                            w="100%"
-                            maxW={{base: "200px", md: "500px"}}
-                            aspectRatio="1"/>
+                        {props.menuItem["menuItemImage"] != "" ?
+                            <Image
+                                src={props.menuItem["menuItemImage"]}
+                                alt={props.menuItem["menuItemName"]}
+                                w="100%"
+                                maxW={{base: "200px", md: "500px"}}
+                                aspectRatio="1"/>
+                            :
+                            <Text
+                                w="100%"
+                                maxW={{base: "200px", md: "500px"}}
+                                aspectRatio="1"
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                                bgColor="gray.100"
+                                color="gray"
+                                fontWeight="bold">
+                                NO IMAGE
+                            </Text>
+                        }
                     </Box>
                     <Box w={{base: "100%", md: "auto"}}>
                         <Heading mb={{base: "0.5rem", md: "1.5rem"}} size={{base: "md", md: "lg"}}>{props.menuItem["menuItemName"]}</Heading>
@@ -188,13 +203,28 @@ const MenuItemCard = (props: MenuItemCardProps) => {
                 maxW={{ base: 'full', md: '200px' }}
                 w={'200px'}
                 textAlign="center">
-                <Image
-                    src={props.menuItem["menuItemImage"]}
-                    alt={props.menuItem["menuItemName"]}
-                    boxSize="200px"
-                    borderRadius="5px"
-                    objectFit="cover"
-                    mb="1rem"/>
+                {props.menuItem["menuItemImage"] != "" ?
+                    <Image
+                        src={props.menuItem["menuItemImage"]}
+                        alt={props.menuItem["menuItemName"]}
+                        boxSize="200px"
+                        borderRadius="5px"
+                        objectFit="cover"
+                        mb="1rem"/>
+                    :
+                    <Text
+                        boxSize="200px"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        bgColor="gray.100"
+                        color="gray"
+                        fontWeight="bold"
+                        borderRadius="5px"
+                        mb="1rem">
+                        NO IMAGE
+                    </Text>
+                }
                 <Heading size="md" mb="0.5rem">{props.menuItem["menuItemName"]}</Heading>
                 <Text mb="0.5rem">{props.menuItem["menuItemDesc"]}</Text>
                 <Text fontSize="xs" mb="1rem">${props.menuItem["price"].toFixed(2)}</Text>
