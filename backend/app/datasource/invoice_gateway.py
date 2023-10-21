@@ -4,7 +4,7 @@ from sqlalchemy import select, insert, update, delete
 from sqlalchemy.sql.functions import sum
 from app.models.invoice import Invoice
 from app.models.order import Order
-from datetime import date
+from datetime import datetime
 
 class InvoiceGateway():
     def __init__():
@@ -14,7 +14,7 @@ class InvoiceGateway():
         try:
             db.execute(
                 insert(Invoice).values(
-                    date=date.today(),
+                    date=datetime.today(),
                     totalPrice=totalPrice,
                     discount=0,
                     status="DRAFT",
@@ -81,7 +81,7 @@ class InvoiceGateway():
                 db.execute(
                     update(Invoice)
                     .where(Invoice.invoiceID == invoiceID)
-                    .values(status=status, discount=discount, date=date.today())
+                    .values(status=status, discount=discount, date=datetime.today())
                 )
             else:
                 db.execute(
