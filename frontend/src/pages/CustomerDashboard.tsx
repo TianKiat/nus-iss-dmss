@@ -22,19 +22,20 @@ import { FaBowlRice, FaStar } from 'react-icons/fa6'
 import { FaRegStar } from 'react-icons/fa'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { MdDelete, MdStore } from 'react-icons/md'
+import OrderStatusBadge from '../components/OrderStatusBadge'
 
-function orderStatusTag(status: string) {
-    switch(status) {
-        case "DONE":
-            return <Text fontWeight="semibold" color="blue.600" w="fit-content">COMPLETED</Text>
-        case "CANCELLED":
-            return <Text fontWeight="semibold" color="red" w="fit-content">CANCELLED</Text>
-        case "PENDING":
-            return <Text fontWeight="semibold" color="orange" w="fit-content">PENDING</Text>
-        default:
-            return null
-    }
-}
+// function orderStatusTag(status: string) {
+//     switch(status) {
+//         case "DONE":
+//             return <Text fontWeight="semibold" color="blue.600" w="fit-content">COMPLETED</Text>
+//         case "CANCELLED":
+//             return <Text fontWeight="semibold" color="red" w="fit-content">CANCELLED</Text>
+//         case "PENDING":
+//             return <Text fontWeight="semibold" color="orange" w="fit-content">PENDING</Text>
+//         default:
+//             return null
+//     }
+// }
 
 function ordersToMenuitemsList(orders: any[]): string[] {
     var menuitems = []
@@ -204,7 +205,7 @@ const OrderCard = (props: OrderCardProps) => {
                         </Flex>
                     }
                 </Box>
-                <Box w={{base: 'full', md: 'calc(100% - 152px - 200px)'}} p={'16px'}>
+                <Box fontSize="sm" w={{base: 'full', md: 'calc(100% - 152px - 200px)'}} p={'16px'}>
                     <Flex mb="0.5rem" gap="1rem">
                         <Text
                             fontWeight="semibold"
@@ -214,7 +215,7 @@ const OrderCard = (props: OrderCardProps) => {
                         </Text>
                         <Text
                             fontWeight="semibold"
-                            w="50px">
+                            w="75px">
                             {props.invoiceID}
                         </Text>
                         <Text
@@ -223,7 +224,7 @@ const OrderCard = (props: OrderCardProps) => {
                             w="fit-content">
                             Status:
                         </Text>
-                        {orderStatusTag(props.status)}
+                        <OrderStatusBadge type={props.status}></OrderStatusBadge>
                     </Flex>
                     <Heading size="lg">{props.vendorName}</Heading>
                     {dateToString(props.date)}
