@@ -17,6 +17,12 @@ export default function OrderStatusBadge(props: StatusBadgeProps) {
             COMPLETED
           </Badge>
         );
+      case "CANCELLED":
+        return (
+          <Badge variant={"solid"} colorScheme="red">
+            CANCELLED
+          </Badge>
+        );
       default:
         return (
           <Badge variant={"subtle"} colorScheme="gray">
