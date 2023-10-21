@@ -406,8 +406,8 @@ const OrderCard = (props: OrderCardProps) => {
                     alignContent={'flex-start'}>
                     <Button
                         colorScheme="red"
-                        variant="ghost"
-                        size="lg"
+                        variant="outline"
+                        size="md"
                         p={2}
                         w="130px"
                         leftIcon={<MdDelete/>}
@@ -416,8 +416,8 @@ const OrderCard = (props: OrderCardProps) => {
                     </Button>
                     <Button
                         colorScheme="blue"
-                        variant="ghost"
-                        size="lg"
+                        variant="outline"
+                        size="md"
                         p={2}
                         w="130px"
                         leftIcon={<MdStore/>}
