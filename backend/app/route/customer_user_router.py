@@ -71,9 +71,9 @@ def get_all_vendor_profile(db: Session = Depends(get_db)):
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex
     
-@router.get("/promotion/get/{promoCode}", description="Verify promotion code")
-def get_promotion_verify(promoCode: str, db: Session = Depends(get_db)):
+@router.get("/promotion/get/{vendorProfileID}/{promoCode}", description="Verify promotion code")
+def get_promotion_verify(vendorProfileID: int, promoCode: str, db: Session = Depends(get_db)):
     try:
-        return CustomerController.get_promotion_verify(db, promoCode)
+        return CustomerController.get_promotion_verify(db, vendorProfileID, promoCode)
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex
