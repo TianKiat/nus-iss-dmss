@@ -28,6 +28,7 @@ def upgrade() -> None:
     sa.Column('userID', sa.Integer(), nullable=False),
     sa.Column('roleID', sa.Integer(), nullable=False),
     sa.Column('status', sa.String(length=100), nullable=False),
+    sa.Column('createdtime', sa.DateTime, nullable=False),
     sa.PrimaryKeyConstraint('complaintID'),
     sa.ForeignKeyConstraint(['userID'], ['user.userID'], ),
     sa.ForeignKeyConstraint(['roleID'], ['role.roleID'], ),

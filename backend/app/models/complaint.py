@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey, String
+from sqlalchemy import Column, Integer, ForeignKey, String, DateTime
 from app.models import Base
 from app.models.role import Role
 from app.models.user import User
@@ -13,3 +13,4 @@ class Complaint(Base):
     userID = Column(Integer, ForeignKey(User.userID), nullable=False)
     roleID = Column(Integer, ForeignKey(Role.roleID), nullable=False)
     status = Column(String(100), nullable=False)
+    createdtime = Column(DateTime, nullable=False)

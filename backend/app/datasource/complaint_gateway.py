@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models import complaint
 from app.common.complaint_model import Complaint
+import datetime
 
 class ComplaintGateway():
     def __init__(self):
@@ -14,7 +15,8 @@ class ComplaintGateway():
                 'comment': complaint_input.comment,
                 'userID': complaint_input.userID,
                 'roleID': complaint_input.roleID,
-                'status': 'pending'
+                'status': 'pending',
+                'createdtime': datetime.datetime.now()
             }
             complaint_table = complaint.Complaint(**complaint_data)
             db.add(complaint_table)
