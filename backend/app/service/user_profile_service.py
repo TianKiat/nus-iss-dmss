@@ -10,3 +10,9 @@ class UserProfileService():
     def get_user_name_by_user(db, userID):
         return UserProfileGateway.get_user_name_by_user(db, userID)
     
+    def check_password(db, userID, password):
+        return UserProfileGateway.check_password(db, userID, password)
+    
+    def save_user_profile(db, userData):
+        return UserProfileGateway.save_user_profile(db, userData)
+    

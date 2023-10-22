@@ -27,3 +27,11 @@ class Login(BaseModel):
     
 class UserID(BaseModel):
     userID: int
+
+class UserProfile(BaseModel):
+    userProfileID: int
+    profileName: str
+    email: str
+    phone: str
+    email: str
+    userID: int

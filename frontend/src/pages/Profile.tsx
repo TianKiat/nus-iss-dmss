@@ -13,6 +13,8 @@ import {
   Heading,
   Icon,
   Input,
+  InputGroup,
+  InputRightElement,
   Stack,
   StackDivider,
   Text,
@@ -21,7 +23,11 @@ import {
 import { useEffect, useState } from 'react';
 import { BiSolidEditAlt } from 'react-icons/bi';
 import { AiOutlineClose } from 'react-icons/ai';
+import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
+
 interface UserData {
+  userProfileID: number;
+  userID: number;
   profileName: string;
   phone: string;
   email: string;
@@ -34,28 +40,82 @@ interface UserProfileProps {
 export default function Profile(props: UserProfileProps) {
 
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [userName, setUserName] = useState<[string] | null>(null);
+  const [userName, setUserName] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false); // State to control the modal
+  const [isModalOpen, setModalState] = useState(false); // State to control the modal
   const [password, setPassword] = useState(''); // State to manage the password input
   const [passwordError, setPasswordError] = useState(''); // State to manage the password errors
+  const [showPassword, setShow] = useState(false)
+  const toggleShowPassword = () => setShow(!showPassword)
+  const [isAllowEdit, setAllowEdit] = useState(false)
 
   const userId = props.userID;
   
-  const handlePasswordSubmit = () => {
-    // Here, you can check the password and proceed with editing if it's correct.
-    // Add your password checking logic here.
-    console.log('Password submitted:', password);
+  const handlePasswordSubmit = async () => {
+
     if(!password){
       setPasswordError("Required")
     }
     else{
-      setIsModalOpen(false); // Close the modal
-      setPasswordError('')
+      const checkPassword = await fetch(`${import.meta.env.VITE_API_BASE_URL}/check_password/${userId}/${password}`);
+      const checkPasswordResult = await checkPassword.json();
+      console.log(checkPasswordResult)
+      if(checkPasswordResult){
+        setIsModalOpen(false); // Close the modal
+        setPasswordError('')
+        setAllowEdit(true)
+      }
+      else {
+        setPasswordError("Wrong password, please reenter")
+      }
+      
     }
   };
   
+  const handleSubmitClick = async () => {
+
+    setAllowEdit(false)
+    if(userData)
+    {
+      userData.userID = props.userID;
+    } else {
+      console.error('userData is null');
+    }
+    
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/save_user_profile`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (response.status === 200) {
+        const result = await response.json();
+        console.log(result)
+      } else {
+        console.error('Error:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle network errors or other exceptions
+    }
+
+      
+  };
+
+  const setIsModalOpen = (state : boolean) => {
+    setPassword('')
+    setPasswordError('')
+    if(state){
+      setModalState(true)
+    }
+    else{
+      setModalState(false)
+    }
+  }
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -94,43 +154,95 @@ export default function Profile(props: UserProfileProps) {
           {error && <div>{error}</div>}
           {userData && (
             <Stack divider={<StackDivider />} spacing='4'>
-                <Box>
-                  <Heading size='xs' textTransform='uppercase'>
-                    Profile Name
-                  </Heading>
-                  <Text pt='2' fontSize='sm'>
-                    {userData.profileName}
-                  </Text>
-                </Box>
-                <Box>
-                  <Heading size='xs' textTransform='uppercase'>
-                    Username
-                  </Heading>
-                  <Text pt='2' fontSize='sm'>
-                    {userName}
-                  </Text>
-                </Box>
+              <Box>
+                <Heading size='xs' textTransform='uppercase'>
+                  Profile Name
+                </Heading>
+                {
+                  !isAllowEdit ? (
+                    <Text>{userData.profileName}</Text>
+                    ) : (
+                    <Input
+                      value={userData.profileName}
+                      onChange={(e) => setUserData({ ...userData, profileName: e.target.value })}
+                    />
+                  )
+                }
+              </Box>
+              <Box>
+                <Heading size='xs' textTransform='uppercase'>
+                  Username
+                </Heading>
+                {
+                  !isAllowEdit ? (
+                    <Text>{userName}</Text>
+                    ) : (
+                    <Input
+                      value={userName}
+                      onChange={(e) => setUserName(e.target.value)}
+                    />
+                  )
+                }
+              </Box>
               <Box>
                 <Heading size='xs' textTransform='uppercase'>
                   Phone Number
                 </Heading>
-                <Text pt='2' fontSize='sm'>
-                  {userData.phone}
-                </Text>
+                {
+                  !isAllowEdit ? (
+                    <Text>{userData.phone}</Text>
+                    ) : (
+                    <Input
+                      value={userData.phone}
+                      onChange={(e) => setUserData({ ...userData, phone: e.target.value })}
+                    />
+                  )
+                }
               </Box>
               <Box>
                 <Heading size='xs' textTransform='uppercase'>
                   Email
                 </Heading>
-                <Text pt='2' fontSize='sm'>
-                  {userData.email}
-                </Text>
+                {
+                  !isAllowEdit ? (
+                    <Text>{userData.email}</Text>
+                    ) : (
+                    <Input
+                      value={userData.email}
+                      onChange={(e) => setUserData({ ...userData, email: e.target.value })}
+                    />
+                  )
+                }
               </Box>
               <Flex>
-                <Button onClick={() => setIsModalOpen(true)}>
-                  <Icon as={BiSolidEditAlt}/>
-                  Edit Profile
-                </Button>
+                {
+                  !isAllowEdit ? (
+                    <Button onClick={() => setIsModalOpen(true)}>
+                    <Icon as={BiSolidEditAlt}/>
+                      Edit Profile
+                    </Button>
+                    ) : (
+                    <InputGroup size='md'>
+                      <Button 
+                        size='sm'
+                        onClick={handleSubmitClick}
+                      >
+                        Submit
+                      </Button>
+                      <InputRightElement h={"full"}>
+                        <Button 
+                          size='sm'
+                          mr={6}
+                          px = '8'
+                          onClick={() => setAllowEdit(false)}
+                        >
+                          Cancel
+                        </Button>
+                      </InputRightElement>
+                    </InputGroup>
+                  )
+                }
+                
             </Flex>
             </Stack>
           )}
@@ -161,19 +273,28 @@ export default function Profile(props: UserProfileProps) {
             <FormControl
               id="password"
               isRequired
-              isInvalid={passwordError == "Required"}
+              isInvalid={passwordError != ""}
             >
-              
               <FormLabel>Password</FormLabel>
-              <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                style={{ marginBottom: '10px' }} // Add margin-bottom
-              />
-              <Button onClick={handlePasswordSubmit}>Submit</Button>
+              <InputGroup size='md'>
+                <Input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  style={{ marginBottom: '10px' }} // Add margin-bottom
+                />
+                <InputRightElement h={"full"}>
+                  <Button
+                    variant={"ghost"}
+                    onClick={toggleShowPassword}
+                  >
+                    {showPassword ? <ViewIcon /> : <ViewOffIcon /> }
+                  </Button>
+                </InputRightElement>
+              </InputGroup>
               {/* Display error message */}
-              {passwordError ? (<FormErrorMessage>Required</FormErrorMessage>) : ("")}
+              {passwordError ? (<FormErrorMessage>{passwordError}</FormErrorMessage>) : ("")}
+              <Button onClick={handlePasswordSubmit}>Submit</Button>
               <Button onClick={() => setIsModalOpen(false)} variant="outline">
                 Cancel
               </Button>
