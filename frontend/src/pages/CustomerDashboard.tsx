@@ -21,23 +21,21 @@ import { ReactElement, useEffect, useState } from 'react'
 import { FaBowlRice, FaStar } from 'react-icons/fa6'
 import { FaRegStar } from 'react-icons/fa'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { MdDelete, MdStore } from 'react-icons/md'
+import OrderStatusBadge from '../components/OrderStatusBadge'
 
-function orderStatusTag(status: string) {
-    switch(status) {
-        case "COMPLETED":
-            return <Text bgColor="blue.500" color="white" w="fit-content" p="0.25rem 1rem" borderRadius="0.5rem">Completed</Text>
-        case "DONE":
-            return <Text bgColor="green.500" color="white" w="fit-content" p="0.25rem 1rem" borderRadius="0.5rem">Ready to collect</Text>
-        case "CANCELLED":
-            return <Text bgColor="red.500" color="white" w="fit-content" p="0.25rem 1rem" borderRadius="0.5rem">Cancelled</Text>
-        case "PENDING":
-            return <Text bgColor="orange.500" color="white" w="fit-content" p="0.25rem 1rem" borderRadius="0.5rem">Pending</Text>
-        case "DRAFT":
-            return <Text bgColor="gray.600" color="white" w="fit-content" p="0.25rem 1rem" borderRadius="0.5rem">Draft</Text>
-        default:
-            return null
-    }
-}
+// function orderStatusTag(status: string) {
+//     switch(status) {
+//         case "DONE":
+//             return <Text fontWeight="semibold" color="blue.600" w="fit-content">COMPLETED</Text>
+//         case "CANCELLED":
+//             return <Text fontWeight="semibold" color="red" w="fit-content">CANCELLED</Text>
+//         case "PENDING":
+//             return <Text fontWeight="semibold" color="orange" w="fit-content">PENDING</Text>
+//         default:
+//             return null
+//     }
+// }
 
 function ordersToMenuitemsList(orders: any[]): string[] {
     var menuitems = []
@@ -49,33 +47,10 @@ function ordersToMenuitemsList(orders: any[]): string[] {
 
 function favoriteIcon(isFavorite: boolean) {
     if (isFavorite) {
-        return <Icon as={FaStar} w={8} h={8} color={'gold'}/>
+        return <Icon as={FaStar} w={8} h={8} color={'gold'} transitionDuration="200ms" _hover={{color: 'gray.400'}}/>
     } else {
-        return <Icon as={FaRegStar} w={8} h={8}/>
+        return <Icon as={FaRegStar} w={8} h={8} color={'gray.400'} transitionDuration="200ms" _hover={{color: 'gold'}}/>
     }
-}
-
-function dateStringFormatTransform(date: string) {
-    var year = date.slice(0, 4);
-    var month = date.slice(5, 7);
-    var day = date.slice(8, 10);
-
-    switch (month) {
-        case "01": month = "Jan"; break;
-        case "02": month = "Feb"; break;
-        case "03": month = "Mar"; break;
-        case "04": month = "Apr"; break;
-        case "05": month = "May"; break;
-        case "06": month = "Jun"; break;
-        case "07": month = "Jul"; break;
-        case "08": month = "Aug"; break;
-        case "09": month = "Sep"; break;
-        case "10": month = "Oct"; break;
-        case "11": month = "Nov"; break;
-        default: month = "Dec";
-    }
-
-    return day + " " + month + " " + year;
 }
 
 interface OrderCardProps {
@@ -85,7 +60,7 @@ interface OrderCardProps {
     status: string,
     vendorProfileID: number,
     vendorName: string,
-    date: string,
+    date: Date,
     orders: any[],
     price: number,
     discount: number,
@@ -133,7 +108,7 @@ const OrderCard = (props: OrderCardProps) => {
             method: "POST",
             body: JSON.stringify({
                 invoiceID: props.invoiceID,
-                status: "COMPLETED"
+                status: "DONE"
             }),
             headers: {
                 'Accept': 'application/json',
@@ -177,28 +152,40 @@ const OrderCard = (props: OrderCardProps) => {
         }
     }
 
+    const dateToString = (date: Date) => {
+        return `${date.toDateString()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`
+    }
+
     return (
         <Box
             borderWidth="1px"
             borderRadius="6px"
             p={3}>
             <Flex w="full" flexDirection={{base: 'column', md: 'row'}}>
-                <Box w={{base: 'full', md: '132px'}} p={'16px'} verticalAlign={'top'} textAlign={'center'}>
+                <Box w={{base: 'full', md: '152px'}} p={'16px'} verticalAlign={'top'} textAlign={'center'}>
                     {props.isFavorite == null ?
-                        props.status == "DONE" ?
+                        <Flex
+                            gap="1rem"
+                            flexWrap={"wrap"}
+                            justifyContent={"center"}>
                             <Button
-                                w="100px"
+                                w="120px"
                                 colorScheme="blue"
-                                onClick={collectOrder}>
+                                variant="outline"
+                                onClick={collectOrder}
+                                leftIcon={<MdStore/>}>
                                 Collected
                             </Button>
-                            :
                             <Button
-                                w="100px"
+                                w="120px"
                                 colorScheme="red"
-                                onClick={cancelInvoice}>
+                                variant="outline"
+                                isDisabled={(new Date() - props.date) > 300000}
+                                onClick={cancelInvoice}
+                                leftIcon={<MdDelete/>}>
                                 Cancel
                             </Button>
+                        </Flex>
                         :
                         <Flex
                             gap="1rem"
@@ -208,20 +195,39 @@ const OrderCard = (props: OrderCardProps) => {
                                 {favoriteIcon(props.isFavorite)}
                             </Button>
                             <Button
-                                w="100px"
+                                w="120px"
                                 colorScheme="green"
-                                variant="ghost"
-                                isDisabled={props.status == "DONE" ? true : false}
-                                onClick={reOrder}>
+                                variant="outline"
+                                onClick={reOrder}
+                                leftIcon={<MdStore/>}>
                                 Re-Order
                             </Button>
                         </Flex>
                     }
                 </Box>
-                <Box w={{base: 'full', md: 'calc(100% - 132px - 200px)'}} p={'16px'}>
-                    {orderStatusTag(props.status)}
+                <Box fontSize="sm" w={{base: 'full', md: 'calc(100% - 152px - 200px)'}} p={'16px'}>
+                    <Flex mb="0.5rem" gap="1rem">
+                        <Text
+                            fontWeight="semibold"
+                            color="gray"
+                            w="fit-content">
+                            Invoice No:
+                        </Text>
+                        <Text
+                            fontWeight="semibold"
+                            w="75px">
+                            {props.invoiceID}
+                        </Text>
+                        <Text
+                            fontWeight="semibold"
+                            color="gray"
+                            w="fit-content">
+                            Status:
+                        </Text>
+                        <OrderStatusBadge type={props.status}></OrderStatusBadge>
+                    </Flex>
                     <Heading size="lg">{props.vendorName}</Heading>
-                    {dateStringFormatTransform(props.date)}
+                    {dateToString(props.date)}
                     <br/><br/>
                     <Heading size="sm">Menu Items</Heading>
                     <UnorderedList>
@@ -292,7 +298,7 @@ export default function (props : CustomerDashboardProps) {
 
             const activeOrderList: any = result.filter(
                 (item: { [x: string]: { [x: string]: any } }) => {
-                    return item["invoice"]["status"] == "PENDING" || item["invoice"]["status"] == "DONE"
+                    return item["invoice"]["status"] == "PENDING"
                 }
             );
             setActiveOrder(activeOrderList);
@@ -306,7 +312,7 @@ export default function (props : CustomerDashboardProps) {
 
             const orderHistoryList: any = result.filter(
                 (item: { [x: string]: { [x: string]: any } }) => {
-                    return item["invoice"]["status"] == "COMPLETED" || item["invoice"]["status"] == "CANCELLED"
+                    return item["invoice"]["status"] == "DONE" || item["invoice"]["status"] == "CANCELLED"
                 }
             );
             setOrderHistory(orderHistoryList);
@@ -361,7 +367,7 @@ export default function (props : CustomerDashboardProps) {
                                                         status={item["invoice"]["status"]}
                                                         vendorProfileID={item["vendor"]["vendorProfileID"]}
                                                         vendorName={item["vendor"]["profileName"]}
-                                                        date={item["invoice"]["date"]}
+                                                        date={new Date(item["invoice"]["date"])}
                                                         orders={item["orders"]}
                                                         price={item["invoice"]["totalPrice"]}
                                                         discount={item["invoice"]["discount"]}
@@ -390,7 +396,7 @@ export default function (props : CustomerDashboardProps) {
                                                         status={item["invoice"]["status"]}
                                                         vendorProfileID={item["vendor"]["vendorProfileID"]}
                                                         vendorName={item["vendor"]["profileName"]}
-                                                        date={item["invoice"]["date"]}
+                                                        date={new Date(item["invoice"]["date"])}
                                                         orders={item["orders"]}
                                                         price={item["invoice"]["totalPrice"]}
                                                         discount={item["invoice"]["discount"]}
@@ -419,7 +425,7 @@ export default function (props : CustomerDashboardProps) {
                                                         status={item["invoice"]["status"]}
                                                         vendorProfileID={item["vendor"]["vendorProfileID"]}
                                                         vendorName={item["vendor"]["profileName"]}
-                                                        date={item["invoice"]["date"]}
+                                                        date={new Date(item["invoice"]["date"])}
                                                         orders={item["orders"]}
                                                         price={item["invoice"]["totalPrice"]}
                                                         discount={item["invoice"]["discount"]}
@@ -436,51 +442,41 @@ export default function (props : CustomerDashboardProps) {
                     </TabPanels>
                 </Tabs>
                 {popupErrorMessage != null ?
-                    <Box
+                    <Text
                         position="fixed"
-                        top="0"
-                        left="0"
-                        w="full"
-                        display="flex"
-                        justifyContent="center"
-                        pt={{base: "1rem", md: "2rem"}}>
-                        <Text
-                            maxW={{base: "300px", md: "500px"}}
-                            pt={1.5}
-                            pb={1.5}
-                            pl={3}
-                            pr={3}
-                            backgroundColor="red.100"
-                            color="red"
-                            borderRadius="0.5rem"
-                            textAlign="center">
-                            {popupErrorMessage}
-                        </Text>
-                    </Box>
+                        top={{base: "1rem", md: "2rem"}}
+                        left="50%"
+                        transform="translateX(-50%)"
+                        maxW={{base: "300px", md: "500px"}}
+                        pt={1.5}
+                        pb={1.5}
+                        pl={3}
+                        pr={3}
+                        backgroundColor="red.100"
+                        color="red"
+                        borderRadius="0.5rem"
+                        textAlign="center">
+                        {popupErrorMessage}
+                    </Text>
                     : null
                 }
                 {popupMessage != null ?
-                    <Box
+                    <Text
                         position="fixed"
-                        top="0"
-                        left="0"
-                        w="full"
-                        display="flex"
-                        justifyContent="center"
-                        pt={{base: "1rem", md: "2rem"}}>
-                        <Text
-                            maxW={{base: "300px", md: "500px"}}
-                            pt={1.5}
-                            pb={1.5}
-                            pl={3}
-                            pr={3}
-                            backgroundColor="green.100"
-                            color="green"
-                            borderRadius="0.5rem"
-                            textAlign="center">
-                            {popupMessage}
-                        </Text>
-                    </Box>
+                        top={{base: "1rem", md: "2rem"}}
+                        left="50%"
+                        transform="translateX(-50%)"
+                        maxW={{base: "300px", md: "500px"}}
+                        pt={1.5}
+                        pb={1.5}
+                        pl={3}
+                        pr={3}
+                        backgroundColor="green.100"
+                        color="green"
+                        borderRadius="0.5rem"
+                        textAlign="center">
+                        {popupMessage}
+                    </Text>
                     : null
                 }
             </Container>
