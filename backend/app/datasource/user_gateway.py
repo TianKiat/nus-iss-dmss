@@ -1,5 +1,4 @@
 import uuid, bcrypt
-import uuid, bcrypt
 from sqlalchemy.orm import Session
 from app.common.user_model import User, Vendor, Login
 from app.models import user, user_profile, vendor_profile, otp
