@@ -59,20 +59,28 @@ def setup_user_table(session):
     values = [
         {'username': 'moses', 'userPassword': '123', 'roleID': 1},
         {'username': 'amy', 'userPassword': '123', 'roleID': 2},
-        {'username': 'joe', 'userPassword': '123', 'roleID': 3}
+        {'username': 'joe', 'userPassword': '123', 'roleID': 3},
+        {'username': 'bob', 'userPassword': '$2b$12$GtUEo1bfqtP11Osbq8iRSOiv5vqNmVFc0eCsdYRDuUGect2HISix6', 'roleID': 3},
+        {'username': 'alan', 'userPassword': '$2b$12$lZlqdlnbKF2sUSS7S0AwQe6Sf7V.td7fYJmik4PTzaMjWhCEDWUzS', 'roleID': 2},
+        {'username': 'ken', 'userPassword': '$2b$12$BcMr6jrz2wH2rbFRXAKFoe4FkkjcsVxoiVHHpU98F.Dt.a1IGhDjG', 'roleID': 1}
     ]
     add_multiple_row_to_table(session, user.User, values)
 
 def setup_user_profile_table(session):
     values = [
         {'profileName': 'Moses', 'email': 'moses@example.com', 'phone': '12345678', 'userID': 1},
-        {'profileName': 'Joe', 'email': 'joe@example.com', 'phone': '78901234', 'userID': 3}
+        {'profileName': 'Joe', 'email': 'joe@example.com', 'phone': '78901234', 'userID': 3},
+        {'profileName': 'bob', 'email': 'bob@asd.com', 'phone': '98767654', 'userID': 4},
+        {'profileName': 'ken', 'email': 'ken@merrr.com', 'phone': '87776333', 'userID': 6}
     ]
     add_multiple_row_to_table(session, user_profile.UserProfile, values)
 
 def setup_vendor_profile_table(session):
-    value = {'profileName': 'Amy ABC', 'address': 'Road 1, Singapore 123456', 'email': 'amy@example.com', 'phone': '90123456', 'status': True, 'userID': 2, 'shopDesc': 'Some short description'}
-    add_single_row_to_table(session, vendor_profile.VendorProfile, value)
+    value = [
+        {'profileName': 'Amy ABC', 'address': 'Road 1, Singapore 123456', 'email': 'amy@example.com', 'phone': '90123456', 'status': True, 'userID': 2, 'shopDesc': 'Some short description'},
+        {'profileName': "Alan's Drink Store", 'address': "alan@aa.com", 'email': 'alan@aa.com', 'phone': '88776655', 'status': False, 'userID': 5, 'shopDesc': "At Alan's Drink Store we sell all sorts of drinks"}
+    ]
+    add_multiple_row_to_table(session, vendor_profile.VendorProfile, value)
 
 def setup_menuitem_table(session):
     values = [

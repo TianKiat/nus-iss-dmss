@@ -115,6 +115,7 @@ class UserGateway():
     def auth(self, db: Session, login: Login):
         try:
             user_session_data = {}
+            checkpw = False
 
             user_object = db.query(user.User).filter(user.User.username == login.username).first()
             if user_object:
@@ -130,6 +131,8 @@ class UserGateway():
                 user_session_data['roleID'] = user_object.roleID
                 user_session_data['profileName'] = user_profile_object.profileName
                 print ('Logged In UserID: {0} | roleID: {1}'.format(user_session_data['userID'], user_session_data['roleID']))
+            else:
+                print ("Login failed.")
 
             return user_session_data
 
