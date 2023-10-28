@@ -57,33 +57,38 @@ function navButtons(cookies: any) {
           </Link>
           : null
         }
-        <Link to={"./profile"}>
-          <Button
-            as={"a"}
-            p={2}
-            fontSize={"sm"}
-            fontWeight={400}
-            variant={"link"}
-            _hover={{textDecoration: "none", color: "black"}}>
-            <Icon as={FaUserCircle} w={5} h={5} marginRight={2}/>
-            <Text size={'sm'} fontWeight={600} alignSelf={'center'} whiteSpace={'nowrap'}>
-              {cookies["profileName"]}
-            </Text>
-          </Button>
-        </Link>
-        <Link to={"./create_complaint"} state={{userID:cookies["userID"], roleID:cookies["roleID"]}}>
-            <Button
-              as={"a"}
-              p={2}
-              fontSize={"sm"}
-              fontWeight={400}
-              variant={"link"}
-              _hover={{textDecoration: "none", color: "black"}}>
-              <Text size={'sm'} fontWeight={600} alignSelf={'center'} whiteSpace={'nowrap'}>
-                Create Complaint
-              </Text>
-            </Button>
-          </Link>
+        {cookies["userID"] == 2 || cookies["userID"] == 3 ?
+          <>
+            <Link to={"./profile"}>
+              <Button
+                as={"a"}
+                p={2}
+                fontSize={"sm"}
+                fontWeight={400}
+                variant={"link"}
+                _hover={{textDecoration: "none", color: "black"}}>
+                <Icon as={FaUserCircle} w={5} h={5} marginRight={2}/>
+                <Text size={'sm'} fontWeight={600} alignSelf={'center'} whiteSpace={'nowrap'}>
+                  {cookies["profileName"]}
+                </Text>
+              </Button>
+            </Link>
+            <Link to={"./create_complaint"} state={{userID:cookies["userID"], roleID:cookies["roleID"]}}>
+              <Button
+                as={"a"}
+                p={2}
+                fontSize={"sm"}
+                fontWeight={400}
+                variant={"link"}
+                _hover={{textDecoration: "none", color: "black"}}>
+                <Text size={'sm'} fontWeight={600} alignSelf={'center'} whiteSpace={'nowrap'}>
+                  Create Complaint
+                </Text>
+              </Button>
+            </Link>
+          </>
+          : null
+        }
         {/* <Button as={"a"} fontSize={"sm"} fontWeight={400} variant={"link"} onClick={signOut}>
           Sign Out
         </Button> */}
