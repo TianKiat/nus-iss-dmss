@@ -33,7 +33,7 @@ import Cookies from 'js-cookie';
 function navButtons(cookies: any) {
 
   function signOut() {
-    Cookies.remove('auth')
+    Cookies.remove('token')
     window.location.href='../login';
   }
 
@@ -101,9 +101,43 @@ interface NavProps {
 }
 
 export default function Nav(props: NavProps) {
-  const { isOpen, onToggle } = useDisclosure();
+  const { isOpen, onToggle } = useDisclosure();  
+  const apiURL = process.env.VITE_API_BASE_URL;
 
+  async function sessionData(){
+    try {
+      const response = await fetch(`${apiURL}/login_user`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(Cookies.get()),
+      });
   
+      // if (response.status === 200) {
+      //   const user = await response.json() as IUserSessionData;
+      //   if (Object.keys(user).length != 0) {
+      //     // Login successful
+      //     // Cookies.remove('auth')
+      //     // 20 minutes cookie
+      //     // const expirationTime = new Date(new Date().getTime() + 1200000);
+      //     // Cookies.set('auth', JSON.stringify(user), { expires: expirationTime });
+      //     /* ---- To access data in cookie ----
+      //       JSON.parse(Cookies.get('auth'))['userID']
+      //       JSON.parse(Cookies.get('auth'))['roleID']
+      //       JSON.parse(Cookies.get('auth'))['profileName'] */
+  
+      //     window.location.href='../';
+      //   }
+      //   else {
+      //   }
+      // } else {
+      //   console.error('Error:', response.statusText);
+      // }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
 
   return (
     <Box>

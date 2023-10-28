@@ -28,6 +28,10 @@ class Login(BaseModel):
 class UserID(BaseModel):
     userID: int
 
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
 class UserProfile(BaseModel):
     userProfileID: int
     profileName: str

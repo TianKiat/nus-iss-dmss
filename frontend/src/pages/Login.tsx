@@ -124,7 +124,7 @@ function UserLogin({ formData, error, handleChange, handleSubmit, setLoginStatus
 
   useEffect(() => {
     // Check if already logged on
-    if(Cookies.get('auth')){
+    if(Cookies.get('token')){
       window.location.href='../';
     }
   }, []);
@@ -242,15 +242,10 @@ export default function Login() {
         const user = await response.json() as IUserSessionData;
         if (Object.keys(user).length != 0) {
           // Login successful
-          Cookies.remove('auth')
+          Cookies.remove('token')
           // 20 minutes cookie
           const expirationTime = new Date(new Date().getTime() + 1200000);
-          Cookies.set('auth', JSON.stringify(user), { expires: expirationTime });
-          /* ---- To access data in cookie ----
-            JSON.parse(Cookies.get('auth'))['userID']
-            JSON.parse(Cookies.get('auth'))['roleID']
-            JSON.parse(Cookies.get('auth'))['profileName'] */
-  
+          Cookies.set('token', JSON.stringify(user), { expires: expirationTime });
           window.location.href='../';
         }
         else {

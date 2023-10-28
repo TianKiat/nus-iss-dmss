@@ -13,13 +13,49 @@ import CustomerBasket from "./pages/CustomerBasket";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 
+interface IUserSessionData {
+  userID: string,
+  roleID: string,
+  profileName: string,
+}
+
 function App() {
-  const [cookies, setCookies] = useState(Cookies.get("auth"));
+  const [cookies, setCookies] = useState(Cookies.get("token"));
+  const apiURL = process.env.VITE_API_BASE_URL;
+
+  
 
   useEffect(() => {
-    if (Cookies.get("auth")) {
-      setCookies(JSON.parse(Cookies.get("auth")));
+    if (Cookies.get("token")) {
+      async function user_token(){
+        try {
+          const token = JSON.parse(Cookies.get("token"));
+        
+          if (!token) {
+            console.error('No token found in cookies.');
+            return null;
+          }
+          const response = await fetch(`${apiURL}/user_token`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(token),
+          });
+    
+          if (response.status === 200) {
+            setCookies(await response.json() as IUserSessionData);
+          } else {
+            console.error('Error:', response.statusText);
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          return null;
+        }
+      }
+      user_token();
     } else {
+      //unathorised or timeout
       setCookies(null);
     }
   }, [Cookies]);
