@@ -4,7 +4,7 @@ from app.service.order_service import OrderService
 from app.service.invoice_service import InvoiceService
 from app.service.opening_hours_service import OpeningHoursService
 from app.service.promotion_service import PromotionService
-from app.common.user_model import UserID
+from app.common.user_model import UserID, VendorProfile
 from app.models.menu_item import MenuItem
 from app.models.promotion import Promotion
 from app.common.menu_item_model import MenuItemModel
@@ -13,6 +13,7 @@ from app.common.promotion_model import PromotionModel
 from sqlalchemy import func
 from datetime import datetime
 from typing import List
+
 class VendorController:
     def __init__ (self):
         pass
@@ -40,6 +41,9 @@ class VendorController:
             return
         
         return user_profile
+    
+    def save_vendor_profile(self, db, vendorData: VendorProfile):
+        return VendorProfileService.save_vendor_profile(db, vendorData)
     
     def get_orders(db, userId: UserID):
         user_profile = VendorProfileService.get_vendor_profile(db, userId)

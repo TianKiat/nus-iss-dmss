@@ -12,3 +12,7 @@ class VendorProfileService():
     
     def get_vendor_profile_by_profile_ID(db, vendorProfileID):
         return VendorProfileGateway.get_vendor_profile_by_profile_ID(db, vendorProfileID)
+    
+    def save_vendor_profile(db, vendorData):
+        return VendorProfileGateway.save_vendor_profile(db, vendorData)
+    

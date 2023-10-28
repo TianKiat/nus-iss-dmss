@@ -35,7 +35,7 @@ function App() {
             <Route path="register" element={<Register />} />
             <Route path="order" element={<CustomerOrder userID={cookies != null ? cookies["userID"] : null}/>} />
             <Route path="basket" element={<CustomerBasket userID={cookies != null ? cookies["userID"] : null}/>} />
-            <Route path="profile" element={<Profile />} />
+            <Route path="profile" element={<Profile userID={cookies != null ? cookies["userID"] : null}/>} />
             <Route path="*" element={<Error />} />
           </Route>
         </Routes>

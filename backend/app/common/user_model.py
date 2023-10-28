@@ -27,3 +27,20 @@ class Login(BaseModel):
     
 class UserID(BaseModel):
     userID: int
+
+class UserProfile(BaseModel):
+    userProfileID: int
+    profileName: str
+    email: str
+    phone: str
+    userID: int
+
+class VendorProfile(BaseModel):
+    vendorProfileID: int
+    profileName: str
+    address: str
+    email: str
+    phone: str
+    status: bool
+    userID: int
+    shopDesc: str

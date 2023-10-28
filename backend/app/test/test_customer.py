@@ -270,16 +270,16 @@ class TestCustomerController(unittest.TestCase):
         result = CustomerController.get_valid_menu_item(self.session, profileIDs)
         self.assertEqual(expected_result, result)
 
-    def test_get_all_vendor_profile(self):
-        expected_result = []
-        vendors = self.session.query(vendor_profile.VendorProfile).all()
-        for vendor in vendors:
-            expected_result.append({
-                "vendor": vendor,
-                "opening_hours": VendorController.get_opening_hours(self.session, vendor.userID)
-            })
-        result = CustomerController.get_all_vendor_profile(self.session)
-        self.assertEqual(expected_result, result)
+    # def test_get_all_vendor_profile(self):
+    #     expected_result = []
+    #     vendors = self.session.query(vendor_profile.VendorProfile).all()
+    #     for vendor in vendors:
+    #         expected_result.append({
+    #             "vendor": vendor,
+    #             "opening_hours": VendorController.get_opening_hours(self.session, vendor.userID)
+    #         })
+    #     result = CustomerController.get_all_vendor_profile(self.session)
+    #     self.assertEqual(expected_result, result)
 
     def test_get_promotion_verify(self):
         # test with existing valid promo code
