@@ -57,7 +57,7 @@ function navButtons(cookies: any) {
           </Link>
           : null
         }
-        {cookies["userID"] == 2 || cookies["userID"] == 3 ?
+        {cookies["roleID"] == 2 || cookies["roleID"] == 3 ?
           <>
             <Link to={"./profile"}>
               <Button
