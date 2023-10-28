@@ -71,13 +71,11 @@ rm -r <your environment name>
    ```
 3. Create .env to store connection string and paste this in .env
    ```
-   DB_DIALECT=mysql
-   DB_DRIVER=mysqlconnector
-   DB_USERNAME=your_username
-   DB_PASSWORD=your_password
-   DB_HOST=localhost
-   DB_PORT=3306
-   DB_DATABASE=food_ordering
+   DB_CONNECTION_STRING=mysql+mysqlconnector://root:your_password@localhost:3306/food_ordering
+   FASTAPI_URL=127.0.0.1
+   FASTAPI_URL_PORT=8000
+   OTP_EMAIL=foodorderingnus@gmail.com
+   OTP_EMAIL_PASSWORD=yasw xhdg fjwl lvty
    ```
 4. Start fastapi and run migration scripts
    ```

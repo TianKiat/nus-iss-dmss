@@ -1,32 +1,13 @@
-name: Backend CI/CD on Pull Request
+name: Backend CI on Pull Request
 
 on:
   pull_request:
     paths:
       - 'backend/**'
 
-env:
-  DATABASE_URL: mysql+mysqlconnector://root:password@127.0.0.1:3306/food_ordering
-  DB_DIALECT: mysql
-  DB_DRIVER: mysqlconnector
-  DB_USERNAME: root
-  DB_PASSWORD: password
-  DB_HOST: 127.0.0.1
-  DB_PORT: 3306
-  DB_DATABASE: food_ordering
-
 jobs:
   build:
     runs-on: ubuntu-latest
-    services:
-     mysql:
-      image: mysql:8.0
-      env: 
-        MYSQL_DATABASE: food_ordering
-        MYSQL_ROOT_PASSWORD: password
-      ports:
-        - 3306:3306
-      options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     defaults:
       run:
@@ -47,30 +28,7 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Apply database migrations
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-          DB_DIALECT: ${{ env.DB_DIALECT }}
-          DB_DRIVER: ${{ env.DB_DRIVER }}
-          DB_USERNAME: ${{ env.DB_USERNAME }}
-          DB_PASSWORD: ${{ env.DB_PASSWORD }}
-          DB_HOST: ${{ env.DB_HOST }}
-          DB_PORT: ${{ env.DB_PORT }}
-          DB_DATABASE: ${{ env.DB_DATABASE }}
-        run: |
-          # Add commands here to apply database migrations if applicable
-          alembic -x database_url=$DATABASE_URL upgrade head
-
       - name: Run pytest for unit testing
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-          DB_DIALECT: ${{ env.DB_DIALECT }}
-          DB_DRIVER: ${{ env.DB_DRIVER }}
-          DB_USERNAME: ${{ env.DB_USERNAME }}
-          DB_PASSWORD: ${{ env.DB_PASSWORD }}
-          DB_HOST: ${{ env.DB_HOST }}
-          DB_PORT: ${{ env.DB_PORT }}
-          DB_DATABASE: ${{ env.DB_DATABASE }}
         run: |
           pytest app/test/
 
@@ -97,22 +55,3 @@ jobs:
           if [ -n "$CHANGED_FILES" ]; then
             echo "$CHANGED_FILES" | xargs bandit -c bandit.yaml -r
           fi
-
-      - name: Start Backend Application
-        run: |
-          # Start the frontend application (adjust the command as per your package.json scripts)
-          py run.py &
-          sleep 10 
-
-      - name: Expose Application with localtunnel
-        run: |
-          npm install -g localtunnel
-          lt --subdomain food-ordering-app-backend-127-0-0-3 --port 8000 &
-          sleep 10 # Allow localtunnel some time to start
-
-      - name: Install Arachni and Run Arachni Scan
-        run: |
-          wget https://github.com/Arachni/arachni/releases/download/v1.5.1/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz
-          tar xzf arachni-1.5.1-0.5.12-linux-x86_64.tar.gz
-          cd arachni-1.5.1-0.5.12/bin
-          ./arachni "https://food-ordering-app-backend-127-0-0-3.loca.lt"

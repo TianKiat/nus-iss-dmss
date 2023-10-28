@@ -4,9 +4,6 @@ from app.models.vendor_profile import VendorProfile
 from app.models.menu_item import MenuItem
 import mysql.connector
 import logging
-from app.common.constants import DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE
-
-sqldb = mysql.connector.connect(host = DB_HOST, user = DB_USERNAME, password = DB_PASSWORD, database = DB_DATABASE)
 
 logging.basicConfig(
     level=logging.DEBUG,  # Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
