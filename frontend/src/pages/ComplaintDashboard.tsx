@@ -25,7 +25,8 @@ import {
     Stat,
     StatLabel,
     StatNumber,
-    Divider
+    Divider,
+    CardFooter
 } from "@chakra-ui/react";
 
 import { useEffect, useState } from "react";
@@ -222,6 +223,7 @@ export default function ComplaintDashboard(props: ComplaintDashboardProps){
     };
 
     return (
+      <>
         <Container maxW="6xl">
           <Heading paddingBlock={"1.5rem"}>ComplaintDashboard</Heading>
             <Stack direction={"row"}>
@@ -344,27 +346,37 @@ export default function ComplaintDashboard(props: ComplaintDashboardProps){
                 <Heading textTransform={'uppercase'}>{complaintData.title}</Heading>
               </CardHeader>
               <CardBody>
-                <Stack>
-                  <Box>
-                    <Heading size={'md'} >{complaintData.description}</Heading>
-                    <Divider size={'md'}/>
-                    <Text>{complaintData.comment}</Text>
-                    <Text>Status: {complaintData.status}</Text>
-                    <Stack direction={['column','row']}>
-                      <Box>
-                        <Text>{complaintData.userID}</Text>
-                      </Box>
-                      <Box>
-                        <Text>{complaintData.createdtime}</Text>
-                      </Box>
+                <Stack direction={'row'}>
+                  <Box width={'60%'}>
+                    <Heading size={'md'} >Description/Category: {complaintData.description}</Heading>
+                    <Stack direction={'row'}>
+                      <Text fontWeight={'bold'}>Comment: </Text>
+                      <Text fontWeight={'bold'}>{complaintData.comment}</Text>
+                    </Stack>
+                  </Box>
+                  <Box width={'40%'}>
+                    <Stack direction={'row'}>
+                      <Text fontWeight={'bold'}>Status: </Text>
+                      <Text fontWeight={'bold'}>{complaintData.status}</Text>
+                    </Stack>
+                    <Stack direction={'row'}>
+                      <Text fontWeight={'bold'}>User:</Text>
+                      <Text fontWeight={'bold'}>{complaintData.userID}</Text>
+                    </Stack>
+                    <Stack direction={'row'}>
+                      <Text fontWeight={'bold'}>Created Time:</Text>
+                      <Text fontWeight={'bold'}>{complaintData.createdtime}</Text>
                     </Stack>
                   </Box>
                 </Stack>
+                
               </CardBody>
+              <CardFooter>
               <Link to = {"../complaint"} state={{complaintID:complaintData.complaintID}}>
-                <Button>Click Me</Button>
+                <Button width={'sm'}>View Complaint</Button>
                 </Link>
               {/* <Button onClick={handleClickMe(complaintData.complaintID)}>click me</Button> */}
+              </CardFooter>
             </Card>
             
             
@@ -373,5 +385,6 @@ export default function ComplaintDashboard(props: ComplaintDashboardProps){
           
           
         </Container>
+      </>
     )
 }

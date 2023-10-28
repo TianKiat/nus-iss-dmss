@@ -98,7 +98,16 @@ function ComplaintForm({formData, error, handleTitleChange, handleDescriptionCha
                     </FormControl>
                     <FormControl id = "description" isRequired isInvalid={error.description} padding = '2'>
                         <FormLabel>Description</FormLabel>
-                        <Input type="text" value={formData.description} onChange={handleDescriptionChange} name="description"></Input>
+                        {/* <Input type="text" value={formData.description} onChange={handleDescriptionChange} name="description"></Input> */}
+                        {/* <FormErrorMessage>Description is required.</FormErrorMessage> */}
+                        <Select value = {formData.description} onChange={handleDescriptionChange}>
+                            <option value="">--Please Select--</option>
+                            <option value="Found a Bug">Found a Bug</option>
+                            <option value="Customer Complaint">Customer Complaint</option>
+                            <option value="Vendor Complaint">Vendor Complaint</option>
+                            <option value="Issue With Order">Issue With Order</option>
+                            <option value="Other Reason">Other Reason</option>
+                        </Select>
                         <FormErrorMessage>Description is required.</FormErrorMessage>
                     </FormControl>
                     <FormControl id = "comment" padding = '2'>

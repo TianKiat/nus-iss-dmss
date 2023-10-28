@@ -96,6 +96,7 @@ export default function Complaint(props : ComplaintProps){
     return(
         <>
             <Container>
+                <Heading paddingBlock={"1.5rem"}>Complaint</Heading>
                 <Card key = {complaintList.complaintID} id = {complaintList.complaintID} borderStyle={'outset'} marginBottom={2} marginTop={2} borderRadius={'lg'}>
                 <CardHeader>
                     <Heading textTransform={'uppercase'}>{complaintList.title}</Heading>
@@ -103,17 +104,26 @@ export default function Complaint(props : ComplaintProps){
                 <CardBody>
                     <Stack>
                     <Box>
-                        <Heading size={'md'} >{complaintList.description}</Heading>
-                        <Divider size={'md'}/>
-                        <Text>{complaintList.comment}</Text>
-                        <Text>Status: {complaintList.status}</Text>
-                        <Stack direction={['column','row']}>
-                        <Box>
-                            <Text>{complaintList.userID}</Text>
-                        </Box>
-                        <Box>
-                            <Text>{complaintList.createdtime}</Text>
-                        </Box>
+                        <Heading size={'md'} >Description/Category: {complaintList.description}</Heading>
+                        <Stack direction={'row'}>
+                        <Text fontWeight={'bold'}>Comment: </Text>
+                        <Text fontWeight={'bold'}>{complaintList.comment}</Text>
+                        </Stack>
+                        <Stack direction={'row'}>
+                        <Text fontWeight={'bold'}>Status: </Text>
+                        <Text fontWeight={'bold'}>{complaintList.status}</Text>
+                        </Stack>
+                        <Stack direction={'row'}>
+
+                            <Text fontWeight={'bold'}>User:</Text>
+                            <Text fontWeight={'bold'}>{complaintList.userID}</Text>
+
+                        </Stack>
+                        <Stack direction={'row'}>
+
+                            <Text fontWeight={'bold'}>Created Time:</Text>
+                            <Text fontWeight={'bold'}>{complaintList.createdtime}</Text>
+
                         </Stack>
                     </Box>
                     </Stack>

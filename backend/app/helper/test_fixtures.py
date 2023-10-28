@@ -115,7 +115,7 @@ def setup_otp_table(session):
 
 def setup_complaint_table(session):
     values = [
-        {'title': 'Test Complaint', 'description': 'To test complaint', 'comment': 'ok', 'userID': 2, 'roleID': 2, 'status': 'pending'},
-        {'title': 'Test Complaint 2', 'description': 'To test another complaint', 'comment': 'ok again', 'userID': 2, 'roleID': 2, 'status': 'pending'},
+        {'title': 'Test Complaint', 'description': 'Found a Bug', 'comment': 'Bug Found', 'userID': 2, 'roleID': 2, 'status': 'pending', 'createdtime': datetime.datetime.now()},
+        {'title': 'Test Complaint 2', 'description': 'Other Reason', 'comment': 'No issue', 'userID': 3, 'roleID': 3, 'status': 'pending', 'createdtime': datetime.datetime.now()},
     ]
     add_multiple_row_to_table(session, complaint.Complaint, values)
