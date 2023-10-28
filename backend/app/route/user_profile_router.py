@@ -21,10 +21,10 @@ def get_user_profile(userId: str, db: Session = Depends(get_db)):
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex
 
-@router.get("/user_name/{userId}")
+@router.get("/user_data/{userId}")
 def get_user_name(userId: str, db: Session = Depends(get_db)):
     try:
-        return UserProfileController().get_user_name(db, userId)
+        return UserProfileController().get_user_data(db, userId)
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex
 
@@ -42,5 +42,12 @@ def check_password(userId: str, password: str, db: Session = Depends(get_db)):
 def save_user_profile(userData: UserProfile, db: Session = Depends(get_db)):
     try:
         return UserProfileController().save_user_profile(db, userData)
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail=str(ex)) from ex
+    
+@router.post("/save_username/{userID}/{username}")
+def save_user_profile(username: str, userID: str, db: Session = Depends(get_db)):
+    try:
+        return UserProfileController().save_username(db, username, userID)
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex

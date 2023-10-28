@@ -26,6 +26,13 @@ import { AiOutlineClose } from 'react-icons/ai';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 
 interface UserData {
+  userID: number;
+  username: string;
+  roleID: number;
+  userPassword: string;
+}
+
+interface UserProfile {
   userProfileID: number;
   userID: number;
   profileName: string;
@@ -33,14 +40,26 @@ interface UserData {
   email: string;
 }
 
+interface VendorProfile {
+  address: string;
+  email: string;
+  phone: string;
+  profileName: string;
+  shopDesc: string | null;
+  status: boolean;
+  userID: Number;
+  vendorProfileID: Number;
+}
 interface UserProfileProps {
   userID: number
 }
 
 export default function Profile(props: UserProfileProps) {
 
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [vendorProfile, setVendorProfile] = useState<VendorProfile | null>(null);
+  const [isVendor, setIsVendor] = useState<boolean | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [userName, setUserName] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setModalState] = useState(false); // State to control the modal
@@ -51,7 +70,6 @@ export default function Profile(props: UserProfileProps) {
   const [isAllowEdit, setAllowEdit] = useState(false)
 
   const userId = props.userID;
-  
   const handlePasswordSubmit = async () => {
 
     if(!password){
@@ -60,7 +78,6 @@ export default function Profile(props: UserProfileProps) {
     else{
       const checkPassword = await fetch(`${import.meta.env.VITE_API_BASE_URL}/check_password/${userId}/${password}`);
       const checkPasswordResult = await checkPassword.json();
-      console.log(checkPasswordResult)
       if(checkPasswordResult){
         setIsModalOpen(false); // Close the modal
         setPasswordError('')
@@ -76,27 +93,70 @@ export default function Profile(props: UserProfileProps) {
   const handleSubmitClick = async () => {
 
     setAllowEdit(false)
-    if(userData)
-    {
-      userData.userID = props.userID;
+    if(isVendor){
+
+      if(vendorProfile){
+        vendorProfile.userID = props.userID;
+      } else {
+        console.error('vendorProfile is null');
+      }
+
     } else {
-      console.error('userData is null');
+
+      if(userProfile){
+        userProfile.userID = props.userID;
+      } else {
+        console.error('userProfile is null');
+      }
+
     }
     
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/save_user_profile`, {
+      let userResponse: Response;
+      userResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/save_username/${userId}/${userData?.username}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(userData),
-      });
+        body: JSON.stringify({ username: userData?.username, userID: userId }),
+        });
 
-      if (response.status === 200) {
-        const result = await response.json();
+      let profileResponse: Response;
+
+      if (isVendor){
+
+        profileResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/save_vendor_profile`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(vendorProfile),
+        });
+
+      } else {
+
+        profileResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/save_user_profile`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(userProfile),
+        });
+
+      }
+      
+      if (profileResponse.status === 200) {
+        const result = await profileResponse.json();
         console.log(result)
       } else {
-        console.error('Error:', response.statusText);
+        console.error('Error:', profileResponse.statusText);
+      }
+
+      if (userResponse.status === 200) {
+        const result = await userResponse.json();
+        console.log(result)
+      } else {
+        console.error('Error:', userResponse.statusText);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -116,20 +176,43 @@ export default function Profile(props: UserProfileProps) {
       setModalState(false)
     }
   }
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userProfileData = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user_profile/${userId}`);
-        const userNameData = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user_name/${userId}`);
-        
-        if (userProfileData.ok && userNameData.ok) {
-          const profileData = await userProfileData.json();
-          const profileUserName = await userNameData.json();
-          setUserData(profileData);
-          setUserName(profileUserName);
+        const userFetchData = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user_data/${userId}`);
+        if (userFetchData.ok) {
+          const userDataJson = await userFetchData.json();
+          setUserData(userDataJson);
+          setError('');
+          if(userDataJson){
+            if(userDataJson.roleID == 3){
+              const userProfileData = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user_profile/${userId}`);
+              if(userProfileData.ok){
+                const profileDataJson = await userProfileData.json();
+                setUserProfile(profileDataJson);
+                setIsVendor(false);
+              } else {
+                setError('Error fetching user profile');
+              }
+            } else if(userDataJson.roleID == 2){
+              const vendorProfileData = await fetch(`${import.meta.env.VITE_API_BASE_URL}/vendor_profile/get/${userId}`);
+              if(vendorProfileData.ok){
+                const profileDataJson = await vendorProfileData.json();
+                setVendorProfile(profileDataJson);
+                setIsVendor(true);
+              } else {
+                setError('Error fetching vendor profile');
+              }
+            } else {
+              setIsVendor(null);
+              setError('unable to show Admin profile');
+            }
+          }
         } else {
           setError('Error fetching user data');
         }
+        
       } catch (error) {
         setError('An error occurred while fetching data.');
       } finally {
@@ -152,7 +235,7 @@ export default function Profile(props: UserProfileProps) {
         <CardBody>
           {loading && <div>Loading...</div>}
           {error && <div>{error}</div>}
-          {userData && (
+          {userProfile && userData && !isVendor && (
             <Stack divider={<StackDivider />} spacing='4'>
               <Box>
                 <Heading size='xs' textTransform='uppercase'>
@@ -160,11 +243,11 @@ export default function Profile(props: UserProfileProps) {
                 </Heading>
                 {
                   !isAllowEdit ? (
-                    <Text>{userData.profileName}</Text>
+                    <Text>{userProfile.profileName}</Text>
                     ) : (
                     <Input
-                      value={userData.profileName}
-                      onChange={(e) => setUserData({ ...userData, profileName: e.target.value })}
+                      value={userProfile.profileName}
+                      onChange={(e) => setUserProfile({ ...userProfile, profileName: e.target.value })}
                     />
                   )
                 }
@@ -175,11 +258,11 @@ export default function Profile(props: UserProfileProps) {
                 </Heading>
                 {
                   !isAllowEdit ? (
-                    <Text>{userName}</Text>
+                    <Text>{userData.username}</Text>
                     ) : (
                     <Input
-                      value={userName}
-                      onChange={(e) => setUserName(e.target.value)}
+                      value={userData.username}
+                      onChange={(e) => setUserData({ ...userData, username: e.target.value })}
                     />
                   )
                 }
@@ -190,11 +273,11 @@ export default function Profile(props: UserProfileProps) {
                 </Heading>
                 {
                   !isAllowEdit ? (
-                    <Text>{userData.phone}</Text>
+                    <Text>{userProfile.phone}</Text>
                     ) : (
                     <Input
-                      value={userData.phone}
-                      onChange={(e) => setUserData({ ...userData, phone: e.target.value })}
+                      value={userProfile.phone}
+                      onChange={(e) => setUserProfile({ ...userProfile, phone: e.target.value })}
                     />
                   )
                 }
@@ -205,14 +288,144 @@ export default function Profile(props: UserProfileProps) {
                 </Heading>
                 {
                   !isAllowEdit ? (
-                    <Text>{userData.email}</Text>
+                    <Text>{userProfile.email}</Text>
                     ) : (
                     <Input
-                      value={userData.email}
-                      onChange={(e) => setUserData({ ...userData, email: e.target.value })}
+                      value={userProfile.email}
+                      onChange={(e) => setUserProfile({ ...userProfile, email: e.target.value })}
                     />
                   )
                 }
+              </Box>
+              <Flex>
+                {
+                  !isAllowEdit ? (
+                    <Button onClick={() => setIsModalOpen(true)}>
+                    <Icon as={BiSolidEditAlt}/>
+                      Edit Profile
+                    </Button>
+                    ) : (
+                    <InputGroup size='md'>
+                      <Button 
+                        size='sm'
+                        onClick={handleSubmitClick}
+                      >
+                        Submit
+                      </Button>
+                      <InputRightElement h={"full"}>
+                        <Button 
+                          size='sm'
+                          mr={6}
+                          px = '8'
+                          onClick={() => setAllowEdit(false)}
+                        >
+                          Cancel
+                        </Button>
+                      </InputRightElement>
+                    </InputGroup>
+                  )
+                }
+                
+            </Flex>
+            </Stack>
+          )}
+          {vendorProfile && userData && isVendor &&(
+            <Stack divider={<StackDivider />} spacing='4'>
+              <Box>
+                <Heading size='xs' textTransform='uppercase'>
+                  Profile Name
+                </Heading>
+                {
+                  !isAllowEdit ? (
+                    <Text>{vendorProfile.profileName}</Text>
+                    ) : (
+                    <Input
+                      value={vendorProfile.profileName}
+                      onChange={(e) => setVendorProfile({ ...vendorProfile, profileName: e.target.value })}
+                    />
+                  )
+                }
+              </Box>
+              <Box>
+                <Heading size='xs' textTransform='uppercase'>
+                  Username
+                </Heading>
+                {
+                  !isAllowEdit ? (
+                    <Text>{userData.username}</Text>
+                    ) : (
+                    <Input
+                      value={userData.username}
+                      onChange={(e) => setUserData({ ...userData, username: e.target.value })}
+                    />
+                  )
+                }
+              </Box>
+              <Box>
+                <Heading size='xs' textTransform='uppercase'>
+                  Address
+                </Heading>
+                {
+                  !isAllowEdit ? (
+                    <Text>{vendorProfile.address}</Text>
+                    ) : (
+                    <Input
+                      value={vendorProfile.address}
+                      onChange={(e) => setVendorProfile({ ...vendorProfile, address: e.target.value })}
+                    />
+                  )
+                }
+              </Box>
+              <Box>
+                <Heading size='xs' textTransform='uppercase'>
+                  Email
+                </Heading>
+                {
+                  !isAllowEdit ? (
+                    <Text>{vendorProfile.email}</Text>
+                    ) : (
+                    <Input
+                      value={vendorProfile.email}
+                      onChange={(e) => setVendorProfile({ ...vendorProfile, email: e.target.value })}
+                    />
+                  )
+                }
+              </Box>
+              <Box>
+                <Heading size='xs' textTransform='uppercase'>
+                  Phone
+                </Heading>
+                {
+                  !isAllowEdit ? (
+                    <Text>{vendorProfile.phone}</Text>
+                    ) : (
+                    <Input
+                      value={vendorProfile.phone}
+                      onChange={(e) => setVendorProfile({ ...vendorProfile, phone: e.target.value })}
+                    />
+                  )
+                }
+              </Box>
+              <Box>
+                <Heading size='xs' textTransform='uppercase'>
+                  Shop Description
+                </Heading>
+                {
+                  !isAllowEdit ? (
+                    <Text>{vendorProfile.shopDesc}</Text>
+                    ) : (
+                    <Input
+                      value={vendorProfile.shopDesc || ''} 
+                      onChange={(e) => setVendorProfile({ ...vendorProfile, shopDesc: e.target.value })}
+                    />
+                  )
+                }
+              </Box>
+              <Box>
+                <Heading size='xs' textTransform='uppercase'>
+                  Status
+                </Heading>
+                <Text>{vendorProfile.status.toString()}</Text>
               </Box>
               <Flex>
                 {

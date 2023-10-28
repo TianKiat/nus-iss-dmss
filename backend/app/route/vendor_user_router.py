@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.apicontroller.vendor_controller import VendorController
-from app.common.user_model import UserID
+from app.common.user_model import VendorProfile
 from app.common.menu_item_model import MenuItemModel
 from run import SessionLocal
 
@@ -20,6 +20,17 @@ def vendor_profile(user_id: int = 0, db: Session = Depends(get_db)):
         return VendorController.get_vendor_profile_id(db, user_id)
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex    
+
+@router.post(
+        "/save_vendor_profile",
+        description="Saving of vendor profile",
+)
+def save_vendor_profile(vendorData: VendorProfile, db: Session = Depends(get_db)):
+    try:
+        return VendorController().save_vendor_profile(db, vendorData)
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail=str(ex)) from ex
+    
     
 @router.get("/vendor/orders/get/{user_id}", description="Retrieve orders for vendor")
 def vendor_orders(user_id: int = 0, db: Session = Depends(get_db)):

@@ -13,9 +13,9 @@ class UserProfileGateway():
         except Exception as e:
             print(f"Error: {e}")
 
-    def get_user_name_by_user(db: Session, userID: int):
+    def get_user_data_by_user(db: Session, userID: int):
         try:
-            return db.query(User).filter(User.userID == userID).first().username
+            return db.query(User).filter(User.userID == userID).first()
         except Exception as e:
             print(f"Error: {e}")
 
@@ -42,3 +42,16 @@ class UserProfileGateway():
             
         except Exception as e:
             print(f"Error: {e}")    
+
+    def save_username(db: Session, username: str, userID: int):
+        try:
+            existing_user = db.query(User).filter(User.userID == userID).first()
+            if existing_user:
+                existing_user.username = username
+
+            db.commit()
+            return True
+            
+        except Exception as e:
+            print(f"Error: {e}")    
+            

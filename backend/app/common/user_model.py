@@ -33,5 +33,14 @@ class UserProfile(BaseModel):
     profileName: str
     email: str
     phone: str
-    email: str
     userID: int
+
+class VendorProfile(BaseModel):
+    vendorProfileID: int
+    profileName: str
+    address: str
+    email: str
+    phone: str
+    status: bool
+    userID: int
+    shopDesc: str

@@ -11,8 +11,25 @@ class VendorProfileGateway():
         except Exception as e:
             print(f"Error: {e}")
 
-    def get_vendor_profile(db: Session, vendorProfileID: int):
+    def get_vendor_profile(db: Session, userId: int):
         try:
-            return db.query(VendorProfile).filter(VendorProfile.vendorProfileID == vendorProfileID).first()
+            return db.query(VendorProfile).filter(VendorProfile.userID == userId).first()
         except Exception as e:
             print(f"Error: {e}")
+
+    def save_vendor_profile(db: Session, vendorData: VendorProfile):
+        try:
+            print(vendorData)
+            existing_user = db.query(VendorProfile).filter(VendorProfile.vendorProfileID == vendorData.vendorProfileID).first()
+            if existing_user:
+                existing_user.profileName = vendorData.profileName
+                existing_user.address = vendorData.address
+                existing_user.email = vendorData.email
+                existing_user.phone = vendorData.phone
+                existing_user.shopDesc = vendorData.shopDesc
+
+            db.commit()
+            return True
+            
+        except Exception as e:
+            print(f"Error: {e}")    

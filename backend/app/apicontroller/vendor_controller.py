@@ -3,9 +3,10 @@ from app.service.vendor_profile_service import VendorProfileService
 from app.service.order_service import OrderService
 from app.service.invoice_service import InvoiceService
 from app.service.user_profile_service import UserProfileService
-from app.common.user_model import UserID
+from app.common.user_model import UserID, VendorProfile
 from app.models.menu_item import MenuItem
 from app.common.menu_item_model import MenuItemModel
+
 class VendorController:
     def __init__ (self):
         pass
@@ -33,6 +34,9 @@ class VendorController:
             return
         
         return user_profile
+    
+    def save_vendor_profile(self, db, vendorData: VendorProfile):
+        return VendorProfileService.save_vendor_profile(db, vendorData)
     
     def get_orders(db, userId: UserID):
         user_profile = VendorProfileService.get_vendor_profile(db, userId)
