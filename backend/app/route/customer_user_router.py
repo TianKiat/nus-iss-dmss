@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.apicontroller.customer_controller import CustomerController
 from app.common.user_model import UserID
 from app.common.invoice_model import IsFavorite, InvoiceStatus, InvoiceID, DraftInvoice
+from app.common.vendor_profile_model import ProfileIDs
 from run import SessionLocal
 
 router = APIRouter()
@@ -42,7 +43,7 @@ def update_favorite_order(isFavorite: IsFavorite, db: Session = Depends(get_db))
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex
 
-@router.post("/invoice/status/update", description="Update order status in invoice table")
+@router.post("/invoice/status_discount/update", description="Update order status in invoice table")
 def update_order_status(invoiceStatus: InvoiceStatus, db: Session = Depends(get_db)):
     try:
         return CustomerController.update_order_status(db, invoiceStatus)
@@ -56,9 +57,23 @@ def delete_order(invoiceID: InvoiceID, db: Session = Depends(get_db)):
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex
 
+@router.post("/menu_items/get_valid", description="Retrieve valid menu items from a vendor")
+def get_valid_menu_item(profileIDs: ProfileIDs, db: Session = Depends(get_db)):
+    try:
+        return CustomerController.get_valid_menu_item(db, profileIDs)
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail=str(ex)) from ex
+
 @router.get("/vendor_profile/get_all", description="Retrieve vendor list for customer order")
 def get_all_vendor_profile(db: Session = Depends(get_db)):
     try:
         return CustomerController.get_all_vendor_profile(db)
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail=str(ex)) from ex
+    
+@router.get("/promotion/get/{vendorProfileID}/{promoCode}", description="Verify promotion code")
+def get_promotion_verify(vendorProfileID: int, promoCode: str, db: Session = Depends(get_db)):
+    try:
+        return CustomerController.get_promotion_verify(db, vendorProfileID, promoCode)
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex

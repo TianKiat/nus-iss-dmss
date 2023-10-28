@@ -1,9 +1,10 @@
+from typing import List
 from sqlalchemy.orm import Session
 from sqlalchemy import select, insert, update, delete
 from sqlalchemy.sql.functions import sum
 from app.models.invoice import Invoice
 from app.models.order import Order
-from datetime import date
+from datetime import datetime
 
 class InvoiceGateway():
     def __init__():
@@ -13,7 +14,7 @@ class InvoiceGateway():
         try:
             db.execute(
                 insert(Invoice).values(
-                    date=date.today(),
+                    date=datetime.today(),
                     totalPrice=totalPrice,
                     discount=0,
                     status="DRAFT",
@@ -32,7 +33,7 @@ class InvoiceGateway():
         except Exception as e:
             print(f"Error: {e}")
 
-    def get_invoice_by_customer_and_order_status(db: Session, customerProfileID: int, orderStatus: list[str]):
+    def get_invoice_by_customer_and_order_status(db: Session, customerProfileID: int, orderStatus: List[str]):
         try:
             return db.query(Invoice).filter(
                 Invoice.customerProfileID == customerProfileID,
@@ -74,13 +75,20 @@ class InvoiceGateway():
         except Exception as e:
             print(f"Error: {e}")
 
-    def update_status(db: Session, invoiceID: int, status: str):
+    def update_status(db: Session, invoiceID: int, status: str, discount: float = 0):
         try:
-            db.execute(
-                update(Invoice)
-                .where(Invoice.invoiceID == invoiceID)
-                .values(status=status)
-            )
+            if (status == "PENDING"):
+                db.execute(
+                    update(Invoice)
+                    .where(Invoice.invoiceID == invoiceID)
+                    .values(status=status, discount=discount, date=datetime.today())
+                )
+            else:
+                db.execute(
+                    update(Invoice)
+                    .where(Invoice.invoiceID == invoiceID)
+                    .values(status=status)
+                )
             db.commit()
 
             updated_invoice = db.query(Invoice).filter(Invoice.invoiceID == invoiceID).first()

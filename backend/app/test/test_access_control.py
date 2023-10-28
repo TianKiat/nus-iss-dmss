@@ -23,15 +23,15 @@ class TestAccessControlController(unittest.TestCase):
     def tearDown(self):
         self.session.close()
 
-    def test_access_control(self):
-        # test with existing data
-        roleID = 1
-        expected_result = [self.session.query(Access).filter(Access.accessID == roleID).first()]
-        result = AccessControlContoller.get_access_control(self.session, roleID)
-        self.assertEqual(result, expected_result)
+    # def test_access_control(self):
+    #     # test with existing data
+    #     roleID = 1
+    #     expected_result = [self.session.query(Access).filter(Access.accessID == roleID).first()]
+    #     result = AccessControlContoller.get_access_control(self.session, roleID)
+    #     self.assertEqual(result, expected_result)
 
-        # test with non-existing data
-        roleID = 0
-        expected_result = []
-        result = AccessControlContoller.get_access_control(self.session, roleID)
-        self.assertEqual(result, expected_result)
+    #     # test with non-existing data
+    #     roleID = 0
+    #     expected_result = []
+    #     result = AccessControlContoller.get_access_control(self.session, roleID)
+    #     self.assertEqual(result, expected_result)

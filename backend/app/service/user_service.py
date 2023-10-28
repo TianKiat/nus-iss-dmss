@@ -1,3 +1,5 @@
+from os import getenv
+from dotenv import load_dotenv
 import smtplib
 import random
 import string
@@ -9,9 +11,10 @@ from app.datasource.user_gateway import UserGateway
 from app.common.user_model import User, Vendor, Login
 from app.service.access_control_service import AccessControlService
 
-
-# import service class needed
-# import gateway class needed
+# Get parameters from env file
+load_dotenv()
+OTP_EMAIL = getenv('OTP_EMAIL')
+OTP_EMAIL_PASSWORD = getenv('OTP_EMAIL_PASSWORD')
 
 class UserService():
     def __init__(self):
@@ -25,8 +28,8 @@ class UserService():
     def send_otp_email(self, otp, email):
         smtp_server = 'smtp.gmail.com'
         smtp_port = 587
-        smtp_username = 'foodorderingnus@gmail.com'
-        smtp_password = 'yasw xhdg fjwl lvty'
+        smtp_username = OTP_EMAIL
+        smtp_password = OTP_EMAIL_PASSWORD
 
         subject = 'Your OTP Code'
         body = f'Your OTP code is: {otp}'
@@ -48,15 +51,6 @@ class UserService():
         except Exception as e:
             print(f'Error: {e}')
 
-    # def generate_otp_email(self, db, email):
-    #     otp = self.generate_otp(6)
-    #     print(otp)
-    #     if self.send_otp_email(otp, email):
-    #         # save otp and email to db for check
-    #         hashed_otp = bcrypt.hashpw(otp.encode('utf-8'), bcrypt.gensalt())
-    #         UserGateway().modify_otp_data(db, hashed_otp, email)
-    #         return {"otp": 1}
-    #     return {"otp": 0}
     def generate_otp_email(self, db, data):
         otp = self.generate_otp(6)
         print(otp)
@@ -78,8 +72,10 @@ class UserService():
 
     def login_user(self, db, user: Login):
         auth_user = UserGateway().auth(db, user)
-        access_control_list = AccessControlService.get_access_control_list(db,auth_user['roleID'])
-        auth_user["access"] = access_control_list
+        if (auth_user):
+            access_control_list = AccessControlService.get_access_control_list(db,auth_user['roleID'])
+            auth_user["access"] = access_control_list
+
         return auth_user
 
 class Register:

@@ -20,23 +20,22 @@ import {
 import { ReactElement, useEffect, useState } from 'react'
 import { FaBowlRice, FaStar } from 'react-icons/fa6'
 import { FaRegStar } from 'react-icons/fa'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { MdDelete, MdStore } from 'react-icons/md'
+import OrderStatusBadge from '../components/OrderStatusBadge'
 
-function orderStatusTag(status: string) {
-    switch(status) {
-        case "COMPLETED":
-            return <Text bgColor="blue.500" color="white" w="fit-content" p="0.25rem 1rem" borderRadius="0.5rem">Completed</Text>
-        case "DONE":
-            return <Text bgColor="green.500" color="white" w="fit-content" p="0.25rem 1rem" borderRadius="0.5rem">Ready to collect</Text>
-        case "CANCELLED":
-            return <Text bgColor="red.500" color="white" w="fit-content" p="0.25rem 1rem" borderRadius="0.5rem">Cancelled</Text>
-        case "PENDING":
-            return <Text bgColor="orange.500" color="white" w="fit-content" p="0.25rem 1rem" borderRadius="0.5rem">Pending</Text>
-        case "DRAFT":
-            return <Text bgColor="gray.600" color="white" w="fit-content" p="0.25rem 1rem" borderRadius="0.5rem">Draft</Text>
-        default:
-            return null
-    }
-}
+// function orderStatusTag(status: string) {
+//     switch(status) {
+//         case "DONE":
+//             return <Text fontWeight="semibold" color="blue.600" w="fit-content">COMPLETED</Text>
+//         case "CANCELLED":
+//             return <Text fontWeight="semibold" color="red" w="fit-content">CANCELLED</Text>
+//         case "PENDING":
+//             return <Text fontWeight="semibold" color="orange" w="fit-content">PENDING</Text>
+//         default:
+//             return null
+//     }
+// }
 
 function ordersToMenuitemsList(orders: any[]): string[] {
     var menuitems = []
@@ -48,33 +47,10 @@ function ordersToMenuitemsList(orders: any[]): string[] {
 
 function favoriteIcon(isFavorite: boolean) {
     if (isFavorite) {
-        return <Icon as={FaStar} w={8} h={8} color={'gold'}/>
+        return <Icon as={FaStar} w={8} h={8} color={'gold'} transitionDuration="200ms" _hover={{color: 'gray.400'}}/>
     } else {
-        return <Icon as={FaRegStar} w={8} h={8}/>
+        return <Icon as={FaRegStar} w={8} h={8} color={'gray.400'} transitionDuration="200ms" _hover={{color: 'gold'}}/>
     }
-}
-
-function dateStringFormatTransform(date: string) {
-    var year = date.slice(0, 4);
-    var month = date.slice(5, 7);
-    var day = date.slice(8, 10);
-
-    switch (month) {
-        case "01": month = "Jan"; break;
-        case "02": month = "Feb"; break;
-        case "03": month = "Mar"; break;
-        case "04": month = "Apr"; break;
-        case "05": month = "May"; break;
-        case "06": month = "Jun"; break;
-        case "07": month = "Jul"; break;
-        case "08": month = "Aug"; break;
-        case "09": month = "Sep"; break;
-        case "10": month = "Oct"; break;
-        case "11": month = "Nov"; break;
-        default: month = "Dec";
-    }
-
-    return day + " " + month + " " + year;
 }
 
 interface OrderCardProps {
@@ -82,14 +58,18 @@ interface OrderCardProps {
     invoiceID: number,
     isFavorite: boolean,
     status: string,
+    vendorProfileID: number,
     vendorName: string,
-    date: string,
-    menuitems: string[],
+    date: Date,
+    orders: any[],
     price: number,
-    updateOrderHistoryTriggerFunction: Function
+    discount: number,
+    updateOrderHistoryTriggerFunction: Function,
+    setPopupErrorMessageFunction: Function
 }
 
 const OrderCard = (props: OrderCardProps) => {
+    const navigate = useNavigate();
 
     const updateInvoiceIsFavorite = async() => {
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/invoice/isFavorite/update`, {
@@ -108,7 +88,7 @@ const OrderCard = (props: OrderCardProps) => {
     }
 
     const cancelInvoice = async() => {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/invoice/status/update`, {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/invoice/status_discount/update`, {
             method: "POST",
             body: JSON.stringify({
                 invoiceID: props.invoiceID,
@@ -123,64 +103,143 @@ const OrderCard = (props: OrderCardProps) => {
         props.updateOrderHistoryTriggerFunction(await response.json());
     }
 
+    const collectOrder = async() => {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/invoice/status_discount/update`, {
+            method: "POST",
+            body: JSON.stringify({
+                invoiceID: props.invoiceID,
+                status: "DONE"
+            }),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        props.updateOrderHistoryTriggerFunction(await response.json());
+    }
+
+    const reOrder = async() => {
+        var menuItems = []
+        for (var i = 0; i < props.orders.length; i++) {
+            menuItems.push({
+                menuItemID: props.orders[i]["menuItemID"],
+                quantity: props.orders[i]["quantity"]
+            });
+        }
+        
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/invoice/update`, {
+            method: "POST",
+            body: JSON.stringify({
+                userID: props.userID,
+                vendorProfileID: props.vendorProfileID,
+                menuItems: menuItems
+            }),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+
+        const result = await response.json();
+        if (result != null && result["invoiceID"] != null) {
+            navigate("/basket", {state: {invoiceID: result["invoiceID"]}})
+        } else if (result != null && result["response"] != null) {
+            props.setPopupErrorMessageFunction(result["response"]);
+            setTimeout(() => {
+                props.setPopupErrorMessageFunction(null);
+            }, 5000);
+        }
+    }
+
+    const dateToString = (date: Date) => {
+        return `${date.toDateString()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`
+    }
+
     return (
-        props.isFavorite != null ?
-            <Button
-                w="full"
-                h="auto"
-                p={3}
-                fontWeight="normal"
-                variant="outline">
-                <Flex w="full" flexDirection={{base: 'column', md: 'row'}}>
-                    <Box w={{base: 'full', md: '112px'}} p={'16px'} verticalAlign={'top'}>
-                        <Button variant={'link'} onClick={updateInvoiceIsFavorite}>
-                            {favoriteIcon(props.isFavorite)}
-                        </Button>
-                    </Box>
-                    <Box w={{base: 'full', md: 'calc(100% - 112px - 150px)'}} p={'16px'} textAlign="left">
-                        {orderStatusTag(props.status)}
-                        <Heading size="lg">{props.vendorName}</Heading>
-                        {dateStringFormatTransform(props.date)}
-                        <br/><br/>
-                        <Heading size="sm">Menu Items</Heading>
-                        <UnorderedList>
-                            {ordersToMenuitemsList(props.menuitems).map((value) => (
-                                <ListItem key={value}>{value}</ListItem>
-                            ))}
-                        </UnorderedList>
-                    </Box>
-                    <Box w={{base: 'full', md: '150px'}} p={'16px'} verticalAlign={'top'} textAlign={{base: 'center', md: 'right'}}>
-                        <Heading size="lg">${props.price.toFixed(2)}</Heading>
-                    </Box>
-                </Flex>
-            </Button>
-        : <Box
+        <Box
             borderWidth="1px"
             borderRadius="6px"
             p={3}>
             <Flex w="full" flexDirection={{base: 'column', md: 'row'}}>
-                <Box w={{base: 'full', md: '112px'}} p={'16px'} verticalAlign={'top'} textAlign={'center'}>
-                    <Button
-                        colorScheme="red"
-                        isDisabled={props.status == "DONE" ? true : false}
-                        onClick={cancelInvoice}>
-                        Cancel
-                    </Button>
+                <Box w={{base: 'full', md: '152px'}} p={'16px'} verticalAlign={'top'} textAlign={'center'}>
+                    {props.isFavorite == null ?
+                        <Flex
+                            gap="1rem"
+                            flexWrap={"wrap"}
+                            justifyContent={"center"}>
+                            <Button
+                                w="120px"
+                                colorScheme="blue"
+                                variant="outline"
+                                onClick={collectOrder}
+                                leftIcon={<MdStore/>}>
+                                Collected
+                            </Button>
+                            <Button
+                                w="120px"
+                                colorScheme="red"
+                                variant="outline"
+                                isDisabled={(new Date() - props.date) > 300000}
+                                onClick={cancelInvoice}
+                                leftIcon={<MdDelete/>}>
+                                Cancel
+                            </Button>
+                        </Flex>
+                        :
+                        <Flex
+                            gap="1rem"
+                            flexWrap={"wrap"}
+                            justifyContent={"center"}>
+                            <Button variant={'link'} onClick={updateInvoiceIsFavorite}>
+                                {favoriteIcon(props.isFavorite)}
+                            </Button>
+                            <Button
+                                w="120px"
+                                colorScheme="green"
+                                variant="outline"
+                                onClick={reOrder}
+                                leftIcon={<MdStore/>}>
+                                Re-Order
+                            </Button>
+                        </Flex>
+                    }
                 </Box>
-                <Box w={{base: 'full', md: 'calc(100% - 112px - 150px)'}} p={'16px'}>
-                    {orderStatusTag(props.status)}
+                <Box fontSize="sm" w={{base: 'full', md: 'calc(100% - 152px - 200px)'}} p={'16px'}>
+                    <Flex mb="0.5rem" gap="1rem">
+                        <Text
+                            fontWeight="semibold"
+                            color="gray"
+                            w="fit-content">
+                            Invoice No:
+                        </Text>
+                        <Text
+                            fontWeight="semibold"
+                            w="75px">
+                            {props.invoiceID}
+                        </Text>
+                        <Text
+                            fontWeight="semibold"
+                            color="gray"
+                            w="fit-content">
+                            Status:
+                        </Text>
+                        <OrderStatusBadge type={props.status}></OrderStatusBadge>
+                    </Flex>
                     <Heading size="lg">{props.vendorName}</Heading>
-                    {dateStringFormatTransform(props.date)}
+                    {dateToString(props.date)}
                     <br/><br/>
                     <Heading size="sm">Menu Items</Heading>
                     <UnorderedList>
-                        {ordersToMenuitemsList(props.menuitems).map((value) => (
+                        {ordersToMenuitemsList(props.orders).map((value) => (
                             <ListItem key={value}>{value}</ListItem>
                         ))}
                     </UnorderedList>
                 </Box>
-                <Box w={{base: 'full', md: '150px'}} p={'16px'} verticalAlign={'top'} textAlign={{base: 'center', md: 'right'}}>
-                    <Heading size="lg">${props.price.toFixed(2)}</Heading>
+                <Box w={{base: 'full', md: '200px'}} p={'16px'} verticalAlign={'top'} textAlign={{base: 'center', md: 'right'}}>
+                    <Text>Subtotal: ${props.price.toFixed(2)}</Text>
+                    <Text>Discount: -${props.discount.toFixed(2)}</Text>
+                    <Heading mt="1rem" size="md">Total: ${Number(props.price - props.discount).toFixed(2)}</Heading>
                 </Box>
             </Flex>
         </Box>
@@ -219,6 +278,9 @@ export default function (props : CustomerDashboardProps) {
     const [orderHistory, setOrderHistory] = useState([]);
     const [favoriteOrder, setFavoriteOrder] = useState([]);
     const [updateOrderHistoryTrigger, setUpdateOrderHistoryTrigger] = useState();
+    const [popupErrorMessage, setPopupErrorMessage] = useState();
+    const location = useLocation();
+    const [popupMessage, setPopupMessage]: any = useState();
     
     useEffect(() => {
         const fetchAccess = async() => {
@@ -236,7 +298,7 @@ export default function (props : CustomerDashboardProps) {
 
             const activeOrderList: any = result.filter(
                 (item: { [x: string]: { [x: string]: any } }) => {
-                    return item["invoice"]["status"] == "PENDING" || item["invoice"]["status"] == "DONE"
+                    return item["invoice"]["status"] == "PENDING"
                 }
             );
             setActiveOrder(activeOrderList);
@@ -250,7 +312,7 @@ export default function (props : CustomerDashboardProps) {
 
             const orderHistoryList: any = result.filter(
                 (item: { [x: string]: { [x: string]: any } }) => {
-                    return item["invoice"]["status"] == "COMPLETED" || item["invoice"]["status"] == "CANCELLED"
+                    return item["invoice"]["status"] == "DONE" || item["invoice"]["status"] == "CANCELLED"
                 }
             );
             setOrderHistory(orderHistoryList);
@@ -259,6 +321,13 @@ export default function (props : CustomerDashboardProps) {
         }
 
         fetchAccess();
+
+        if (location != null && location.state != null && location.state.popupMessage != null) {
+            setPopupMessage(location.state.popupMessage);
+            setTimeout(() => {
+                setPopupMessage(null);
+            }, 5000);
+        }
     }, [props.userID, updateOrderHistoryTrigger]);
 
     return ( 
@@ -296,11 +365,14 @@ export default function (props : CustomerDashboardProps) {
                                                         invoiceID={item["invoice"]["invoiceID"]}
                                                         isFavorite={null}
                                                         status={item["invoice"]["status"]}
+                                                        vendorProfileID={item["vendor"]["vendorProfileID"]}
                                                         vendorName={item["vendor"]["profileName"]}
-                                                        date={item["invoice"]["date"]}
-                                                        menuitems={item["orders"]}
+                                                        date={new Date(item["invoice"]["date"])}
+                                                        orders={item["orders"]}
                                                         price={item["invoice"]["totalPrice"]}
+                                                        discount={item["invoice"]["discount"]}
                                                         updateOrderHistoryTriggerFunction={setUpdateOrderHistoryTrigger}
+                                                        setPopupErrorMessageFunction={setPopupErrorMessage}
                                                     />
                                                 ))
                                                 : <Text>No active order</Text>
@@ -322,11 +394,14 @@ export default function (props : CustomerDashboardProps) {
                                                         invoiceID={item["invoice"]["invoiceID"]}
                                                         isFavorite={item["invoice"]["isFavorite"]}
                                                         status={item["invoice"]["status"]}
+                                                        vendorProfileID={item["vendor"]["vendorProfileID"]}
                                                         vendorName={item["vendor"]["profileName"]}
-                                                        date={item["invoice"]["date"]}
-                                                        menuitems={item["orders"]}
+                                                        date={new Date(item["invoice"]["date"])}
+                                                        orders={item["orders"]}
                                                         price={item["invoice"]["totalPrice"]}
+                                                        discount={item["invoice"]["discount"]}
                                                         updateOrderHistoryTriggerFunction={setUpdateOrderHistoryTrigger}
+                                                        setPopupErrorMessageFunction={setPopupErrorMessage}
                                                     />
                                                 ))
                                                 : <Text>No favorite order</Text>
@@ -348,11 +423,14 @@ export default function (props : CustomerDashboardProps) {
                                                         invoiceID={item["invoice"]["invoiceID"]}
                                                         isFavorite={item["invoice"]["isFavorite"]}
                                                         status={item["invoice"]["status"]}
+                                                        vendorProfileID={item["vendor"]["vendorProfileID"]}
                                                         vendorName={item["vendor"]["profileName"]}
-                                                        date={item["invoice"]["date"]}
-                                                        menuitems={item["orders"]}
+                                                        date={new Date(item["invoice"]["date"])}
+                                                        orders={item["orders"]}
                                                         price={item["invoice"]["totalPrice"]}
+                                                        discount={item["invoice"]["discount"]}
                                                         updateOrderHistoryTriggerFunction={setUpdateOrderHistoryTrigger}
+                                                        setPopupErrorMessageFunction={setPopupErrorMessage}
                                                     />
                                                 ))
                                                 : <Text>No order history</Text>
@@ -363,6 +441,44 @@ export default function (props : CustomerDashboardProps) {
                         </TabPanel>
                     </TabPanels>
                 </Tabs>
+                {popupErrorMessage != null ?
+                    <Text
+                        position="fixed"
+                        top={{base: "1rem", md: "2rem"}}
+                        left="50%"
+                        transform="translateX(-50%)"
+                        maxW={{base: "300px", md: "500px"}}
+                        pt={1.5}
+                        pb={1.5}
+                        pl={3}
+                        pr={3}
+                        backgroundColor="red.100"
+                        color="red"
+                        borderRadius="0.5rem"
+                        textAlign="center">
+                        {popupErrorMessage}
+                    </Text>
+                    : null
+                }
+                {popupMessage != null ?
+                    <Text
+                        position="fixed"
+                        top={{base: "1rem", md: "2rem"}}
+                        left="50%"
+                        transform="translateX(-50%)"
+                        maxW={{base: "300px", md: "500px"}}
+                        pt={1.5}
+                        pb={1.5}
+                        pl={3}
+                        pr={3}
+                        backgroundColor="green.100"
+                        color="green"
+                        borderRadius="0.5rem"
+                        textAlign="center">
+                        {popupMessage}
+                    </Text>
+                    : null
+                }
             </Container>
         </Box>  
     )
