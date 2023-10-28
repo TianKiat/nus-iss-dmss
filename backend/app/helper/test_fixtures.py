@@ -1,5 +1,5 @@
 import datetime
-from app.models import access, access_control, role, user, user_profile, vendor_profile, menu_item, invoice, order, promotion, otp
+from app.models import access, access_control, role, user, user_profile, vendor_profile, menu_item, invoice, order, promotion, otp, complaint
 
 def add_single_row_to_table(session, table_cls, values):
     new_row = table_cls(**values)
@@ -30,6 +30,7 @@ def setup_test_fixtures(session):
     setup_order_table(session)
     setup_promotion_table(session)
     setup_otp_table(session)
+    setup_complaint_table(session)
 
 def setup_access_table(session):
     values = [
@@ -123,3 +124,10 @@ def setup_otp_table(session):
         {'otp': '$2b$12$qv/EDAIrMDCiDEv8b4j2yu0mcbwxqVtoLsbrgSSrYxL4P2VfCzoUG', 'email': 'vendor@test.com'},
     ]
     add_multiple_row_to_table(session, otp.Otp, values)
+
+def setup_complaint_table(session):
+    values = [
+        {'title': 'Test Complaint', 'description': 'Found a Bug', 'comment': 'Bug Found', 'userID': 2, 'roleID': 2, 'status': 'pending', 'createdtime': datetime.datetime.now()},
+        {'title': 'Test Complaint 2', 'description': 'Other Reason', 'comment': 'No issue', 'userID': 3, 'roleID': 3, 'status': 'pending', 'createdtime': datetime.datetime.now()},
+    ]
+    add_multiple_row_to_table(session, complaint.Complaint, values)
