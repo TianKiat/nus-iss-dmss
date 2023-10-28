@@ -1,5 +1,5 @@
 from app.datasource.complaint_gateway import ComplaintGateway
-from app.common.complaint_model import Complaint
+from app.common.complaint_model import Complaint, ComplaintUpdate
 
 class ComplaintService():
     def __init__(self):
@@ -14,3 +14,6 @@ class ComplaintService():
     
     def get_complaint(self, db, complaintID: int):
         return ComplaintGateway().get_complaint(db, complaintID)
+    
+    def update_complaint(self, db, complaintUpdate: ComplaintUpdate):
+        return ComplaintGateway().update_complaint(db, complaintUpdate.complaintID, complaintUpdate.status)

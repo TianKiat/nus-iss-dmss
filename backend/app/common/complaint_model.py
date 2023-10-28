@@ -10,3 +10,7 @@ class Complaint(BaseModel):
 
 class ComplaintID(BaseModel):
     complaintID: int
+
+class ComplaintUpdate(BaseModel):
+    complaintID: int
+    status: str

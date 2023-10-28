@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models import complaint
 from app.common.complaint_model import Complaint
+from sqlalchemy import update
 import datetime
 
 class ComplaintGateway():
@@ -44,5 +45,14 @@ class ComplaintGateway():
                 return complaint_id_object
             else:
                 return "not found"
+        except Exception as e:
+            print(f"Error: {e}")
+
+    def update_complaint(self, db: Session, complaintID: int, status: str):
+        try:
+            db.execute(update(complaint.Complaint).where(complaint.Complaint.complaintID == complaintID).values(status = status))
+            db.commit()
+            complaint_id_object = db.query(complaint.Complaint).filter(complaint.Complaint.complaintID == complaintID).first()
+            return complaint_id_object
         except Exception as e:
             print(f"Error: {e}")

@@ -1,5 +1,5 @@
 from app.service.complaint_service import ComplaintService
-from app.common.complaint_model import Complaint
+from app.common.complaint_model import Complaint, ComplaintUpdate
 
 class ComplaintController():
     def __init__(self):
@@ -13,3 +13,6 @@ class ComplaintController():
     
     def get_complaint(self, db, complaintID: int):
         return ComplaintService().get_complaint(db, complaintID)
+    
+    def update_complaint(self, db, complaintUpdate: ComplaintUpdate):
+        return ComplaintService().update_complaint(db, complaintUpdate)

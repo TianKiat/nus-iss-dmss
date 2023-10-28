@@ -12,15 +12,21 @@ import {
     StatLabel,
     StatNumber,
     Stat,
+    Button
+} from '@chakra-ui/react';
 
-} from '@chakra-ui/react'
+import {Link} from "react-router-dom";
+import { ReactElement, useEffect, useState } from 'react';
 
-import { ReactElement, useEffect, useState } from 'react'
-
-interface ComplaintCardProps {
-    id: string
-    title: string
-    description:string
+interface IComplaintData{
+    complaintID: string,
+    title: string,
+    description: string,
+    comment: string,
+    userID: number,
+    roleID: number,
+    status: string,
+    createdtime: datetime,
 
 }
 
@@ -39,42 +45,110 @@ interface AdminDashboardProps {
 
 
 
+// function ComplaintCard({complaint}:{
+//     complaint: IComplaintData;
+// }){
+//     return (
+//         <Container>
+            
+//         </Container>
+//     )
+// }
+
 export default function (props : AdminDashboardProps) {
+    const [complaintData, setComplaintData] = useState<IComplaintData>();
+    const [complaints, setComplaints] = useState([]);
+    const [status, setStatus] = useState<ISubmitFormStatus>({isSuccessful: false})
+    const [complaintList, setComplaintList] = useState([]);
+    const [numOfPendingComplaint, setNumOfPendingComplaint] = useState(0);
+    const [numOfNewComplaintToday, setNumOfNewComplaintToday] = useState(0);
+    const [todayDate, setTodayDate] = useState("");
+    
+    useEffect(()=>{
+        const fetchComplaintList = async() => {
+            try{
+                const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/get_complaint_list`, {
+                    method: 'GET',
+                });
+                if (response.status == 200){
+                    const complaint = await response.json();
+                    setComplaintList(complaint);
+
+                }else{
+                    console.log("here")
+                }
+        
+            }catch (error){
+                console.log("here error")
+            } 
+        }
+        fetchComplaintList();
+        
+    },[]);
+  
+    useEffect(()=>{
+        setNumOfPendingComplaint(complaintList.filter(c=>c.status == 'pending').length);
+        getTodayDate();
+        setNumOfNewComplaintToday(complaintList.filter(c=>c.createdtime.toString().includes(todayDate)).length);
+    },[complaintList]);
+  
+    const getTodayDate = ()=>{
+        let today = new Date().toLocaleDateString().replaceAll('/','-')
+        const dateArray = today.split('-');
+        let newDate = dateArray[2]+'-'+dateArray[0]+'-'+dateArray[1];
+        setTodayDate(newDate);
+        
+  
+    }
 
     return ( 
         <Container maxW="6xl">
-            <Heading paddingBlock={"1.5rem"}>Admin Dashboard</Heading>
+            <Heading paddingBlock={"1.5rem"} textAlign={'center'}>Admin Dashboard</Heading>
+            <Container maxW="3xl" padding={'2'}>
+                <Heading paddingBlock={"1.5rem"}>Complaints</Heading>
+                {/* <Link to = {"./complaint"} state={{complaintID:4}}>
+                    <button>Click Me</button>
+                </Link> */}
+                <Stack direction={"row"} paddingBottom={2}>
+                    <Card width = {"50%"} variant={'outline'}>
+                        <CardHeader>
+                            <Heading>Number of Complaints</Heading>
+                        </CardHeader>
+                        <CardBody>
+                            <Box>
+                                <Stat>
+                                    <StatLabel>Pending Complaints</StatLabel>
+                                    <StatNumber>{numOfPendingComplaint}</StatNumber>
+                                </Stat>
+                            </Box>
+                        </CardBody>
+                    </Card>
+                    <Card width = {"50%"} variant={'outline'}>
+                        <CardHeader>
+                            <Heading>New Complaints Today</Heading>
+                        </CardHeader>
+                        <CardBody>
+                            <Box>
+                                <Stat>
+                                    <StatLabel>New Complaints</StatLabel>
+                                    <StatNumber>{numOfNewComplaintToday}</StatNumber>
+                                </Stat>
+                            </Box>
+                        </CardBody>
+                    </Card>
+                </Stack>
+                <Link to = {"./complaint_dashboard"}>
+                    <Button colorScheme='teal' variant={'solid'}>Complaint Dashboard</Button>
+                </Link>
+            </Container>
 
-            <Heading paddingBlock={"1.5rem"}>Complaints</Heading>
-            <Stack direction={"row"}>
-                <Card width = {"50%"}>
-                    <CardHeader>
-                        <Heading>Number of Complaints</Heading>
-                    </CardHeader>
-                    <CardBody>
-                        <Box>
-                            <Stat>
-                                <StatLabel>Current Complaints</StatLabel>
-                                <StatNumber>3</StatNumber>
-                            </Stat>
-                        </Box>
-                    </CardBody>
-                </Card>
-                <Card width = {"50%"}>
-                    <CardHeader>
-                        <Heading>New Complaints Today</Heading>
-                    </CardHeader>
-                    <CardBody>
-                        <Box>
-                            <Stat>
-                                <StatLabel>New Complaints</StatLabel>
-                                <StatNumber>3</StatNumber>
-                            </Stat>
-                        </Box>
-                    </CardBody>
-                </Card>
-            </Stack>
-            <Heading paddingBlock={"1rem"} fontSize={"1.5rem"}>Complaints</Heading>
+            <Container maxW="3xl" padding={'2'}>
+                <Heading paddingBlock={"1.5rem"}>Manage Access Control</Heading>
+                <Link to = {"./complaint_dashboard"}>
+                    <Button colorScheme='teal' variant={'solid'}>Access Control</Button>
+                </Link>
+            </Container>
+            {/* <Heading paddingBlock={"1rem"} fontSize={"1.5rem"}>Complaints</Heading>
             <Stack direction={"column"}>
                 <ComplaintCard
                     id={'1'}
@@ -92,7 +166,13 @@ export default function (props : AdminDashboardProps) {
                     description={"test"}
                 />
             </Stack>
+            {complaints?
+                <Container>
+                    {complaints.map((complaintData) => (<div>{complaintData.title}</div>))}              
+                </Container> :""
+            } */}
         </Container>
+        
         
     )
 }

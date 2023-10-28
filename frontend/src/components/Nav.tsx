@@ -71,6 +71,19 @@ function navButtons(cookies: any) {
             </Text>
           </Button>
         </Link>
+        <Link to={"./create_complaint"} state={{userID:cookies["userID"], roleID:cookies["roleID"]}}>
+            <Button
+              as={"a"}
+              p={2}
+              fontSize={"sm"}
+              fontWeight={400}
+              variant={"link"}
+              _hover={{textDecoration: "none", color: "black"}}>
+              <Text size={'sm'} fontWeight={600} alignSelf={'center'} whiteSpace={'nowrap'}>
+                Create Complaint
+              </Text>
+            </Button>
+          </Link>
         {/* <Button as={"a"} fontSize={"sm"} fontWeight={400} variant={"link"} onClick={signOut}>
           Sign Out
         </Button> */}
