@@ -1,19 +1,19 @@
-"""added complaints table
+"""added_complaint
 
-Revision ID: da280a3a5918
-Revises: 849d8388b0f8
-Create Date: 2023-10-15 21:48:08.223456
+Revision ID: c645f2bf2997
+Revises: e8ac05b33347
+Create Date: 2023-10-28 23:21:57.462280
 
 """
 from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-
+from sqlalchemy.dialects import mysql
 
 # revision identifiers, used by Alembic.
-revision: str = 'da280a3a5918'
-down_revision: Union[str, None] = '849d8388b0f8'
+revision: str = 'c645f2bf2997'
+down_revision: Union[str, None] = 'e8ac05b33347'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
