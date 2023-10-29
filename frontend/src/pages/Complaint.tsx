@@ -97,44 +97,45 @@ export default function Complaint(props : ComplaintProps){
         <>
             <Container>
                 <Heading paddingBlock={"1.5rem"}>Complaint</Heading>
-                <Card key = {complaintList.complaintID} id = {complaintList.complaintID} borderStyle={'outset'} marginBottom={2} marginTop={2} borderRadius={'lg'}>
+                {complaintList.map((complaintData, index) => {return(
+                <Card key = {complaintData.complaintID} id = {complaintData.complaintID} borderStyle={'outset'} marginBottom={2} marginTop={2} borderRadius={'lg'}>
                 <CardHeader>
-                    <Heading textTransform={'uppercase'}>{complaintList.title}</Heading>
+                    <Heading textTransform={'uppercase'}>{complaintData.title}</Heading>
                 </CardHeader>
                 <CardBody>
                     <Stack>
                     <Box>
-                        <Heading size={'md'} >Description/Category: {complaintList.description}</Heading>
+                        <Heading size={'md'} >Description/Category: {complaintData.description}</Heading>
                         <Stack direction={'row'}>
                         <Text fontWeight={'bold'}>Comment: </Text>
-                        <Text fontWeight={'bold'}>{complaintList.comment}</Text>
+                        <Text fontWeight={'bold'}>{complaintData.comment}</Text>
                         </Stack>
                         <Stack direction={'row'}>
                         <Text fontWeight={'bold'}>Status: </Text>
-                        <Text fontWeight={'bold'}>{complaintList.status}</Text>
+                        <Text fontWeight={'bold'}>{complaintData.status}</Text>
                         </Stack>
                         <Stack direction={'row'}>
 
                             <Text fontWeight={'bold'}>User:</Text>
-                            <Text fontWeight={'bold'}>{complaintList.userID}</Text>
+                            <Text fontWeight={'bold'}>{complaintData.profileName}</Text>
 
                         </Stack>
                         <Stack direction={'row'}>
 
                             <Text fontWeight={'bold'}>Created Time:</Text>
-                            <Text fontWeight={'bold'}>{complaintList.createdtime}</Text>
+                            <Text fontWeight={'bold'}>{complaintData.createdtime}</Text>
 
                         </Stack>
                     </Box>
                     </Stack>
                 </CardBody>
-                {complaintList.status == 'done'?
+                {complaintData.status == 'done'?
                 <Button colorScheme='teal' variant={'outline'}>Already Completed</Button>
-                :<Button colorScheme='teal' variant={'solid'} onClick={(e)=>handleUpdateStatus(complaintList.complaintID)}>Resolve</Button>
+                :<Button colorScheme='teal' variant={'solid'} onClick={(e)=>handleUpdateStatus(complaintData.complaintID)}>Resolve</Button>
                 
                 }
                 </Card>
-                
+                )})}
             </Container>
             
             
