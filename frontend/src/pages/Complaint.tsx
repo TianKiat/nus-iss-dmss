@@ -1,22 +1,20 @@
 'use client'
 
 import {
+    Alert,
+  AlertIcon,
   Box,
   Button,
   Card,
   CardBody,
   CardHeader,
   Container,
-  Divider,
-  Flex,
   Heading,
   Stack,
-  StackDivider,
   Text,
-  useColorModeValue
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
-import {useLocation} from 'react-router-dom';
+import {Link, useLocation} from 'react-router-dom';
 
 
 interface IComplaintData{
@@ -31,14 +29,15 @@ interface IComplaintData{
 
 }
 
-interface ComplaintProps {
-    complaintID: number
-}
+// interface ComplaintProps {
+//     complaintID: number
+// }
 
-export default function Complaint(props : ComplaintProps){
-    const [complaintData, setComplaintData] = useState<IComplaintData>();
+export default function Complaint(){
+    //const [complaintData, setComplaintData] = useState<IComplaintData>();
     const [complaintList, setComplaintList] = useState([]);
-    const [status, setStatus] = useState({isSuccessful: false})
+    const [showComplaint, setShowComplaint] = useState([]);
+    const [status, setStatus] = useState({isSuccessful: null});
     const location = useLocation();
     const complaintID = location != null?location.state.complaintID:0
     useEffect(()=>{
@@ -53,7 +52,7 @@ export default function Complaint(props : ComplaintProps){
             });
             if (response.status == 200){
                 const complaint = await response.json();
-                console.log(complaint);
+                //console.log(complaint);
                 setComplaintList(complaint);
                 
                 
@@ -81,6 +80,7 @@ export default function Complaint(props : ComplaintProps){
             });
             if (response.status == 200){
                 const complaint = await response.json();
+                setComplaintList(complaint);
                 setStatus({isSuccessful: true})
                 
                 
@@ -93,11 +93,19 @@ export default function Complaint(props : ComplaintProps){
           } 
       }
 
+      useEffect(()=>{
+        setShowComplaint(complaintList);
+      },[complaintList])
+
     return(
         <>
             <Container>
                 <Heading paddingBlock={"1.5rem"}>Complaint</Heading>
-                {complaintList.map((complaintData, index) => {return(
+                <Link to = {"../complaint_dashboard"}>
+                    <Button colorScheme='teal' variant={'solid'}>Back to Complaint Dashboard</Button>
+                </Link>
+                <div></div>
+                {showComplaint.map((complaintData) => {return(
                 <Card key = {complaintData.complaintID} id = {complaintData.complaintID} borderStyle={'outset'} marginBottom={2} marginTop={2} borderRadius={'lg'}>
                 <CardHeader>
                     <Heading textTransform={'uppercase'}>{complaintData.title}</Heading>
@@ -131,11 +139,22 @@ export default function Complaint(props : ComplaintProps){
                 </CardBody>
                 {complaintData.status == 'done'?
                 <Button colorScheme='teal' variant={'outline'}>Already Completed</Button>
-                :<Button colorScheme='teal' variant={'solid'} onClick={(e)=>handleUpdateStatus(complaintData.complaintID)}>Resolve</Button>
-                
+                :<Button colorScheme='teal' variant={'solid'} onClick={()=>handleUpdateStatus(complaintData.complaintID)}>Resolve</Button>
                 }
                 </Card>
                 )})}
+                {status.isSuccessful == true? 
+                    <Alert status = 'success' rounded='lg' padding='2'>
+                        <AlertIcon />
+                        Your Request has succesfully been submitted!
+                    </Alert>
+                    : status.isSuccessful == false?
+                    <Alert status = 'error' rounded='lg' padding='2'>
+                        <AlertIcon />
+                    Your Request has not been submitted! 
+                    </Alert>
+                    :""
+                }
             </Container>
             
             
