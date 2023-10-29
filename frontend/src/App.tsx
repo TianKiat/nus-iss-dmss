@@ -17,7 +17,7 @@ import Cookies from "js-cookie";
 import { useCallback, useEffect, useState } from "react";
 
 function App() {
-  const [cookies, setCookies] = useState(Cookies.get("token"));
+  const [cookies, setCookies] = useState();
   const apiURL = process.env.VITE_API_BASE_URL;
 
   const fetchData = useCallback(async () => {
@@ -56,9 +56,9 @@ function App() {
             <Route path="login" element={<Login />} />
             <Route path="vendor/login" element={<LoginVendor />} />
             <Route path="register" element={<Register />} />
-            <Route path="order" element={<CustomerOrder userID={cookies != null ? cookies["userID"] : null}/>} />
-            <Route path="basket" element={<CustomerBasket userID={cookies != null ? cookies["userID"] : null}/>} />
-            <Route path="profile" element={<Profile userID={cookies != null ? cookies["userID"] : null}/>} />
+            <Route path="order" element={<CustomerOrder userID={cookies != null ? cookies["userID"] : -1}/>} />
+            <Route path="basket" element={<CustomerBasket userID={cookies != null ? cookies["userID"] : -1}/>} />
+            <Route path="profile" element={<Profile userID={cookies != null ? cookies["userID"] : -1}/>} />
             <Route path="*" element={<Error />} />
             <Route path="create_complaint" element={<CreateComplaint/>}/>
             <Route path="complaint_dashboard" element={<ComplaintDashboard/>}/>

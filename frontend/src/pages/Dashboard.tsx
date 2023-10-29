@@ -3,7 +3,6 @@
 import VendorDashboard from './VendorDashboard'
 import CustomerDashboard from './CustomerDashboard'
 import AdminDashboard from './AdminDashboard'
-import { useEffect, useState } from "react"
 
 interface DashboardProps {
     userID : number
