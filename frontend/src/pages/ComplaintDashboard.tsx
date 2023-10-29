@@ -361,7 +361,7 @@ export default function ComplaintDashboard(props: ComplaintDashboardProps){
                     </Stack>
                     <Stack direction={'row'}>
                       <Text fontWeight={'bold'}>User:</Text>
-                      <Text fontWeight={'bold'}>{complaintData.userID}</Text>
+                      <Text fontWeight={'bold'}>{complaintData.profileName}</Text>
                     </Stack>
                     <Stack direction={'row'}>
                       <Text fontWeight={'bold'}>Created Time:</Text>
