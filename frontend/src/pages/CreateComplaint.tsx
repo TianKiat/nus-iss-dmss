@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Flex,
   Box,
   FormControl,
   FormLabel,
@@ -9,21 +8,14 @@ import {
   Stack,
   Button,
   Heading,
-  Text,
-  useColorModeValue,
-  Link,
   Container,
-  FormHelperText,
   Textarea,
   Select,
   Alert,
   FormErrorMessage,
   AlertIcon
 }  from "@chakra-ui/react";
-import { error } from "console";
-import { useEffect, useState } from "react";
-import React from "react";
-import { isError } from "util";
+import React, { useState } from "react";
 import {useLocation} from 'react-router-dom';
 
 interface IComplaintData{
@@ -37,13 +29,12 @@ interface IComplaintData{
 interface IFormChecker{
     title?:boolean,
     description?:boolean,
-    comment: string
 }
 
-interface ComplaintProps{
-    userID : number
-    roleID : number
-}
+// interface ComplaintProps{
+//     userID : number
+//     roleID : number
+// }
 
 interface ISubmitFormStatus{
     isSuccessful: boolean
@@ -75,16 +66,14 @@ interface ISubmitButtonCheck{
 //     )
 // }
 
-function ComplaintForm({formData, error, handleTitleChange, handleDescriptionChange, handleCommentChange, handleSubmit, userInfo, role }:{
+function ComplaintForm({formData, error, handleTitleChange, handleDescriptionChange, handleCommentChange, handleSubmit }:{
     formData: IComplaintData;
     error: IFormChecker;
     handleTitleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    handleDescriptionChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    handleCommentChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    handleDescriptionChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    handleCommentChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
     //handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     handleSubmit: () => void;
-    userInfo: number;
-    role: number;
 }){
         return(
         <>
@@ -122,7 +111,7 @@ function ComplaintForm({formData, error, handleTitleChange, handleDescriptionCha
     )
 }
 
-export default function CreateComplaint(props: ComplaintProps){
+export default function CreateComplaint(){
 
     // actual implementation
     const location = useLocation();
@@ -148,13 +137,13 @@ export default function CreateComplaint(props: ComplaintProps){
     
     const [complaintData, setComplaintData] = useState<IComplaintData>(initialComplaint);
     const [error, setError] = useState<IFormChecker>({title:false, description:false});
-    const [complaints, setComplaints] = useState([]);
+    // const [complaints, setComplaints] = useState([]);
     const [status, setStatus] = useState<ISubmitFormStatus>({isSuccessful: false})
     const [isSubmitted, setSubmittedCheck] = useState<ISubmitButtonCheck>({isClicked: false})
 
     
     //set field to remove message
-    const handleTitleChange = (e) => {
+    const handleTitleChange = (e: any) => {
         setSubmittedCheck({isClicked: false})
         
         if (complaintData.title !== '') {
@@ -167,7 +156,7 @@ export default function CreateComplaint(props: ComplaintProps){
         });
     };
 
-    const handleDescriptionChange = (e) => {
+    const handleDescriptionChange = (e: any) => {
         setSubmittedCheck({isClicked: false})
         if (complaintData.description !== '') {
             setError({description: false});
@@ -179,7 +168,7 @@ export default function CreateComplaint(props: ComplaintProps){
         });
     };
 
-    const handleCommentChange = (e) => {    
+    const handleCommentChange = (e: any) => {    
         setSubmittedCheck({isClicked: false})    
         setComplaintData({
             ...complaintData,
@@ -224,7 +213,7 @@ export default function CreateComplaint(props: ComplaintProps){
                 body: JSON.stringify(complaintData),
             });
             if (response.status == 200){
-                const complaint = await response.json();
+                await response.json();
                 //setComplaints([...complaints, complaint])
                 setStatus({isSuccessful: true})
             }else{
@@ -260,8 +249,7 @@ export default function CreateComplaint(props: ComplaintProps){
                         handleDescriptionChange={handleDescriptionChange}
                         handleCommentChange={handleCommentChange}    
                         handleSubmit={handleComplaintSubmit}
-                        userInfo={userID}
-                        role={roleID}
+                        
                     />
                 </Box>
                 {isSubmitted.isClicked ?

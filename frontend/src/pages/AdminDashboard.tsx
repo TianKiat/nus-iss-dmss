@@ -3,7 +3,6 @@
 import {
     Box,
     Container,
-    Flex,
     Heading,
     Stack,
     Card,
@@ -16,32 +15,32 @@ import {
 } from '@chakra-ui/react';
 
 import {Link} from "react-router-dom";
-import { ReactElement, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-interface IComplaintData{
-    complaintID: string,
-    title: string,
-    description: string,
-    comment: string,
-    userID: number,
-    roleID: number,
-    status: string,
-    createdtime: datetime,
+// interface IComplaintData{
+//     complaintID: string,
+//     title: string,
+//     description: string,
+//     comment: string,
+//     userID: number,
+//     roleID: number,
+//     status: string,
+    
 
-}
+// }
 
-const ComplaintCard = ({ id, title, description }: CardProps) => {
-    return (
-        <Container id = {id} maxW="6xl" borderStyle={'outset'}>
-        <Heading paddingBlock={"1.5rem"} size={'md'}>{title}</Heading>
-        <p>{description}</p>
-        </Container>
-    )
-}
+// const ComplaintCard = ({ id, title, description }: CardProps) => {
+//     return (
+//         <Container id = {id} maxW="6xl" borderStyle={'outset'}>
+//         <Heading paddingBlock={"1.5rem"} size={'md'}>{title}</Heading>
+//         <p>{description}</p>
+//         </Container>
+//     )
+// }
 
-interface AdminDashboardProps {
-    userID: number
-}
+// interface AdminDashboardProps {
+//     userID: number
+// }
 
 
 
@@ -55,11 +54,11 @@ interface AdminDashboardProps {
 //     )
 // }
 
-export default function (props : AdminDashboardProps) {
-    const [complaintData, setComplaintData] = useState<IComplaintData>();
-    const [complaints, setComplaints] = useState([]);
-    const [status, setStatus] = useState<ISubmitFormStatus>({isSuccessful: false})
-    const [complaintList, setComplaintList] = useState([]);
+export default function AdminDashboard() {
+    //const [complaintData, setComplaintData] = useState<IComplaintData>();
+    //const [complaints, setComplaints] = useState([]);
+    //const [status, setStatus] = useState<ISubmitFormStatus>({isSuccessful: false})
+    const [complaintList, setComplaintList] = useState<any[]>([]);
     const [numOfPendingComplaint, setNumOfPendingComplaint] = useState(0);
     const [numOfNewComplaintToday, setNumOfNewComplaintToday] = useState(0);
     const [todayDate, setTodayDate] = useState("");
@@ -88,13 +87,16 @@ export default function (props : AdminDashboardProps) {
   
     useEffect(()=>{
         setNumOfPendingComplaint(complaintList.filter(c=>c.status == 'pending').length);
+        console.log(complaintList.filter(c=>c.status == 'pending').length);
+        
         getTodayDate();
+        console.log(complaintList.filter(c=>c.createdtime.toString().includes(todayDate)).length);
         setNumOfNewComplaintToday(complaintList.filter(c=>c.createdtime.toString().includes(todayDate)).length);
     },[complaintList]);
   
     const getTodayDate = ()=>{
-        let today = new Date().toLocaleDateString().replaceAll('/','-')
-        const dateArray = today.split('-');
+        let today = new Date().toLocaleDateString();
+        const dateArray = today.split('/');
         let newDate = dateArray[2]+'-'+dateArray[0]+'-'+dateArray[1];
         setTodayDate(newDate);
         
