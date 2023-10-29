@@ -1,0 +1,1 @@
+exclude_dirs: ['venv', 'alembic', 'models', 'test']

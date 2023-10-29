@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: password1!
+      MYSQL_DATABASE: food_ordering
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password1!
+      MYSQL_HOST: db
+    ports:
+      - '3306:3306'
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"] # Command to check health.
+      interval: 10s # Interval between health checks.
+      timeout: 10s # Timeout for each health checking.
+      retries: 20 # How many times retries.
+      start_period: 30s # Warm up wait period
+
+  app:
+    build: .
+    ports:
+      - '8000:8000'
+    depends_on:
+      db:
+        condition: service_healthy
+

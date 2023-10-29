@@ -1,0 +1,82 @@
+name: Frontend CI on Pull Request
+
+on:
+  pull_request:
+    paths:
+      - 'frontend/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: 'frontend'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18
+
+      - name: Install dependencies using pnpm
+        run: |
+          npm install -g pnpm # Install pnpm globally
+          pnpm install
+        working-directory: frontend
+
+      - name: Run Unit Tests
+        run: |
+          # Run unit tests
+          pnpm run test
+
+      - name: Get changed tsx files
+        id: changed-files
+        run: |
+          CHANGED_FILES=$(git diff --name-only origin/dev...HEAD -- '*.tsx')
+          echo "Changed TSX files:"
+          echo "$CHANGED_FILES"
+          echo "::set-output name=changed_files::$CHANGED_FILES"
+
+      - name: Lint frontend code
+        run: |  
+          CHANGED_FILES="${{ steps.changed-files.outputs.changed_files }}"
+          if [ -n "$CHANGED_FILES" ]; then
+            url=$(cd ..; pwd)
+            echo "$url"
+            echo "$CHANGED_FILES" | while IFS= read -r line; do
+              full_path="$url/$line"
+              echo "$full_path"
+            done | xargs pnpm eslint 
+          fi
+
+      - name: Run npm audit
+        run: |
+          CHANGED_FILES="${{ steps.changed-files.outputs.changed_files }}"
+          if [ -n "$CHANGED_FILES" ]; then
+          echo "$CHANGED_FILES" | xargs pnpm audit
+          fi
+
+      - name: Start your Frontend App
+        run: |
+          # Add commands here to start your frontend application if it's not already running
+          pnpm run dev &
+          sleep 5
+
+      - name: Expose Application with localtunnel
+        run: |
+          npm install -g localtunnel
+          lt --subdomain food-ordering-app-frontend-127-0-0-3 --port 5173 &
+          sleep 10 # Allow localtunnel some time to start
+
+      - name: Install Arachni and Run Arachni Scan
+        run: |
+          wget https://github.com/Arachni/arachni/releases/download/v1.5.1/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz
+          tar xzf arachni-1.5.1-0.5.12-linux-x86_64.tar.gz
+          cd arachni-1.5.1-0.5.12/bin
+          ./arachni "https://food-ordering-app-frontend-127-0-0-3.loca.lt"

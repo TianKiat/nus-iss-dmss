@@ -1,0 +1,47 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - releases
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the files
+        uses: actions/checkout@v2
+
+      - name: Copy Frontend Application to EC2
+        run: |
+          scp -i ${{ secrets.EC2_FE_PRIVATE_KEY }} -r ./frontend ec2-user@${{ secrets.EC2_FE_PUBLIC_IP }}:~/
+
+      - name: Copy Backend Application to EC2
+        run: |
+          scp -i ${{ secrets.EC2_BE_PRIVATE_KEY }} -r ./backend ec2-user@${{ secrets.EC2_BE_PUBLIC_IP }}:~/
+
+      - name: Copy GitHub Secrets env variables to EC2 for FE
+        run: |
+          echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" > .env
+          scp -i ${{ secrets.EC2_FE_PRIVATE_KEY }} .env ec2-user@${{ secrets.EC2_FE_PUBLIC_IP }}:~/frontend
+
+      - name: Copy GitHub Secrets env variables to EC2 for BE
+        run: |
+          echo "DB_CONNECTION_STRING=${{ secrets.DB_CONNECTION_STRING }}" > .env
+          echo "FASTAPI_URL=${{ secrets.FASTAPI_URL }}" > .env
+          echo "FASTAPI_URL_PORT=${{ secrets.FASTAPI_URL_PORT }}" > .env
+          echo "OTP_EMAIL=${{ secrets.OTP_EMAIL }}" > .env
+          echo "OTP_EMAIL_PASSWORD=${{ secrets.OTP_EMAIL_PASSWORD }}" > .env
+          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" > .env
+          echo "ALGORITHM=${{ secrets.ALGORITHM }}" > .env
+          echo "ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}" > .env
+          scp -i ${{ secrets.EC2_BE_PRIVATE_KEY }} .env ec2-user@${{ secrets.EC2_BE_PUBLIC_IP }}:~/backend
+
+      - name: SSH into EC2 and Deploy FE
+        run: |
+          ssh -i ${{ secrets.EC2_FE_PRIVATE_KEY }} ec2-user@${{ secrets.EC2_FE_PUBLIC_IP }} "cd ~/frontend && pnpm run dev"
+
+      - name: SSH into EC2 and Deploy BE
+        run: |
+          ssh -i ${{ secrets.EC2_BE_PRIVATE_KEY }} ec2-user@${{ secrets.EC2_BE_PUBLIC_IP }} "cd ~/backend && python3 run.py"
