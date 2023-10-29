@@ -42,7 +42,7 @@ jobs:
           echo "ALGORITHM=${{ secrets.ALGORITHM }}" > .env
           echo "ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}" > .env
           scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapi-private-key.pem .env ubuntu@${{ secrets.EC2_BE_PUBLIC_IP }}:~/backend
-          
+
       - name: SSH into EC2 and Deploy FE
         run: |
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapp-private-key.pem ubuntu@${{ secrets.EC2_FE_PUBLIC_IP }} "cd ~/frontend && pnpm run dev"
