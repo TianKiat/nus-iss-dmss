@@ -324,7 +324,7 @@ export default function ComplaintDashboard(){
           {numOfComplaint > 0?
             filteredList.length == 0?
               <div>No result meets the criteria</div>
-              :<Button onClick={()=>(setFilteredList([]))}>Clear Result</Button>
+              :<Button colorScheme='teal' variant={'solid'} onClick={()=>(setFilteredList([]))}>Clear Result</Button>
             :<div>No Complaints</div>
           }
 
@@ -361,7 +361,7 @@ export default function ComplaintDashboard(){
               </CardBody>
               <CardFooter>
               <Link to = {"../complaint"} state={{complaintID:complaintData.complaintID}}>
-                <Button width={'sm'}>View Complaint</Button>
+                <Button colorScheme='teal' variant={'solid'} width={'sm'}>View Complaint</Button>
                 </Link>
               {/* <Button onClick={handleClickMe(complaintData.complaintID)}>click me</Button> */}
               </CardFooter>
