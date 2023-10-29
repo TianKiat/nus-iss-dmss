@@ -12,8 +12,6 @@ import {
   Heading,
   Text,
   useColorModeValue,
-  Radio,
-  RadioGroup
 } from '@chakra-ui/react'
 
 export default function LoginVendor() {
