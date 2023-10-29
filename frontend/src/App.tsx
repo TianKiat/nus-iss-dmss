@@ -77,7 +77,7 @@ function App() {
             <Route path="*" element={<Error />} />
             <Route path="create_complaint" element={<CreateComplaint/>}/>
             <Route path="complaint_dashboard" element={<ComplaintDashboard/>}/>
-            <Route path="complaint" element={<Complaint complaintID={0}/>}/>
+            <Route path="complaint" element={<Complaint/>}/>
           </Route>
         </Routes>
       </BrowserRouter>
