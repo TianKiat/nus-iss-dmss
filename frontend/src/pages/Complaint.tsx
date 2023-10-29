@@ -79,7 +79,7 @@ export default function Complaint(){
                 body: JSON.stringify({complaintID: complaintID, status:"done"}),
             });
             if (response.status == 200){
-                const complaint = await response.json();
+                await response.json();
                 //setComplaintList(complaint);
                 setStatus({isSuccessful: true})
                 
