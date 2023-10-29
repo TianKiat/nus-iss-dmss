@@ -33,6 +33,9 @@ jobs:
           echo "FASTAPI_URL_PORT=${{ secrets.FASTAPI_URL_PORT }}" > .env
           echo "OTP_EMAIL=${{ secrets.OTP_EMAIL }}" > .env
           echo "OTP_EMAIL_PASSWORD=${{ secrets.OTP_EMAIL_PASSWORD }}" > .env
+          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" > .env
+          echo "ALGORITHM=${{ secrets.ALGORITHM }}" > .env
+          echo "ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}" > .env
           scp -i ${{ secrets.EC2_BE_PRIVATE_KEY }} .env ec2-user@${{ secrets.EC2_BE_PUBLIC_IP }}:~/backend
 
       - name: SSH into EC2 and Deploy FE
