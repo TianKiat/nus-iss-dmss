@@ -17,17 +17,17 @@ import { useEffect, useState } from 'react';
 import {Link, useLocation} from 'react-router-dom';
 
 
-interface IComplaintData{
-    complaintID: string,
-    title: string,
-    description: string,
-    comment: string,
-    userID: number,
-    roleID: number,
-    status: string,
-    createdtime: datetime,
+// interface IComplaintData{
+//     complaintID: string,
+//     title: string,
+//     description: string,
+//     comment: string,
+//     userID: number,
+//     roleID: number,
+//     status: string,
+//     createdtime: datetime,
 
-}
+// }
 
 // interface ComplaintProps {
 //     complaintID: number
@@ -80,7 +80,7 @@ export default function Complaint(){
             });
             if (response.status == 200){
                 const complaint = await response.json();
-                setComplaintList(complaint);
+                //setComplaintList(complaint);
                 setStatus({isSuccessful: true})
                 
                 
