@@ -26,11 +26,6 @@ jobs:
         run: |
           scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapi-private-key.pem -r ./backend ubuntu@${{ secrets.EC2_BE_PUBLIC_IP }}:~/
 
-      - name: Copy GitHub Secrets env variables to EC2 for FE
-        run: |
-          echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" > .env
-          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapp-private-key.pem .env ubuntu@${{ secrets.EC2_FE_PUBLIC_IP }}:~/frontend
-
       - name: Copy GitHub Secrets env variables to EC2 for BE
         run: |
           echo "DB_CONNECTION_STRING=${{ secrets.DB_CONNECTION_STRING }}" > .env
@@ -43,10 +38,16 @@ jobs:
           echo "ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}" > .env
           scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapi-private-key.pem .env ubuntu@${{ secrets.EC2_BE_PUBLIC_IP }}:~/backend
 
-      - name: SSH into EC2 and Deploy FE
+      - name: Copy GitHub Secrets env variables to EC2 for FE
         run: |
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapp-private-key.pem ubuntu@${{ secrets.EC2_FE_PUBLIC_IP }} "cd ~/frontend && pnpm run dev"
+          echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" > .env
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapp-private-key.pem .env ubuntu@${{ secrets.EC2_FE_PUBLIC_IP }}:~/frontend
 
       - name: SSH into EC2 and Deploy BE
         run: |
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapi-private-key.pem ubuntu@${{ secrets.EC2_BE_PUBLIC_IP }} "cd ~/backend && python3 run.py"
+
+      - name: SSH into EC2 and Deploy FE
+        run: |
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapp-private-key.pem ubuntu@${{ secrets.EC2_FE_PUBLIC_IP }} "cd ~/frontend && pnpm run build && pnpm run preview"
+
