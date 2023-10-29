@@ -51,7 +51,6 @@ import {
   NotAllowedIcon,
   DeleteIcon,
   ViewIcon,
-  CheckIcon,
 } from "@chakra-ui/icons";
 import { FunctionComponent, useState, useEffect } from "react";
 import OrderStatusBadge from "../components/OrderStatusBadge";
@@ -67,8 +66,8 @@ const DataCard = ({
   data: Number;
   subtitle: string;
 }) => {
-  const iconFactory = (iconType: string) => {
-    switch (icon) {
+  const iconFactory = (iconType:string) => {
+    switch (iconType) {
       case "orders":
         return <CalendarIcon boxSize={"2rem"}></CalendarIcon>;
       case "cancelled":
@@ -440,7 +439,6 @@ function PromotionTab(props: TabProps) {
     props.userID
   }`;
   const createUrl = `${import.meta.env.VITE_API_BASE_URL}/promotion/create`;
-  const deleteUrl = `${import.meta.env.VITE_API_BASE_URL}/promotion/delete`;
   const [promotions, setPromotions] = useState<Promotion[]>([]);
 
   useEffect(() => {
