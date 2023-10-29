@@ -123,10 +123,9 @@ export default function ComplaintDashboard(){
     },[complaintList]);
 
     const getTodayDate = ()=>{
-      let today = new Date().toLocaleDateString().replace('/','-')
-      const dateArray = today.split('-');
+      let today = new Date().toLocaleDateString();
+      const dateArray = today.split('/');
       let newDate = dateArray[2]+'-'+dateArray[0]+'-'+dateArray[1];
-      //console.log(newDate);
       setTodayDate(newDate);
       
 
