@@ -4,9 +4,6 @@ from app.models.vendor_profile import VendorProfile
 from app.models.menu_item import MenuItem
 import mysql.connector
 import logging
-from app.common.constants import DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE
-
-sqldb = mysql.connector.connect(host = DB_HOST, user = DB_USERNAME, password = DB_PASSWORD, database = DB_DATABASE)
 
 logging.basicConfig(
     level=logging.DEBUG,  # Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
@@ -47,6 +44,12 @@ class MenuItemGateway():
     def get_menu_item(self, db: Session, menuItemID: int):
         try:
             return db.query(MenuItem).filter(MenuItem.menuItemID == menuItemID).first()
+        except Exception as e:
+            print(f"Error: {e}")
+
+    def get_valid_menu_item_for_vendor(self, db: Session, vendorProfileId: int):
+        try:
+            return db.query(MenuItem).filter(MenuItem.vendorProfileID == vendorProfileId, MenuItem.isValid).all()
         except Exception as e:
             print(f"Error: {e}")
     

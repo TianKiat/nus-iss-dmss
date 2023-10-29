@@ -1,0 +1,17 @@
+# Use the official Python 3.8 image as the base
+FROM python:3.8
+
+# Set the working directory inside the container
+WORKDIR /backend
+
+# Copy the FastAPI application code into the container
+COPY . /backend
+
+# Install dependencies
+RUN pip install -r requirements.txt
+
+# Expose port 8000 (optional, for documentation purposes)
+EXPOSE 8000
+
+# Define the command to run the FastAPI application using Uvicorn
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

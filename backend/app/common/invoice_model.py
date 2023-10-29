@@ -1,3 +1,4 @@
+from typing import List
 from pydantic import BaseModel
 
 class InvoiceID(BaseModel):
@@ -10,9 +11,13 @@ class IsFavorite(BaseModel):
 class InvoiceStatus(BaseModel):
     invoiceID: int
     status: str
+    discount: float = 0
+
+class DraftInvoiceMenuItem(BaseModel):
+    menuItemID: int
+    quantity: int
 
 class DraftInvoice(BaseModel):
     userID: int
     vendorProfileID: int
-    menuItemID: int
-    quantity: int
+    menuItems: List[DraftInvoiceMenuItem]
