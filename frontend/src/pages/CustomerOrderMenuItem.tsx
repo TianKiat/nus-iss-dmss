@@ -1,13 +1,23 @@
 import { Box, Button, Container, Flex, Heading, Icon, Image, Text } from "@chakra-ui/react"
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { MdAdd, MdClose, MdEmail, MdPhone, MdRemove, MdStore } from "react-icons/md"
+
+interface iMenuItem {
+    menuItemID: number,
+    menuItemName: string,
+    price: number,
+    menuItemImage: string,
+    menuItemDesc: string,
+    isValid: boolean,
+    vendorProfileID: number
+}
 
 interface MenuItemPopupProps {
     userID: number,
-    menuItem: any,
-    setMenuItemPopupFunction: Function,
-    setUpdateMenuItemsTriggerFunction: Function,
-    setPopupMessageFunction: Function
+    menuItem: iMenuItem,
+    setMenuItemPopupFunction: (any: any) => void,
+    setUpdateMenuItemsTriggerFunction: (any: any) => void,
+    setPopupMessageFunction: (message: string | null) => void
 }
 
 const MenuItemPopup = (props: MenuItemPopupProps) => {
@@ -149,16 +159,25 @@ const MenuItemPopup = (props: MenuItemPopupProps) => {
     )
 }
 
+interface iOrder {
+    orderID: number,
+    menuItemID: number,
+    foodName: string,
+    quantity: number,
+    price: number,
+    invoiceID: number
+}
+
 interface MenuItemCardProps {
     userID: number,
-    menuItem: any,
-    order: any,
-    setUpdateMenuItemsTriggerFunction: Function,
-    setPopupMessageFunction: Function
+    menuItem: iMenuItem,
+    order: iOrder,
+    setUpdateMenuItemsTriggerFunction: (any: any) => void,
+    setPopupMessageFunction: (messsage: string | null) => void
 }
 
 const MenuItemCard = (props: MenuItemCardProps) => {
-    const [menuItemPopup, setMenuItemPopup]: any = useState();
+    const [menuItemPopup, setMenuItemPopup] = useState<ReactElement>();
 
     const menuItemPopupTag = (
         <MenuItemPopup
@@ -265,16 +284,27 @@ const MenuItemCard = (props: MenuItemCardProps) => {
     )
 }
 
+interface iVendor {
+    vendorProfileID: number,
+    profileName: string,
+    address: string,
+    email: string,
+    phone: string,
+    status: boolean,
+    userID: number,
+    shopDesc: string
+}
+
 interface CustomerOrderMenuItemProps {
     userID: number,
-    vendor: any
+    vendor: iVendor
 }
 
 export default function(props: CustomerOrderMenuItemProps) {
     const [menuItems, setMenuItems] = useState([]);
     const [promotions, setPromotions] = useState([]);
     const [updateMenuItemsTrigger, setUpdateMenuItemsTrigger] = useState();
-    const [popupMessage, setPopupMessage]: any = useState();
+    const [popupMessage, setPopupMessage] = useState<string | null>();
 
     useEffect(() => {
         const fetchAccess = async() => {
