@@ -304,3 +304,19 @@ class TestCustomerController(unittest.TestCase):
         expected_result = None
         result = CustomerController.get_promotion_verify(self.session, vendorProfileID, promoCode)
         self.assertEqual(expected_result, result)
+
+    def test_get_promotion(self):
+        # test with existing vendor profile ID 
+        vendorProfileID = 1
+        expected_result = self.session.query(promotion.Promotion).filter(
+            promotion.Promotion.vendorProfileID == vendorProfileID,
+            promotion.Promotion.isValid
+        ).all()
+        result = CustomerController.get_promotion(self.session, vendorProfileID)
+        self.assertEqual(expected_result, result)
+
+        # test with non-existing vendor profile ID
+        vendorProfileID = 0
+        expected_result = []
+        result = CustomerController.get_promotion(self.session, vendorProfileID)
+        self.assertEqual(expected_result, result)

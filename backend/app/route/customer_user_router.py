@@ -77,3 +77,10 @@ def get_promotion_verify(vendorProfileID: int, promoCode: str, db: Session = Dep
         return CustomerController.get_promotion_verify(db, vendorProfileID, promoCode)
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex
+    
+@router.get("/promotion/get/{vendorProfileID}", description="Retrieve all valid promotions")
+def get_promotion(vendorProfileID: int, db: Session = Depends(get_db)):
+    try:
+        return CustomerController.get_promotion(db, vendorProfileID)
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail=str(ex)) from ex

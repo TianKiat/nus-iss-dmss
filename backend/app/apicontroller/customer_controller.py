@@ -144,3 +144,6 @@ class CustomerController:
     
     def get_promotion_verify(db, vendorProfileID, promoCode):
         return PromotionService.get_promotion_verify(db, vendorProfileID, promoCode)
+    
+    def get_promotion(db, vendorProfileID):
+        return PromotionService.get_promotions_for_vendor(db, vendorProfileID)
