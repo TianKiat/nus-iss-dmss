@@ -12,11 +12,18 @@ interface iMenuItem {
     vendorProfileID: number
 }
 
+interface iMenuItemResponse {
+    invoiceID: number | null,
+    orderID: number | null,
+    orderIDs: number[] | null,
+    response: string | null
+}
+
 interface MenuItemPopupProps {
     userID: number,
     menuItem: iMenuItem,
-    setMenuItemPopupFunction: (any: any) => void,
-    setUpdateMenuItemsTriggerFunction: (any: any) => void,
+    setMenuItemPopupFunction: (popup: ReactElement | null) => void,
+    setUpdateMenuItemsTriggerFunction: (response: iMenuItemResponse | null) => void,
     setPopupMessageFunction: (message: string | null) => void
 }
 
@@ -172,12 +179,12 @@ interface MenuItemCardProps {
     userID: number,
     menuItem: iMenuItem,
     order: iOrder,
-    setUpdateMenuItemsTriggerFunction: (any: any) => void,
+    setUpdateMenuItemsTriggerFunction: (response: iMenuItemResponse | null) => void,
     setPopupMessageFunction: (messsage: string | null) => void
 }
 
 const MenuItemCard = (props: MenuItemCardProps) => {
-    const [menuItemPopup, setMenuItemPopup] = useState<ReactElement>();
+    const [menuItemPopup, setMenuItemPopup] = useState<ReactElement | null>();
 
     const menuItemPopupTag = (
         <MenuItemPopup
@@ -303,7 +310,7 @@ interface CustomerOrderMenuItemProps {
 export default function(props: CustomerOrderMenuItemProps) {
     const [menuItems, setMenuItems] = useState([]);
     const [promotions, setPromotions] = useState([]);
-    const [updateMenuItemsTrigger, setUpdateMenuItemsTrigger] = useState();
+    const [updateMenuItemsTrigger, setUpdateMenuItemsTrigger] = useState<iMenuItemResponse | null>();
     const [popupMessage, setPopupMessage] = useState<string | null>();
 
     useEffect(() => {
