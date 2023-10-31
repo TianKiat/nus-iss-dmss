@@ -1,13 +1,30 @@
 import { Box, Button, Container, Flex, Heading, Icon, Image, Text } from "@chakra-ui/react"
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { MdAdd, MdClose, MdEmail, MdPhone, MdRemove, MdStore } from "react-icons/md"
+
+interface iMenuItem {
+    menuItemID: number,
+    menuItemName: string,
+    price: number,
+    menuItemImage: string,
+    menuItemDesc: string,
+    isValid: boolean,
+    vendorProfileID: number
+}
+
+interface iMenuItemResponse {
+    invoiceID: number | null,
+    orderID: number | null,
+    orderIDs: number[] | null,
+    response: string | null
+}
 
 interface MenuItemPopupProps {
     userID: number,
-    menuItem: any,
-    setMenuItemPopupFunction: Function,
-    setUpdateMenuItemsTriggerFunction: Function,
-    setPopupMessageFunction: Function
+    menuItem: iMenuItem,
+    setMenuItemPopupFunction: (popup: ReactElement | null) => void,
+    setUpdateMenuItemsTriggerFunction: (response: iMenuItemResponse | null) => void,
+    setPopupMessageFunction: (message: string | null) => void
 }
 
 const MenuItemPopup = (props: MenuItemPopupProps) => {
@@ -149,16 +166,25 @@ const MenuItemPopup = (props: MenuItemPopupProps) => {
     )
 }
 
+interface iOrder {
+    orderID: number,
+    menuItemID: number,
+    foodName: string,
+    quantity: number,
+    price: number,
+    invoiceID: number
+}
+
 interface MenuItemCardProps {
     userID: number,
-    menuItem: any,
-    order: any,
-    setUpdateMenuItemsTriggerFunction: Function,
-    setPopupMessageFunction: Function
+    menuItem: iMenuItem,
+    order: iOrder,
+    setUpdateMenuItemsTriggerFunction: (response: iMenuItemResponse | null) => void,
+    setPopupMessageFunction: (messsage: string | null) => void
 }
 
 const MenuItemCard = (props: MenuItemCardProps) => {
-    const [menuItemPopup, setMenuItemPopup]: any = useState();
+    const [menuItemPopup, setMenuItemPopup] = useState<ReactElement | null>();
 
     const menuItemPopupTag = (
         <MenuItemPopup
@@ -265,19 +291,31 @@ const MenuItemCard = (props: MenuItemCardProps) => {
     )
 }
 
+interface iVendor {
+    vendorProfileID: number,
+    profileName: string,
+    address: string,
+    email: string,
+    phone: string,
+    status: boolean,
+    userID: number,
+    shopDesc: string
+}
+
 interface CustomerOrderMenuItemProps {
     userID: number,
-    vendor: any
+    vendor: iVendor
 }
 
 export default function(props: CustomerOrderMenuItemProps) {
     const [menuItems, setMenuItems] = useState([]);
-    const [updateMenuItemsTrigger, setUpdateMenuItemsTrigger] = useState();
-    const [popupMessage, setPopupMessage]: any = useState();
+    const [promotions, setPromotions] = useState([]);
+    const [updateMenuItemsTrigger, setUpdateMenuItemsTrigger] = useState<iMenuItemResponse | null>();
+    const [popupMessage, setPopupMessage] = useState<string | null>();
 
     useEffect(() => {
         const fetchAccess = async() => {
-            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/menu_items/get_valid`, {
+            const menuItemsResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/menu_items/get_valid`, {
                 method: "POST",
                 body: JSON.stringify({
                     userID: props.userID,
@@ -288,8 +326,12 @@ export default function(props: CustomerOrderMenuItemProps) {
                     'Content-Type': 'application/json'
                 }
             });
-            const result = await response.json();
-            setMenuItems(result)
+            const menuItemsResult = await menuItemsResponse.json();
+            setMenuItems(menuItemsResult);
+
+            const promotionResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/promotion/get/${props.vendor["vendorProfileID"]}`);
+            const promotionResult = await promotionResponse.json();
+            setPromotions(promotionResult);
         }
 
         fetchAccess();
@@ -303,29 +345,49 @@ export default function(props: CustomerOrderMenuItemProps) {
             <Text mb="1rem">
                 {props.vendor["shopDesc"]}
             </Text>
-            <Flex color="gray.500">
-                <Box w="50px" display="inline-block">
-                    <Icon as={MdStore} fontSize="1.5rem"/>
+            <Flex flexDirection={{base: "column", sm: "row"}} gap={{base: "1.5rem" , md: "0.5rem"}}>
+                <Box
+                    w={{base: "full", sm: "250px", md: "300px"}}>
+                    <Flex color="gray.500">
+                        <Box w="50px" display="inline-block">
+                            <Icon as={MdStore} fontSize="1.5rem"/>
+                        </Box>
+                        <Text>
+                            {props.vendor["address"]}
+                        </Text>
+                    </Flex>
+                    <Flex color="gray.500">
+                        <Box w="50px" display="inline-block">
+                            <Icon as={MdPhone} fontSize="1.5rem"/>
+                        </Box>
+                        <Text>
+                            {props.vendor["phone"]}
+                        </Text>
+                    </Flex>
+                    <Flex color="gray.500">
+                        <Box w="50px" display="inline-block">
+                            <Icon as={MdEmail} fontSize="1.5rem"/>
+                        </Box>
+                        <Text>
+                            {props.vendor["email"]}
+                        </Text>
+                    </Flex>
                 </Box>
-                <Text>
-                    {props.vendor["address"]}
-                </Text>
-            </Flex>
-            <Flex color="gray.500">
-                <Box w="50px" display="inline-block">
-                    <Icon as={MdPhone} fontSize="1.5rem"/>
+                <Box w={{base: "full", sm: "calc(100% - 250px)", md: "calc(100% - 300px)"}}>
+                    <Heading fontSize="sm" color="green.500" mb="0.5rem">Promotions</Heading>
+                    <Flex w="full" overflowX="auto" gap="0.5rem" pb="0.5rem">
+                        {promotions.length > 0 ?
+                            promotions.map((item) => (
+                                <Box minW="fit-content" w="fit-content" bgColor="green.50" borderWidth="1px" borderColor="green.200" borderRadius="5px" p="5px 10px">
+                                    <Heading fontSize="sm">{String(item["promoCode"]).toUpperCase()}</Heading>
+                                    <Text fontSize="2xs">Discounts: {item["discountType"] == "ONEFORONE" ? "1-FOR-1" : String(Number(item["discount"]).toFixed(2)).concat("%")}</Text>
+                                    <Text fontSize="2xs">Minimum Spending: ${Number(item["minimumSpending"]).toFixed(2)}</Text>
+                                </Box>
+                            ))
+                            : <Text fontSize="sm" color="gray.500">No available promotions</Text>
+                        }
+                    </Flex>
                 </Box>
-                <Text>
-                    {props.vendor["phone"]}
-                </Text>
-            </Flex>
-            <Flex color="gray.500">
-                <Box w="50px" display="inline-block">
-                    <Icon as={MdEmail} fontSize="1.5rem"/>
-                </Box>
-                <Text>
-                    {props.vendor["email"]}
-                </Text>
             </Flex>
             <br/>
             <Flex gap="1rem" flexWrap="wrap">
