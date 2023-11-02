@@ -38,7 +38,7 @@ class InvoiceGateway():
             return db.query(Invoice).filter(
                 Invoice.customerProfileID == customerProfileID,
                 Invoice.status.in_(orderStatus)
-            ).all()
+            ).order_by(Invoice.date.desc()).all()
         except Exception as e:
             print(f"Error: {e}")
 
