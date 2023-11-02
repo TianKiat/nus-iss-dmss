@@ -13,3 +13,12 @@ class AccessControlContoller:
         for acl in accessControl:
             access.append(AccessService.get_access(db, acl.accessID))
         return access
+    
+    def get_full_access_list(db):
+        return AccessService.get_full_access_list(db)
+    
+    def get_access_control_by_role(db, roleID):
+        return AccessControlService.get_access_control_list(db, roleID)
+    
+    def update_access_list(db, roleID, access_list):
+        return AccessControlService.update_access_list(db, roleID, access_list)

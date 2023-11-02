@@ -17,7 +17,7 @@ class AccessControlGateway():
             access_list = []
             if result:
                 for item in result:
-                    access_list.append(item.accessControlID)
+                    access_list.append(item.accessID)
             return access_list
         
         except Exception as e:

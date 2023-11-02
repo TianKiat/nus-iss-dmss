@@ -12,6 +12,7 @@ import CustomerOrder from "./pages/CustomerOrder" ;
 import CustomerBasket from "./pages/CustomerBasket";
 import CreateComplaint from "./pages/CreateComplaint";
 import ComplaintDashboard from "./pages/ComplaintDashboard";
+import AccessControl from "./pages/AccessControl";
 import Complaint from "./pages/Complaint";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
@@ -78,6 +79,7 @@ function App() {
             <Route path="create_complaint" element={<CreateComplaint/>}/>
             <Route path="complaint_dashboard" element={<ComplaintDashboard/>}/>
             <Route path="complaint" element={<Complaint/>}/>
+            <Route path="access_control" element={<AccessControl cookies={cookies}/>}/>
           </Route>
         </Routes>
       </BrowserRouter>

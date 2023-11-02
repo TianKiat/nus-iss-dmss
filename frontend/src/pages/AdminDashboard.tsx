@@ -146,7 +146,7 @@ export default function AdminDashboard() {
 
             <Container maxW="3xl" padding={'2'}>
                 <Heading paddingBlock={"1.5rem"}>Manage Access Control</Heading>
-                <Link to = {"./complaint_dashboard"}>
+                <Link to = {"./access_control"}>
                     <Button colorScheme='teal' variant={'solid'}>Access Control</Button>
                 </Link>
             </Container>

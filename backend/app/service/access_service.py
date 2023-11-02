@@ -6,3 +6,6 @@ class AccessService():
 
     def get_access(db, accessID):
         return AccessGateway.get_access(db, accessID)
+    
+    def get_full_access_list(db):
+        return AccessGateway.get_full_access_list(db)
