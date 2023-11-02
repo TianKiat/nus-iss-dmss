@@ -58,13 +58,13 @@ def setup_access_control_table(session):
 
 def setup_user_table(session):
     values = [
-        {'username': 'moses', 'userPassword': '123', 'roleID': 1},
-        {'username': 'amy', 'userPassword': '123', 'roleID': 2},
-        {'username': 'joe', 'userPassword': '123', 'roleID': 3},
-        {'username': 'bob', 'userPassword': '$2b$12$GtUEo1bfqtP11Osbq8iRSOiv5vqNmVFc0eCsdYRDuUGect2HISix6', 'roleID': 3},
-        {'username': 'alan', 'userPassword': '$2b$12$lZlqdlnbKF2sUSS7S0AwQe6Sf7V.td7fYJmik4PTzaMjWhCEDWUzS', 'roleID': 2},
-        {'username': 'ken', 'userPassword': '$2b$12$BcMr6jrz2wH2rbFRXAKFoe4FkkjcsVxoiVHHpU98F.Dt.a1IGhDjG', 'roleID': 1},
-        {'username': 'tim', 'userPassword': '$2b$12$BydwhkBUqC9z36JPOjzJdu/x/1tgpR111NfI4fxMkrgvnXYhHirn6', 'roleID': 3},
+        {'username': 'moses', 'userPassword': '123', 'roleID': 1, 'isDisabled': 0},
+        {'username': 'amy', 'userPassword': '123', 'roleID': 2, 'isDisabled': 0},
+        {'username': 'joe', 'userPassword': '123', 'roleID': 3, 'isDisabled': 0},
+        {'username': 'bob', 'userPassword': '$2b$12$GtUEo1bfqtP11Osbq8iRSOiv5vqNmVFc0eCsdYRDuUGect2HISix6', 'roleID': 3, 'isDisabled': 0},
+        {'username': 'alan', 'userPassword': '$2b$12$lZlqdlnbKF2sUSS7S0AwQe6Sf7V.td7fYJmik4PTzaMjWhCEDWUzS', 'roleID': 2, 'isDisabled': 0},
+        {'username': 'ken', 'userPassword': '$2b$12$BcMr6jrz2wH2rbFRXAKFoe4FkkjcsVxoiVHHpU98F.Dt.a1IGhDjG', 'roleID': 1, 'isDisabled': 0},
+        {'username': 'tim', 'userPassword': '$2b$12$BydwhkBUqC9z36JPOjzJdu/x/1tgpR111NfI4fxMkrgvnXYhHirn6', 'roleID': 3, 'isDisabled': 0},
         
     ]
     add_multiple_row_to_table(session, user.User, values)

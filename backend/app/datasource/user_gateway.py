@@ -52,7 +52,8 @@ class UserGateway():
             user_data = {
                 'username': customer.username,
                 'userPassword': customer.password,
-                'roleID': customer.role
+                'roleID': customer.role,
+                'isDisabled': 0
             }
             user_table = user.User(**user_data)
             db.add(user_table)
@@ -83,7 +84,8 @@ class UserGateway():
             user_data = {
                 'username': vendor.username,
                 'userPassword': vendor.password,
-                'roleID': vendor.role
+                'roleID': vendor.role,
+                'isDisabled': 0
             }
             user_table = user.User(**user_data)
             db.add(user_table)
