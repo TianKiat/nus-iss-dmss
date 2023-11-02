@@ -73,7 +73,7 @@ class UserService():
     def login_user(self, db, user: Login):
         auth_user = UserGateway().auth(db, user)
         if (auth_user):
-            access_control_list = AccessControlService.get_access_control_list(db,auth_user['roleID'])
+            access_control_list = AccessControlService().get_access_control_list(db,auth_user['roleID'])
             auth_user["access"] = access_control_list
 
         return auth_user
