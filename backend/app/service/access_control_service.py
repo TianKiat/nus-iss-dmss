@@ -4,13 +4,13 @@ class AccessControlService():
     def __init__(self):
         pass
     
-    def get_access_control(db, roleID):
+    def get_access_control(self, db, roleID):
         return AccessControlGateway.get_access_control(db, roleID)
     
-    def get_access_control_list(db, roleID):
+    def get_access_control_list(self, db, roleID):
         return AccessControlGateway.get_access_control_list(db, roleID)
     
-    def update_access_list(db, roleID, access_list):
+    def update_access_list(self, db, roleID, access_list):
         original_list = AccessControlGateway.get_access_control_list(db,roleID)
         add_list = []
         remove_list = []
