@@ -20,7 +20,7 @@ def get_db():
 )
 def get_access_list(db: Session = Depends(get_db)):
     try:
-        return AccessControlContoller.get_full_access_list(db)
+        return AccessControlContoller().get_full_access_list(db)
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex
     
@@ -30,7 +30,7 @@ def get_access_list(db: Session = Depends(get_db)):
 )
 def get_access_list(inputID: AccessRole, db: Session = Depends(get_db)):
     try:
-        return AccessControlContoller.get_access_control_by_role(db, inputID.roleID)
+        return AccessControlContoller().get_access_control_by_role(db, inputID.roleID)
     except Exception as ex:
         raise HTTPException(status_code=500, detail=str(ex)) from ex
     
@@ -39,4 +39,4 @@ def get_access_list(inputID: AccessRole, db: Session = Depends(get_db)):
         description="update specific role access list",
 )    
 def update_access_List(AccessUpdate: AccessUpdate, db: Session = Depends(get_db)):
-        return AccessControlContoller.update_access_list(db, AccessUpdate.roleID, AccessUpdate.access_list)
+        return AccessControlContoller().update_access_list(db, AccessUpdate.roleID, AccessUpdate.access_list)

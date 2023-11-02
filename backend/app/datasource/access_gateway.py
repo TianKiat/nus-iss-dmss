@@ -2,16 +2,16 @@ from sqlalchemy.orm import Session
 from app.models.access import Access
 
 class AccessGateway():
-    def __init__():
+    def __init__(self):
         pass
 
-    def get_access(db: Session, accessID: int):
+    def get_access(self,db: Session, accessID: int):
         try:
             return db.query(Access).filter(Access.accessID == accessID).first()
         except Exception as e:
             print(f"Error: {e}")
 
-    def get_full_access_list(db:Session):
+    def get_full_access_list(self, db:Session):
         try:
             
             access_dict = {}
