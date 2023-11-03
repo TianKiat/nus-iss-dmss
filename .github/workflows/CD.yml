@@ -28,6 +28,7 @@ jobs:
 
       - name: Copy GitHub Secrets env variables to EC2 for FE
         run: |
+          echo "VITE_APP_NAME=${{ secrets.VITE_APP_NAME }}" > .env
           echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" > .env
           scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapp-private-key.pem .env ubuntu@${{ secrets.EC2_FE_PUBLIC_IP }}:~/frontend
 
@@ -46,6 +47,8 @@ jobs:
       - name: SSH into EC2 and Deploy FE
         run: |
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapp-private-key.pem ubuntu@${{ secrets.EC2_FE_PUBLIC_IP }} "cd ~/frontend && pnpm run build"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapp-private-key.pem ubuntu@${{ secrets.EC2_FE_PUBLIC_IP }} "sudo cp -r frontend/dist/* /var/www/dmss_domain.com/html"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapp-private-key.pem ubuntu@${{ secrets.EC2_FE_PUBLIC_IP }} "sudo systemctl reload nginx"
 
       - name: SSH into EC2 and Deploy BE
         run: |
