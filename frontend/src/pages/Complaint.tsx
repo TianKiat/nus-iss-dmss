@@ -1,44 +1,44 @@
 'use client'
 
 import {
+    Alert,
+  AlertIcon,
   Box,
   Button,
   Card,
   CardBody,
   CardHeader,
   Container,
-  Divider,
-  Flex,
   Heading,
   Stack,
-  StackDivider,
   Text,
-  useColorModeValue
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
-import {useLocation} from 'react-router-dom';
+import {Link, useLocation} from 'react-router-dom';
 
 
-interface IComplaintData{
-    complaintID: string,
-    title: string,
-    description: string,
-    comment: string,
-    userID: number,
-    roleID: number,
-    status: string,
-    createdtime: datetime,
+// interface IComplaintData{
+//     complaintID: string,
+//     title: string,
+//     description: string,
+//     comment: string,
+//     userID: number,
+//     roleID: number,
+//     status: string,
+//     createdtime: datetime,
 
-}
+// }
 
-interface ComplaintProps {
-    complaintID: number
-}
+// interface ComplaintProps {
+//     complaintID: number
+// }
 
-export default function Complaint(props : ComplaintProps){
-    const [complaintData, setComplaintData] = useState<IComplaintData>();
-    const [complaintList, setComplaintList] = useState([]);
-    const [status, setStatus] = useState({isSuccessful: false})
+export default function Complaint(){
+    //const [complaintData, setComplaintData] = useState<IComplaintData>();
+    const [complaintList, setComplaintList] = useState<any[]>([]);
+    const [showComplaint, setShowComplaint] = useState<any[]>([]);
+    const [status, setStatus] = useState({isSuccessful: false});
+    const [isClicked, setIsClicked] = useState(false);
     const location = useLocation();
     const complaintID = location != null?location.state.complaintID:0
     useEffect(()=>{
@@ -53,8 +53,9 @@ export default function Complaint(props : ComplaintProps){
             });
             if (response.status == 200){
                 const complaint = await response.json();
-                console.log(complaint);
+                //console.log(complaint);
                 setComplaintList(complaint);
+                
                 
                 
             }else{
@@ -68,7 +69,7 @@ export default function Complaint(props : ComplaintProps){
         fetchComplaintList();
       },[]);
 
-      const handleUpdateStatus = async (complaintID: int)=>{
+      const handleUpdateStatus = async (complaintID: number)=>{
         console.log("click until me");
         console.log(complaintID);
         try{
@@ -80,8 +81,10 @@ export default function Complaint(props : ComplaintProps){
                 body: JSON.stringify({complaintID: complaintID, status:"done"}),
             });
             if (response.status == 200){
-                const complaint = await response.json();
+                await response.json();
+                //setComplaintList(complaint);
                 setStatus({isSuccessful: true})
+                setIsClicked(true);
                 
                 
             }else{
@@ -93,48 +96,122 @@ export default function Complaint(props : ComplaintProps){
           } 
       }
 
+      useEffect(()=>{
+        setShowComplaint(complaintList);
+      },[complaintList])
+
     return(
         <>
             <Container>
                 <Heading paddingBlock={"1.5rem"}>Complaint</Heading>
-                <Card key = {complaintList.complaintID} id = {complaintList.complaintID} borderStyle={'outset'} marginBottom={2} marginTop={2} borderRadius={'lg'}>
+                <Link to = {"../complaint_dashboard"}>
+                    <Button colorScheme='teal' variant={'solid'}>Back to Complaint Dashboard</Button>
+                </Link>
+                <div></div>
+                {isClicked?
+                <div></div>
+                :showComplaint.map((complaintData) => {return(
+                    <Card key = {complaintData.complaintID} id = {complaintData.complaintID} borderStyle={'outset'} marginBottom={2} marginTop={2} borderRadius={'lg'}>
+                    <CardHeader>
+                        <Heading textTransform={'uppercase'}>{complaintData.title}</Heading>
+                    </CardHeader>
+                    <CardBody>
+                        <Stack>
+                        <Box>
+                            <Heading size={'md'} >Description/Category: {complaintData.description}</Heading>
+                            <Stack direction={'row'}>
+                            <Text fontWeight={'bold'}>Comment: </Text>
+                            <Text fontWeight={'bold'}>{complaintData.comment}</Text>
+                            </Stack>
+                            <Stack direction={'row'}>
+                            <Text fontWeight={'bold'}>Status: </Text>
+                            <Text fontWeight={'bold'}>{complaintData.status}</Text>
+                            </Stack>
+                            <Stack direction={'row'}>
+    
+                                <Text fontWeight={'bold'}>User:</Text>
+                                <Text fontWeight={'bold'}>{complaintData.profileName}</Text>
+    
+                            </Stack>
+                            <Stack direction={'row'}>
+    
+                                <Text fontWeight={'bold'}>Created Time:</Text>
+                                <Text fontWeight={'bold'}>{complaintData.createdtime}</Text>
+    
+                            </Stack>
+                        </Box>
+                        </Stack>
+                    </CardBody>
+                    {complaintData.status == 'done'?
+                    <Button colorScheme='teal' variant={'outline'}>Already Completed</Button>
+                    :<Button colorScheme='teal' variant={'solid'} onClick={()=>handleUpdateStatus(complaintData.complaintID)}>Resolve</Button>
+                    }
+                    </Card>
+                    )})
+                }
+                {/* {showComplaint.map((complaintData) => {return(
+                <Card key = {complaintData.complaintID} id = {complaintData.complaintID} borderStyle={'outset'} marginBottom={2} marginTop={2} borderRadius={'lg'}>
                 <CardHeader>
-                    <Heading textTransform={'uppercase'}>{complaintList.title}</Heading>
+                    <Heading textTransform={'uppercase'}>{complaintData.title}</Heading>
                 </CardHeader>
                 <CardBody>
                     <Stack>
                     <Box>
-                        <Heading size={'md'} >Description/Category: {complaintList.description}</Heading>
+                        <Heading size={'md'} >Description/Category: {complaintData.description}</Heading>
                         <Stack direction={'row'}>
                         <Text fontWeight={'bold'}>Comment: </Text>
-                        <Text fontWeight={'bold'}>{complaintList.comment}</Text>
+                        <Text fontWeight={'bold'}>{complaintData.comment}</Text>
                         </Stack>
                         <Stack direction={'row'}>
                         <Text fontWeight={'bold'}>Status: </Text>
-                        <Text fontWeight={'bold'}>{complaintList.status}</Text>
+                        <Text fontWeight={'bold'}>{complaintData.status}</Text>
                         </Stack>
                         <Stack direction={'row'}>
 
                             <Text fontWeight={'bold'}>User:</Text>
-                            <Text fontWeight={'bold'}>{complaintList.userID}</Text>
+                            <Text fontWeight={'bold'}>{complaintData.profileName}</Text>
 
                         </Stack>
                         <Stack direction={'row'}>
 
                             <Text fontWeight={'bold'}>Created Time:</Text>
-                            <Text fontWeight={'bold'}>{complaintList.createdtime}</Text>
+                            <Text fontWeight={'bold'}>{complaintData.createdtime}</Text>
 
                         </Stack>
                     </Box>
                     </Stack>
                 </CardBody>
-                {complaintList.status == 'done'?
+                {complaintData.status == 'done'?
                 <Button colorScheme='teal' variant={'outline'}>Already Completed</Button>
-                :<Button colorScheme='teal' variant={'solid'} onClick={(e)=>handleUpdateStatus(complaintList.complaintID)}>Resolve</Button>
-                
+                :<Button colorScheme='teal' variant={'solid'} onClick={()=>handleUpdateStatus(complaintData.complaintID)}>Resolve</Button>
                 }
                 </Card>
-                
+                )})} */}
+                {isClicked?
+                    status.isSuccessful?
+                    <Alert status = 'success' rounded='lg' padding='2'>
+                        <AlertIcon />
+                        Your Request has succesfully been submitted!
+                    </Alert>
+                    :
+                    <Alert status = 'error' rounded='lg' padding='2'>
+                        <AlertIcon />
+                    Your Request has not been submitted! 
+                    </Alert>
+                :<div></div>
+                }
+                {/* {status.isSuccessful == true? 
+                    <Alert status = 'success' rounded='lg' padding='2'>
+                        <AlertIcon />
+                        Your Request has succesfully been submitted!
+                    </Alert>
+                    : status.isSuccessful == false?
+                    <Alert status = 'error' rounded='lg' padding='2'>
+                        <AlertIcon />
+                    Your Request has not been submitted! 
+                    </Alert>
+                    :""
+                } */}
             </Container>
             
             

@@ -94,7 +94,7 @@ interface CustomerOrderProps {
 
 export default function(props: CustomerOrderProps) {
     const [vendorList, setVendorList] = useState([]);
-    const [vendor, setVendor] = useState();
+    const [vendor, setVendor]: any = useState();
 
     useEffect(() => {
         const fetchAccess = async() => {

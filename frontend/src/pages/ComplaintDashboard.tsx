@@ -1,98 +1,87 @@
 "use client";
 
 import {
-    Flex,
     Box,
-    FormControl,
-    FormLabel,
     Input,
     Stack,
     Button,
     Heading,
     Text,
-    useColorModeValue,
     Container,
-    FormHelperText,
-    Textarea,
     Select,
-    Alert,
-    FormErrorMessage,
-    AlertIcon,
     CardBody,
-    StackDivider,
     CardHeader,
     Card,
     Stat,
     StatLabel,
     StatNumber,
-    Divider,
     CardFooter
 } from "@chakra-ui/react";
 
 import { useEffect, useState } from "react";
 import {Link} from "react-router-dom";
 
-interface IComplaintData{
-    complaintID: string,
-    title: string,
-    description: string,
-    comment: string,
-    userID: number,
-    roleID: number,
-    status: string,
-    createdtime: datetime,
-}
+// interface IComplaintData{
+//     complaintID: string,
+//     title: string,
+//     description: string,
+//     comment: string,
+//     userID: number,
+//     roleID: number,
+//     status: string,
+//     createdtime: Date,
+// }
 
-interface ComplaintDashboardProps{
-    setComplaintID: Function
-}
+// interface ComplaintDashboardProps{
+//     setComplaintID: Function
+// }
 
-function ComplaintCard({complaint}:{
-  complaint: IComplaintData;
-  //handleStatusUpdate: (complaintID: number) => void;
+// function ComplaintCard({complaint}:{
+//   complaint: IComplaintData;
+//   //handleStatusUpdate: (complaintID: number) => void;
   
 
-}){
-  return (
-    <>
-      <Card id = {complaint.complaintID} maxW="6xl" borderStyle={'outset'}>
-        <CardHeader>
-          <Heading textTransform={'uppercase'}>{complaint.title}</Heading>
-        </CardHeader>
-        <CardBody>
-          <Stack>
-            <Box>
-              <Heading size={'md'} >{complaint.description}</Heading>
-              <Text>{complaint.comment}</Text>
-              <Stack direction={['column','row']}>
-                <Box>
-                  <Text>{complaint.userID}</Text>
-                </Box>
-                <Box>
-                  <Text>{complaint.createdtime}</Text>
-                </Box>
-              </Stack>
-            </Box>
-          </Stack>
-        </CardBody>
+// }){
+//   return (
+//     <>
+//       <Card id = {complaint.complaintID} maxW="6xl" borderStyle={'outset'}>
+//         <CardHeader>
+//           <Heading textTransform={'uppercase'}>{complaint.title}</Heading>
+//         </CardHeader>
+//         <CardBody>
+//           <Stack>
+//             <Box>
+//               <Heading size={'md'} >{complaint.description}</Heading>
+//               <Text>{complaint.comment}</Text>
+//               <Stack direction={['column','row']}>
+//                 <Box>
+//                   <Text>{complaint.userID}</Text>
+//                 </Box>
+//                 <Box>
+//                   <Text>{complaint.createdtime}</Text>
+//                 </Box>
+//               </Stack>
+//             </Box>
+//           </Stack>
+//         </CardBody>
 
-        {/* <Button onClick={handleStatusUpdate(complaint.complaintID)}>press me</Button> */}
-        <button onClick={console.log("Hello")}>press me</button>
-      </Card>
-    </>
-  )
-}
+//         {/* <Button onClick={handleStatusUpdate(complaint.complaintID)}>press me</Button> */}
+//         <button onClick={console.log("Hello")}>press me</button>
+//       </Card>
+//     </>
+//   )
+// }
 
-export default function ComplaintDashboard(props: ComplaintDashboardProps){
-    const [complaintData, setComplaintData] = useState<IComplaintData>();
-    const [complaintList, setComplaintList] = useState([]);
+export default function ComplaintDashboard(){
+    //const [complaintData, setComplaintData] = useState<IComplaintData>();
+    const [complaintList, setComplaintList] = useState<any[]>([]);
     const [numOfComplaint, setNumOfComplaint] = useState(0);
     const [numOfPendingComplaint, setNumOfPendingComplaint] = useState(0);
     const [numOfNewComplaintToday, setNumOfNewComplaintToday] = useState(0);
     const [filterSearchCategory, setFilterSearchCategory] = useState("");
     const [filterStatus, setFilterStatus] = useState("");
     const [filterText, setFilterText] = useState("");
-    const [filteredList, setFilteredList] = useState([]);
+    const [filteredList, setFilteredList] = useState<any[]>([]);
     const [todayDate, setTodayDate] = useState("");
     
 
@@ -134,10 +123,9 @@ export default function ComplaintDashboard(props: ComplaintDashboardProps){
     },[complaintList]);
 
     const getTodayDate = ()=>{
-      let today = new Date().toLocaleDateString().replaceAll('/','-')
-      const dateArray = today.split('-');
+      let today = new Date().toLocaleDateString();
+      const dateArray = today.split('/');
       let newDate = dateArray[2]+'-'+dateArray[0]+'-'+dateArray[1];
-      //console.log(newDate);
       setTodayDate(newDate);
       
 
@@ -169,35 +157,35 @@ export default function ComplaintDashboard(props: ComplaintDashboardProps){
     // }
 
     
-    const handleOnClick = (id: int) => {
-        let index = complaintList.findIndex(c => c.complaintID === id);
-        const newlist = complaintList.splice(index, 1);
-        console.log(newlist, index);
-        setComplaintList([...complaintList]);
-    };
+    // const handleOnClick = (id: int) => {
+    //     let index = complaintList.findIndex(c => c.complaintID === id);
+    //     const newlist = complaintList.splice(index, 1);
+    //     console.log(newlist, index);
+    //     setComplaintList([...complaintList]);
+    // };
 
-    const handleClickMe = (complaintID: int) =>()=>{
-      console.log("click until me");
-      console.log(complaintID);
-    }
+    // const handleClickMe = (complaintID: int) =>()=>{
+    //   console.log("click until me");
+    //   console.log(complaintID);
+    // }
     // const handleComplaintStatusUpdate = (complaintID: int) => {
     //     console.log(complaintID)
     //     console.log("but why")
     // };
 
-    const checkPendingStatus = () => {
-      let counter = 0;
-      for(const complaint of complaintList){
-        console.log(complaint);
-        console.log(complaint.status == 'pending')
-        if(complaint.status == 'pending'){  
-          counter = counter + 1;
-          console.log(counter)
-        }
-      }
-      setNumOfPendingComplaint(counter);
-      console.log(numOfPendingComplaint)
-    };
+    // const checkPendingStatus = () => {
+    //   let counter = 0;
+    //   for(const complaint of complaintList){
+    //     console.log(complaint);
+    //     console.log(complaint.status == 'pending')
+    //     if(complaint.status == 'pending'){  
+    //       counter = counter + 1;
+    //       console.log(counter)
+    //     }
+    //   }
+    //   setNumOfPendingComplaint(counter);
+    //   console.log(numOfPendingComplaint)
+    // };
     
     const searchByFilter = () =>{
       // console.log(filterText);
@@ -205,11 +193,11 @@ export default function ComplaintDashboard(props: ComplaintDashboardProps){
       // console.log(filterStatus);
       // console.log(complaintList.filter(c => c.createdtime.includes(filterText)));
 
-      const byTitle = title => complaint => {return complaint.title.includes(filterText) && complaint.status.includes(filterStatus)};
-      const byDescription = description => complaint =>{return complaint.description.includes(filterText) && complaint.status.includes(filterStatus)};
-      const byComment = comment => complaint => {return complaint.comment.includes(filterText) && complaint.status.includes(filterStatus)};
-      const byUser = user => complaint => {return complaint.userID.toString().includes(filterText) && complaint.status.includes(filterStatus)};
-      const byDate = date => complaint => {return complaint.createdtime.includes(filterText) && complaint.status.includes(filterStatus)};
+      const byTitle = (complaint: any) => {return complaint.title.toLowerCase().includes(filterText.toLowerCase()) && complaint.status.includes(filterStatus)};
+      const byDescription = (complaint: any) =>{return complaint.description.toLowerCase().includes(filterText.toLowerCase()) && complaint.status.includes(filterStatus)};
+      const byComment = (complaint: any) => {return complaint.comment.toLowerCase().includes(filterText.toLowerCase()) && complaint.status.includes(filterStatus)};
+      const byUser = (complaint: any) => {return complaint.userID.toString().includes(filterText) && complaint.status.includes(filterStatus)};
+      const byDate = (complaint: any) => {return complaint.createdtime.includes(filterText.toLowerCase()) && complaint.status.includes(filterStatus)};
       switch(filterSearchCategory){
         case '': setFilteredList(complaintList.filter(c=>c)); break;
         case 'title': setFilteredList(complaintList.filter(byTitle(filterText)));break;
@@ -292,7 +280,7 @@ export default function ComplaintDashboard(props: ComplaintDashboardProps){
               <option value="pending">Pending</option>
               <option value="done">Done</option>
             </Select>
-            <Button colorScheme='teal' variant={'solid'} onClick={(e)=>searchByFilter()} width={'sm'}>Filter</Button>
+            <Button colorScheme='teal' variant={'solid'} onClick={()=>searchByFilter()} width={'sm'}>Filter</Button>
           </Stack>
           {/* {complaintList.map((complaintData, index) => (
             <Card key = {complaintData.complaintID} id = {complaintData.complaintID} borderStyle={'outset'} marginBottom={2} marginTop={2} borderRadius={'lg'}>
@@ -336,11 +324,11 @@ export default function ComplaintDashboard(props: ComplaintDashboardProps){
           {numOfComplaint > 0?
             filteredList.length == 0?
               <div>No result meets the criteria</div>
-              :<Button onClick={(e)=>(setFilteredList([]))}>Clear Result</Button>
+              :<Button colorScheme='teal' variant={'solid'} onClick={()=>(setFilteredList([]))}>Clear Result</Button>
             :<div>No Complaints</div>
           }
 
-          {filteredList.map((complaintData, index) => {return(
+          {filteredList.map((complaintData) => {return(
             <Card key = {complaintData.complaintID} id = {complaintData.complaintID} borderStyle={'outset'} marginBottom={2} marginTop={2} borderRadius={'lg'}>
               <CardHeader>
                 <Heading textTransform={'uppercase'}>{complaintData.title}</Heading>
@@ -361,7 +349,7 @@ export default function ComplaintDashboard(props: ComplaintDashboardProps){
                     </Stack>
                     <Stack direction={'row'}>
                       <Text fontWeight={'bold'}>User:</Text>
-                      <Text fontWeight={'bold'}>{complaintData.userID}</Text>
+                      <Text fontWeight={'bold'}>{complaintData.profileName}</Text>
                     </Stack>
                     <Stack direction={'row'}>
                       <Text fontWeight={'bold'}>Created Time:</Text>
@@ -373,7 +361,7 @@ export default function ComplaintDashboard(props: ComplaintDashboardProps){
               </CardBody>
               <CardFooter>
               <Link to = {"../complaint"} state={{complaintID:complaintData.complaintID}}>
-                <Button width={'sm'}>View Complaint</Button>
+                <Button colorScheme='teal' variant={'solid'} width={'sm'}>View Complaint</Button>
                 </Link>
               {/* <Button onClick={handleClickMe(complaintData.complaintID)}>click me</Button> */}
               </CardFooter>

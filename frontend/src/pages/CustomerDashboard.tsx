@@ -56,7 +56,7 @@ function favoriteIcon(isFavorite: boolean) {
 interface OrderCardProps {
     userID: number,
     invoiceID: number,
-    isFavorite: boolean,
+    isFavorite: boolean | null,
     status: string,
     vendorProfileID: number,
     vendorName: string,
@@ -180,7 +180,7 @@ const OrderCard = (props: OrderCardProps) => {
                                 w="120px"
                                 colorScheme="red"
                                 variant="outline"
-                                isDisabled={(new Date() - props.date) > 300000}
+                                isDisabled={((new Date()).getTime() - props.date.getTime()) > 300000}
                                 onClick={cancelInvoice}
                                 leftIcon={<MdDelete/>}>
                                 Cancel

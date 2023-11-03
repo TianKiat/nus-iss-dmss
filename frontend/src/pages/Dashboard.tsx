@@ -3,7 +3,6 @@
 import VendorDashboard from './VendorDashboard'
 import CustomerDashboard from './CustomerDashboard'
 import AdminDashboard from './AdminDashboard'
-import { useEffect, useState } from "react"
 
 interface DashboardProps {
     userID : number
@@ -28,7 +27,7 @@ export default function Dashboard(props : DashboardProps) {
             <VendorDashboard userID={props.userID}></VendorDashboard>
             : (props.roleID === 3 ?
                 <CustomerDashboard userID={props.userID}></CustomerDashboard>
-                : <AdminDashboard userID={props.userID}></AdminDashboard>)
+                : <AdminDashboard></AdminDashboard>)
 
     ); // for now until login and session is done
 }

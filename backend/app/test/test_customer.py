@@ -33,7 +33,7 @@ class TestCustomerController(unittest.TestCase):
             vendorProfileID=1,
             menuItems=[DraftInvoiceMenuItem(menuItemID=1, quantity=1)]
         )
-        result = CustomerController.update_order_basket(self.session, draftInvoice)
+        result = CustomerController().update_order_basket(self.session, draftInvoice)
         self.assertIsNotNone(result)
         self.assertIsNotNone(result["invoiceID"])
         self.assertIsNotNone(result["orderID"])
@@ -46,7 +46,7 @@ class TestCustomerController(unittest.TestCase):
 
         # Add new order with existing invoice
         draftInvoice.menuItems[0].menuItemID = 2
-        result = CustomerController.update_order_basket(self.session, draftInvoice)
+        result = CustomerController().update_order_basket(self.session, draftInvoice)
         self.assertIsNotNone(result)
         self.assertIsNotNone(result["invoiceID"])
         self.assertIsNotNone(result["orderID"])
@@ -57,7 +57,7 @@ class TestCustomerController(unittest.TestCase):
 
         # Update order with existing invoice and existing order
         draftInvoice.menuItems[0].quantity = 5
-        result = CustomerController.update_order_basket(self.session, draftInvoice)
+        result = CustomerController().update_order_basket(self.session, draftInvoice)
         self.assertIsNotNone(result)
         self.assertIsNotNone(result["invoiceID"])
         self.assertIsNotNone(result["orderID"])
@@ -68,7 +68,7 @@ class TestCustomerController(unittest.TestCase):
 
         # Update order basket with quantity 0 (delete order)
         draftInvoice.menuItems[0].quantity = 0
-        result = CustomerController.update_order_basket(self.session, draftInvoice)
+        result = CustomerController().update_order_basket(self.session, draftInvoice)
         self.assertIsNotNone(result)
         self.assertIsNotNone(result["invoiceID"])
         self.assertIsNone(result["orderID"])
@@ -81,7 +81,7 @@ class TestCustomerController(unittest.TestCase):
 
         # Update order basket with last menuitem quantity 0 (delete order and invoice)
         draftInvoice.menuItems[0].menuItemID = 1
-        result = CustomerController.update_order_basket(self.session, draftInvoice)
+        result = CustomerController().update_order_basket(self.session, draftInvoice)
         self.assertIsNotNone(result)
         self.assertIsNone(result["invoiceID"])
 
@@ -104,7 +104,7 @@ class TestCustomerController(unittest.TestCase):
                 DraftInvoiceMenuItem(menuItemID=3, quantity=3)
             ]
         )
-        result = CustomerController.update_order_basket(self.session, draftInvoice)
+        result = CustomerController().update_order_basket(self.session, draftInvoice)
         self.assertIsNotNone(result)
         self.assertIsNotNone(result["invoiceID"])
         self.assertIsNotNone(result["orderIDs"])
@@ -127,7 +127,7 @@ class TestCustomerController(unittest.TestCase):
                 DraftInvoiceMenuItem(menuItemID=4, quantity=1)
             ]
         )
-        result = CustomerController.update_order_basket(self.session, draftInvoice)
+        result = CustomerController().update_order_basket(self.session, draftInvoice)
         self.assertIsNotNone(result)
         self.assertIsNone(result["invoiceID"])
 
@@ -140,7 +140,7 @@ class TestCustomerController(unittest.TestCase):
                 DraftInvoiceMenuItem(menuItemID=2, quantity=1)
             ]
         )
-        result = CustomerController.update_order_basket(self.session, draftInvoice)
+        result = CustomerController().update_order_basket(self.session, draftInvoice)
         self.assertIsNotNone(result)
         self.assertIsNone(result["invoiceID"])
 
@@ -155,19 +155,19 @@ class TestCustomerController(unittest.TestCase):
             "vendor": expected_vendor,
             "orders": expected_orders
         }]
-        result = CustomerController.get_order_history(self.session, userID)
+        result = CustomerController().get_order_history(self.session, userID)
         self.assertEqual(result, expected_result)
 
         # test with existing userID and non-existing invoice
         userID.userID = 2
         expected_result = []
-        result = CustomerController.get_order_history(self.session, userID)
+        result = CustomerController().get_order_history(self.session, userID)
         self.assertEqual(result, expected_result)
 
         # test with non-existing userID
         userID.userID = 0
         expected_result = []
-        result = CustomerController.get_order_history(self.session, userID)
+        result = CustomerController().get_order_history(self.session, userID)
         self.assertEqual(result, expected_result)
 
     def test_get_order_basket(self):
@@ -181,25 +181,25 @@ class TestCustomerController(unittest.TestCase):
             "vendor": expected_vendor,
             "orders": expected_orders
         }]
-        result = CustomerController.get_order_basket(self.session, userID)
+        result = CustomerController().get_order_basket(self.session, userID)
         self.assertEqual(result, expected_result)
 
         # test with existing userID and non-existing invoice
         userID.userID = 2
         expected_result = []
-        result = CustomerController.get_order_basket(self.session, userID)
+        result = CustomerController().get_order_basket(self.session, userID)
         self.assertEqual(result, expected_result)
 
         # test with non-existing userID
         userID.userID = 0
         expected_result = []
-        result = CustomerController.get_order_basket(self.session, userID)
+        result = CustomerController().get_order_basket(self.session, userID)
         self.assertEqual(result, expected_result)
     
     def test_update_favorite_order(self):
         # Update invoice isFavorite with existing data
         isFavorite = IsFavorite(invoiceID=1, isFavorite=True)
-        result = CustomerController.update_favorite_order(self.session, isFavorite)
+        result = CustomerController().update_favorite_order(self.session, isFavorite)
         self.assertEqual(isFavorite.invoiceID, result["invoiceID"])
         self.assertEqual(True, result["isFavorite"])
 
@@ -209,13 +209,13 @@ class TestCustomerController(unittest.TestCase):
 
         # Update invoice isFavorite with non-existing data
         isFavorite = IsFavorite(invoiceID=0, isFavorite=True)
-        result = CustomerController.update_favorite_order(self.session, isFavorite)
+        result = CustomerController().update_favorite_order(self.session, isFavorite)
         self.assertEqual(None, result["invoiceID"])
     
     def test_update_order_status(self):
         # Update invoice status with existing data
         invoiceStatus = InvoiceStatus(invoiceID=1, status="CANCELLED")
-        result = CustomerController.update_order_status(self.session, invoiceStatus)
+        result = CustomerController().update_order_status(self.session, invoiceStatus)
         self.assertEqual(invoiceStatus.invoiceID, result["invoiceID"])
         self.assertEqual(invoiceStatus.status, result["status"])
 
@@ -225,12 +225,12 @@ class TestCustomerController(unittest.TestCase):
 
         # Update invoice status with non-existing data
         invoiceStatus = InvoiceStatus(invoiceID=0, status="CANCELLED")
-        result = CustomerController.update_order_status(self.session, invoiceStatus)
+        result = CustomerController().update_order_status(self.session, invoiceStatus)
         self.assertEqual(None, result["invoiceID"])
 
         # Update invoice status and discount with existing data
         invoiceStatus = InvoiceStatus(invoiceID=2, status="PENDING", discount=5)
-        result = CustomerController.update_order_status(self.session, invoiceStatus)
+        result = CustomerController().update_order_status(self.session, invoiceStatus)
         self.assertEqual("PENDING", result["status"])
 
         # Check if it is updated in database
@@ -241,7 +241,7 @@ class TestCustomerController(unittest.TestCase):
     def test_delete_order(self):
         # Delete invoice with existing data
         invoiceID = InvoiceID(invoiceID=1)
-        result = CustomerController.delete_order(self.session, invoiceID)
+        result = CustomerController().delete_order(self.session, invoiceID)
         self.assertEqual(invoiceID.invoiceID, result["invoiceID"])
 
         # Check if it is updated in database
@@ -252,7 +252,7 @@ class TestCustomerController(unittest.TestCase):
 
         # Delete invoice with non-existing data
         invoiceID = InvoiceID(invoiceID=0)
-        result = CustomerController.delete_order(self.session, invoiceID)
+        result = CustomerController().delete_order(self.session, invoiceID)
         self.assertEqual(invoiceID.invoiceID, result["invoiceID"])
 
     def test_get_valid_menu_item(self):
@@ -267,7 +267,7 @@ class TestCustomerController(unittest.TestCase):
             "menuItem": self.session.query(menu_item.MenuItem).filter(menu_item.MenuItem.menuItemID == 3).first(),
             "order": self.session.query(order.Order).filter(order.Order.menuItemID == 3, order.Order.invoiceID == 2).first()
         }]
-        result = CustomerController.get_valid_menu_item(self.session, profileIDs)
+        result = CustomerController().get_valid_menu_item(self.session, profileIDs)
         self.assertEqual(expected_result, result)
 
     # def test_get_all_vendor_profile(self):
@@ -278,7 +278,7 @@ class TestCustomerController(unittest.TestCase):
     #             "vendor": vendor,
     #             "opening_hours": VendorController.get_opening_hours(self.session, vendor.userID)
     #         })
-    #     result = CustomerController.get_all_vendor_profile(self.session)
+    #     result = CustomerController().get_all_vendor_profile(self.session)
     #     self.assertEqual(expected_result, result)
 
     def test_get_promotion_verify(self):
@@ -290,17 +290,33 @@ class TestCustomerController(unittest.TestCase):
             promotion.Promotion.promoCode == promoCode,
             promotion.Promotion.isValid
         ).first()
-        result = CustomerController.get_promotion_verify(self.session, vendorProfileID, promoCode)
+        result = CustomerController().get_promotion_verify(self.session, vendorProfileID, promoCode)
         self.assertEqual(expected_result, result)
 
         # test with existing invalid promo code
         promoCode = "CNY2023"
         expected_result = None
-        result = CustomerController.get_promotion_verify(self.session, vendorProfileID, promoCode)
+        result = CustomerController().get_promotion_verify(self.session, vendorProfileID, promoCode)
         self.assertEqual(expected_result, result)
 
         # test with non-existing promo code
         promoCode = "ANYTHING123"
         expected_result = None
-        result = CustomerController.get_promotion_verify(self.session, vendorProfileID, promoCode)
+        result = CustomerController().get_promotion_verify(self.session, vendorProfileID, promoCode)
+        self.assertEqual(expected_result, result)
+
+    def test_get_promotion(self):
+        # test with existing vendor profile ID 
+        vendorProfileID = 1
+        expected_result = self.session.query(promotion.Promotion).filter(
+            promotion.Promotion.vendorProfileID == vendorProfileID,
+            promotion.Promotion.isValid
+        ).all()
+        result = CustomerController().get_promotion(self.session, vendorProfileID)
+        self.assertEqual(expected_result, result)
+
+        # test with non-existing vendor profile ID
+        vendorProfileID = 0
+        expected_result = []
+        result = CustomerController().get_promotion(self.session, vendorProfileID)
         self.assertEqual(expected_result, result)
