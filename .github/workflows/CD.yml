@@ -28,27 +28,25 @@ jobs:
 
       - name: Copy GitHub Secrets env variables to EC2 for FE
         run: |
-          echo "VITE_APP_NAME=${{ secrets.VITE_APP_NAME }}" > .env
-          echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" > .env
+          echo "VITE_APP_NAME=${{ secrets.VITE_APP_NAME }}" >> .env
+          echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" >> .env
           scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapp-private-key.pem .env ubuntu@${{ secrets.EC2_FE_PUBLIC_IP }}:~/frontend
 
       - name: Copy GitHub Secrets env variables to EC2 for BE
         run: |
-          echo "DB_CONNECTION_STRING=${{ secrets.DB_CONNECTION_STRING }}" > .env
-          echo "FASTAPI_URL=${{ secrets.FASTAPI_URL }}" > .env
-          echo "FASTAPI_URL_PORT=${{ secrets.FASTAPI_URL_PORT }}" > .env
-          echo "OTP_EMAIL=${{ secrets.OTP_EMAIL }}" > .env
-          echo "OTP_EMAIL_PASSWORD=${{ secrets.OTP_EMAIL_PASSWORD }}" > .env
-          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" > .env
-          echo "ALGORITHM=${{ secrets.ALGORITHM }}" > .env
-          echo "ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}" > .env
+          echo "DB_CONNECTION_STRING=${{ secrets.DB_CONNECTION_STRING }}" >> .env
+          echo "FASTAPI_URL=${{ secrets.FASTAPI_URL }}" >> .env
+          echo "FASTAPI_URL_PORT=${{ secrets.FASTAPI_URL_PORT }}" >> .env
+          echo "OTP_EMAIL=${{ secrets.OTP_EMAIL }}" >> .env
+          echo "OTP_EMAIL_PASSWORD=${{ secrets.OTP_EMAIL_PASSWORD }}" >> .env
+          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env
+          echo "ALGORITHM=${{ secrets.ALGORITHM }}" >> .env
+          echo "ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}" >> .env
           scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapi-private-key.pem .env ubuntu@${{ secrets.EC2_BE_PUBLIC_IP }}:~/backend
 
       - name: SSH into EC2 and Deploy FE
         run: |
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapp-private-key.pem ubuntu@${{ secrets.EC2_FE_PUBLIC_IP }} "cd ~/frontend && pnpm run build"
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapp-private-key.pem ubuntu@${{ secrets.EC2_FE_PUBLIC_IP }} "sudo cp -r frontend/dist/* /var/www/dmss_domain.com/html"
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapp-private-key.pem ubuntu@${{ secrets.EC2_FE_PUBLIC_IP }} "sudo systemctl reload nginx"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapp-private-key.pem ubuntu@${{ secrets.EC2_FE_PUBLIC_IP }} "cd ~/frontend && pnpm run build && sudo cp -r frontend/dist/* /var/www/dmss_domain.com/html && sudo systemctl reload nginx"
 
       - name: SSH into EC2 and Deploy BE
         run: |
