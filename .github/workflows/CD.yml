@@ -46,7 +46,7 @@ jobs:
 
       - name: SSH into EC2 and Deploy FE
         run: |
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapp-private-key.pem ubuntu@${{ secrets.EC2_FE_PUBLIC_IP }} "cd ~/frontend && pnpm run build && sudo cp -r frontend/dist/* /var/www/dmss_domain.com/html && sudo systemctl reload nginx"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapp-private-key.pem ubuntu@${{ secrets.EC2_FE_PUBLIC_IP }} "cd ~/frontend && pnpm run build && cd && sudo cp -r frontend/dist/* /var/www/dmss_domain.com/html && sudo systemctl reload nginx"
 
       - name: SSH into EC2 and Deploy BE
         run: |
