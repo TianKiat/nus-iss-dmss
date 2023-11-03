@@ -41,7 +41,7 @@ jobs:
           echo "OTP_EMAIL_PASSWORD=${{ secrets.OTP_EMAIL_PASSWORD }}" >> .env
           echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env
           echo "ALGORITHM=${{ secrets.ALGORITHM }}" >> .env
-          echo "ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}" > .env
+          echo "ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}" >> .env
           scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapi-private-key.pem .env ubuntu@${{ secrets.EC2_BE_PUBLIC_IP }}:~/backend
 
       - name: SSH into EC2 and Deploy FE
