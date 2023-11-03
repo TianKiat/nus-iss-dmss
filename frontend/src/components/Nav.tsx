@@ -100,14 +100,18 @@ function navButtons(cookies: any) {
   } else {
     return (
       <Stack flex={{ base: 1, md: 0 }} justify={"flex-end"} direction={"row"} spacing={6}>
-        <Button as={"a"} fontSize={"sm"} fontWeight={400} variant={"link"} href={"/login"}>
-          Sign In
-        </Button>
-        <Button as={"a"} display={{ base: "none", md: "inline-flex" }} fontSize={"sm"}
-                fontWeight={600} color={"white"} bg={"blue.400"} href={"register"}
-                _hover={{ bg: "blue.300" }}>
-          Sign Up
-        </Button>
+        <Link to="/login">
+          <Button as={"a"} fontSize={"sm"} fontWeight={400} variant={"link"}>
+            Sign In
+          </Button>
+        </Link>
+        <Link to="/register">
+          <Button as={"a"} display={{ base: "none", md: "inline-flex" }} fontSize={"sm"}
+                  fontWeight={600} color={"white"} bg={"blue.400"}
+                  _hover={{ bg: "blue.300" }}>
+            Sign Up
+          </Button>
+        </Link>
       </Stack>
     )
   }
