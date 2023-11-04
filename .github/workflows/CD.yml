@@ -58,4 +58,4 @@ jobs:
           fi
       - name: SSH into EC2 and Deploy BE
         run: |
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapi-private-key.pem ubuntu@${{ secrets.EC2_BE_PUBLIC_IP }} "cd ~/backend && nohup python3 run.py &"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapi-private-key.pem ubuntu@${{ secrets.EC2_BE_PUBLIC_IP }} "cd ~/backend && python3 run.py &"
