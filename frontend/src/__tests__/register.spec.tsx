@@ -1,10 +1,15 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Register from '../pages/Register';
+import { BrowserRouter as Router } from 'react-router-dom';
 
 describe('Register Component', () => {
   test('handles customer registration submission', async () => {
-    render(<Register />);
+    render(
+      <Router>
+        <Register />
+      </Router>
+    );
 
     fireEvent.change(screen.getAllByLabelText(/Name/i)[0], { target: { value: 'J' } });
     fireEvent.change(screen.getByLabelText(/Username/i), { target: { value: 'J' } });
@@ -50,24 +55,40 @@ describe('Register Component', () => {
   });
 
   test('renders Customer sign up form by default', () => {
-    render(<Register />);
+    render(
+      <Router>
+        <Register />
+      </Router>
+    );
     expect(screen.getByText(/Sign up as a Customer/i)).toBeInTheDocument();
   });
 
   test('renders Vendor sign up form after tab switch', () => {
-    render(<Register />);
+    render(
+      <Router>
+        <Register />
+      </Router>
+    );
     fireEvent.click(screen.getByText(/Vendor/i));
     expect(screen.getByText(/Sign up as a Vendor/i)).toBeInTheDocument();
   });
 
   test('displays error messages for empty form fields for customer tab', () => {
-    render(<Register />);
+    render(
+      <Router>
+        <Register />
+      </Router>
+    );
     fireEvent.click(screen.getByRole('button', { name: /Sign Up/i }))
     expect(screen.getAllByText(/Required/i)).toHaveLength(6);
   });
 
   test('displays Invalid email address', () => {
-    render(<Register />);
+    render(
+      <Router>
+        <Register />
+      </Router>
+    );
     fireEvent.change(screen.getByLabelText(/Email address/i), {
       target: { value: 'invalidemail' },
     });
@@ -76,7 +97,11 @@ describe('Register Component', () => {
   });
 
   test('displays Passwords do not match', () => {
-    render(<Register />);
+    render(
+      <Router>
+        <Register />
+      </Router>
+    );
     fireEvent.change(screen.getAllByLabelText(/Password/i)[0], {
       target: { value: 'qwerty' },
     });

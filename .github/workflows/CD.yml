@@ -48,6 +48,14 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapp-private-key.pem ubuntu@${{ secrets.EC2_FE_PUBLIC_IP }} "cd ~/frontend && pnpm run build && cd && sudo cp -r frontend/dist/* /var/www/dmss_domain.com/html && sudo systemctl reload nginx"
 
+      - name: Check for existing Python Process and end any if found
+        run: |
+          if pgrep -f "python3 run.py"; then
+            echo "Python process is already running, stopping it..."
+            pkill -f "python3 run.py"
+          else
+            echo "No existing Python process found."
+          fi
       - name: SSH into EC2 and Deploy BE
         run: |
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i webapi-private-key.pem ubuntu@${{ secrets.EC2_BE_PUBLIC_IP }} "cd ~/backend && nohup python3 run.py &"
