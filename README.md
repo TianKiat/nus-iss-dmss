@@ -1,7 +1,7 @@
 # nus-iss-dmss
 NUS ISS Designing Modern Software Solutions Practice Module
 
-
+[![CD](https://github.com/TianKiat/nus-iss-dmss/actions/workflows/CD.yml/badge.svg)](https://github.com/TianKiat/nus-iss-dmss/actions/workflows/CD.yml)
 
 # To build frontend app without docker
 
