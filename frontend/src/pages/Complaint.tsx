@@ -54,6 +54,7 @@ export default function Complaint(props:ComplaintProps){
     const [showComplaint, setShowComplaint] = useState<any[]>([]);
     const [status, setStatus] = useState({isSuccessful: false});
     const [isClicked, setIsClicked] = useState(false);
+    const [complaintStatus, setComplaintStatus] = useState(false);
     const locationObj = useLocation();
     const complaintID = locationObj != null?locationObj.state.complaintID:0
     useEffect(()=>{
@@ -68,7 +69,8 @@ export default function Complaint(props:ComplaintProps){
             });
             if (response.status == 200){
                 const complaint = await response.json();
-                //console.log(complaint);
+                console.log(complaint[0]['status']);
+                setComplaintStatus(complaint[0]['status'])
                 setComplaintList(complaint);
                 
                 
@@ -96,7 +98,10 @@ export default function Complaint(props:ComplaintProps){
                 body: JSON.stringify({complaintID: complaintID, status:"done"}),
             });
             if (response.status == 200){
-                await response.json();
+                const result = await response.json();
+                console.log(result)
+                console.log(result['status'])
+                setComplaintStatus(result['status'])
                 //setComplaintList(complaint);
                 setStatus({isSuccessful: true})
                 setIsClicked(true);
@@ -123,9 +128,7 @@ export default function Complaint(props:ComplaintProps){
                     <Button colorScheme='teal' variant={'solid'}>Back to Complaint Dashboard</Button>
                 </Link>
                 <div></div>
-                {isClicked?
-                <div></div>
-                :showComplaint.map((complaintData) => {return(
+                {showComplaint.map((complaintData) => {return(
                     <Card key = {complaintData.complaintID} id = {complaintData.complaintID} borderStyle={'outset'} marginBottom={2} marginTop={2} borderRadius={'lg'}>
                     <CardHeader>
                         <Heading textTransform={'uppercase'}>{complaintData.title}</Heading>
@@ -140,7 +143,7 @@ export default function Complaint(props:ComplaintProps){
                             </Stack>
                             <Stack direction={'row'}>
                             <Text fontWeight={'bold'}>Status: </Text>
-                            <Text fontWeight={'bold'}>{complaintData.status}</Text>
+                            <Text fontWeight={'bold'}>{complaintStatus}</Text>
                             </Stack>
                             <Stack direction={'row'}>
     
