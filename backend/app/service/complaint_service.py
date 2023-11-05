@@ -1,5 +1,5 @@
 from app.datasource.complaint_gateway import ComplaintGateway
-from app.datasource.user_profile_gateway import UserProfileGateway
+from app.datasource.user_gateway import UserGateway
 from app.common.complaint_model import Complaint, ComplaintUpdate
 
 class ComplaintService():
@@ -15,9 +15,9 @@ class ComplaintService():
         profileName = ""
         result = ComplaintGateway().get_complaint_list(db)
         for complaint in result:
-            user_profile = UserProfileGateway.get_user_profile_by_user(db, complaint.userID)
+            user_profile = UserGateway().retrieve_user_control_by_id(db, complaint.userID)
             if user_profile:
-                profileName = user_profile.profileName
+                profileName = user_profile['username']
             else:
                 profileName = ""
             temp_list = {}
@@ -37,9 +37,9 @@ class ComplaintService():
         complaint_list = []
         profileName = ""
         complaint = ComplaintGateway().get_complaint(db, complaintID)
-        user_profile = UserProfileGateway.get_user_profile_by_user(db, complaint.userID)
+        user_profile = UserGateway().retrieve_user_control_by_id(db, complaint.userID)
         if user_profile:
-            profileName = user_profile.profileName
+            profileName = user_profile['username']
         else:
             profileName = ""
         temp_list = {}

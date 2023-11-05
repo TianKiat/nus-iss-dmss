@@ -23,7 +23,7 @@ interface UserControlProps{
 
 export default function UserControl(props:UserControlProps){
     if(props.cookies!=null){
-        if (!props.cookies['access'].includes(5)){
+        if (props.cookies["roleID"] != 1){
             location.replace('../Error')
         }else{
             // console.log(props.cookies["access"])

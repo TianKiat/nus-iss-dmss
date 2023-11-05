@@ -83,13 +83,26 @@ class UserService():
     
     def retrieve_user_control(self, db):
         total = UserGateway().retrieve_user_details(db)
-        customer = UserGateway().retrieve_customer_data(db)
-        vendor = UserGateway().retrieve_vendor_data(db)
+        total_count = 0
+        customer_count = 0
+        vendor_count = 0
+        if total == None:
+            total = []
+        else:
+            for item in total:
+                if item['roleID'] == 2:
+                    vendor_count = vendor_count + 1
+                if item['roleID'] == 3:
+                    customer_count = customer_count + 1
+                total_count = total_count + 1
+                
+        #customer = UserGateway().retrieve_customer_data(db)
+        #vendor = UserGateway().retrieve_vendor_data(db)
         try:
-            total_user = len(total)
-            total_customer = len(customer)
-            total_vendor = len(vendor)
-            return {"total":total_user,"customer":len(customer),"vendor":len(vendor),"user_list":total}
+            # total_user = len(total)
+            # total_customer = len(customer)
+            # total_vendor = len(vendor)
+            return {"total":total_count,"customer":customer_count,"vendor":vendor_count,"user_list":total}
         except():
             return {"total":0,"customer":0,"vendor":0,"user_list":total}
         
