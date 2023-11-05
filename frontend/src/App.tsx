@@ -12,7 +12,10 @@ import CustomerOrder from "./pages/CustomerOrder" ;
 import CustomerBasket from "./pages/CustomerBasket";
 import CreateComplaint from "./pages/CreateComplaint";
 import ComplaintDashboard from "./pages/ComplaintDashboard";
+import AccessControl from "./pages/AccessControl";
 import Complaint from "./pages/Complaint";
+import UserControlDashboard from "./pages/UserControlDashboard";
+import UserControl from "./pages/UserControl";
 import Cookies from "js-cookie";
 import { useCallback, useEffect, useState } from "react";
 
@@ -61,8 +64,11 @@ function App() {
             <Route path="profile" element={<Profile userID={cookies != null ? cookies["userID"] : -1}/>} />
             <Route path="*" element={<Error />} />
             <Route path="create_complaint" element={<CreateComplaint/>}/>
-            <Route path="complaint_dashboard" element={<ComplaintDashboard/>}/>
-            <Route path="complaint" element={<Complaint/>}/>
+            <Route path="complaint_dashboard" element={<ComplaintDashboard cookies={cookies}/>}/>
+            <Route path="complaint" element={<Complaint cookies={cookies}/>}/>
+            <Route path="access_control" element={<AccessControl cookies={cookies}/>}/>
+            <Route path="user_control_dashboard" element={<UserControlDashboard cookies={cookies}/>}/>
+            <Route path="user_control" element={<UserControl cookies={cookies}/>}/>
           </Route>
         </Routes>
       </BrowserRouter>

@@ -1,8 +1,10 @@
 /* ===== ACCESS table ===== */
 INSERT INTO ACCESS (accessName, accessURL) VALUES
-('ACCESS 1', 'frontend/src/pages/viewAccounts'),
-('ACCESS 2', 'frontend/src/pages/viewMenuItems'),
-('ACCESS 3', 'frontend/src/pages/addOrder');
+('Order', 'Order'),
+('Basket', 'Basket'),
+('Profile', 'Profile'),
+('Create_Complaint', 'Create_Complaint'),
+('Complaint', 'Complaint');
 
 /* ===== ROLE table ===== */
 INSERT INTO ROLE VALUES
@@ -17,10 +19,10 @@ INSERT INTO ACCESS_CONTROL (accessID, roleID) VALUES
 (3, 3);
 
 /* ===== USER table ===== */
-INSERT INTO USER (username, userPassword, roleID) VALUES
-('moses', '123', 1),
-('amy', '123', 2),
-('joe', '123', 3);
+INSERT INTO USER (username, userPassword, roleID, isDisabled) VALUES
+('moses', '123', 1, 0),
+('amy', '123', 2, 0),
+('joe', '123', 3, 0);
 
 /* ===== USER_PROFILE table ===== */
 INSERT INTO USER_PROFILE (profileName, email, phone, userID) VALUES

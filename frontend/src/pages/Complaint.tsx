@@ -33,14 +33,30 @@ import {Link, useLocation} from 'react-router-dom';
 //     complaintID: number
 // }
 
-export default function Complaint(){
+interface ComplaintProps{
+    cookies: any
+}
+
+export default function Complaint(props:ComplaintProps){
+    if(props.cookies!=null){
+        if (!props.cookies['access'].includes(5)){
+            location.replace('../Error')
+        }else{
+            // console.log(props.cookies["access"])
+            // console.log(props.cookies['access'].includes(5))
+        }
+        
+    }else{
+      location.replace('../')
+    }
     //const [complaintData, setComplaintData] = useState<IComplaintData>();
     const [complaintList, setComplaintList] = useState<any[]>([]);
     const [showComplaint, setShowComplaint] = useState<any[]>([]);
     const [status, setStatus] = useState({isSuccessful: false});
     const [isClicked, setIsClicked] = useState(false);
-    const location = useLocation();
-    const complaintID = location != null?location.state.complaintID:0
+    const [complaintStatus, setComplaintStatus] = useState(false);
+    const locationObj = useLocation();
+    const complaintID = locationObj != null?locationObj.state.complaintID:0
     useEffect(()=>{
         const fetchComplaintList = async() => {
           try{
@@ -53,7 +69,8 @@ export default function Complaint(){
             });
             if (response.status == 200){
                 const complaint = await response.json();
-                //console.log(complaint);
+                console.log(complaint[0]['status']);
+                setComplaintStatus(complaint[0]['status'])
                 setComplaintList(complaint);
                 
                 
@@ -81,7 +98,10 @@ export default function Complaint(){
                 body: JSON.stringify({complaintID: complaintID, status:"done"}),
             });
             if (response.status == 200){
-                await response.json();
+                const result = await response.json();
+                console.log(result)
+                console.log(result['status'])
+                setComplaintStatus(result['status'])
                 //setComplaintList(complaint);
                 setStatus({isSuccessful: true})
                 setIsClicked(true);
@@ -108,9 +128,7 @@ export default function Complaint(){
                     <Button colorScheme='teal' variant={'solid'}>Back to Complaint Dashboard</Button>
                 </Link>
                 <div></div>
-                {isClicked?
-                <div></div>
-                :showComplaint.map((complaintData) => {return(
+                {showComplaint.map((complaintData) => {return(
                     <Card key = {complaintData.complaintID} id = {complaintData.complaintID} borderStyle={'outset'} marginBottom={2} marginTop={2} borderRadius={'lg'}>
                     <CardHeader>
                         <Heading textTransform={'uppercase'}>{complaintData.title}</Heading>
@@ -125,7 +143,7 @@ export default function Complaint(){
                             </Stack>
                             <Stack direction={'row'}>
                             <Text fontWeight={'bold'}>Status: </Text>
-                            <Text fontWeight={'bold'}>{complaintData.status}</Text>
+                            <Text fontWeight={'bold'}>{complaintStatus}</Text>
                             </Stack>
                             <Stack direction={'row'}>
     

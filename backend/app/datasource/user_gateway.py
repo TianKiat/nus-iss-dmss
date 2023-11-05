@@ -2,6 +2,7 @@ import uuid, bcrypt
 from sqlalchemy.orm import Session
 from app.common.user_model import User, Vendor, Login
 from app.models import user, user_profile, vendor_profile, otp
+from sqlalchemy import update
 
 class UserGateway():
     def __init__(self):
@@ -52,7 +53,8 @@ class UserGateway():
             user_data = {
                 'username': customer.username,
                 'userPassword': customer.password,
-                'roleID': customer.role
+                'roleID': customer.role,
+                'isDisabled': 0
             }
             user_table = user.User(**user_data)
             db.add(user_table)
@@ -83,7 +85,8 @@ class UserGateway():
             user_data = {
                 'username': vendor.username,
                 'userPassword': vendor.password,
-                'roleID': vendor.role
+                'roleID': vendor.role,
+                'isDisabled': 0
             }
             user_table = user.User(**user_data)
             db.add(user_table)
@@ -117,7 +120,7 @@ class UserGateway():
             user_session_data = {}
             checkpw = False
 
-            user_object = db.query(user.User).filter(user.User.username == login.username).first()
+            user_object = db.query(user.User).filter(user.User.isDisabled==False,user.User.username == login.username).first()
             if user_object:
                 checkpw = bcrypt.checkpw(login.password.encode('utf-8'), (user_object.userPassword).encode('utf-8'))
 
@@ -135,6 +138,48 @@ class UserGateway():
                 print ("Login failed.")
 
             return user_session_data
+
+        except Exception as e:
+            print(f"Error: {e}")
+
+    def update_user_is_disabled(self, db: Session, user_id: int, is_disabled: int):
+        db.execute(update(user.User).where(user.User.userID == user_id).values(isDisabled = is_disabled))
+        db.commit()
+        result = db.query(user.User).filter(user.User.userID == user_id).first()
+        status = ""
+        if result:
+            status = result.isDisabled
+            
+        return {'status': status}
+        
+    def retrieve_user_details(self, db: Session):
+        try:
+            user_list = []
+            result = db.query(user.User).all()
+            if result:
+                for items in result:
+                    temp_list = {}
+                    temp_list['userID'] = items.userID
+                    temp_list['username'] = items.username
+                    temp_list['roleID'] = items.roleID
+                    temp_list['isDisabled'] = items.isDisabled
+                    user_list.append(temp_list)
+            return user_list
+
+
+        except Exception as e:
+            print(f"Error: {e}")
+
+    def retrieve_user_control_by_id(self, db:Session, userID: int):
+        try:
+            result = db.query(user.User).filter(user.User.userID == userID).first()
+            if result:
+                temp_list = {}
+                temp_list['userID'] = result.userID
+                temp_list['username'] = result.username
+                temp_list['roleID'] = result.roleID
+                temp_list['isDisabled'] = result.isDisabled
+                return temp_list 
 
         except Exception as e:
             print(f"Error: {e}")
