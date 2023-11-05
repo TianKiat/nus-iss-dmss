@@ -62,6 +62,9 @@ export default function AdminDashboard() {
     const [numOfPendingComplaint, setNumOfPendingComplaint] = useState(0);
     const [numOfNewComplaintToday, setNumOfNewComplaintToday] = useState(0);
     const [todayDate, setTodayDate] = useState("");
+    const [numOfUser, setNumOfUser] = useState(0);
+    const [numOfCustomer, setNumOfCustomer] = useState(0);
+    const [numOfVendor, setNumOfVendor] = useState(0);
     
     useEffect(()=>{
         const fetchComplaintList = async() => {
@@ -81,7 +84,27 @@ export default function AdminDashboard() {
                 console.log("here error")
             } 
         }
+        const fetchUserControlList = async() => {
+            try{
+                const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/retrieve_user_control`, {
+                    method: 'GET',
+                });
+                if (response.status == 200){
+                    const result = await response.json();
+                    setNumOfUser(result['total'])
+                    setNumOfCustomer(result['customer'])
+                    setNumOfVendor(result['vendor'])
+
+                }else{
+                    console.log("here")
+                }
+        
+            }catch (error){
+                console.log("here error")
+            } 
+        }
         fetchComplaintList();
+        fetchUserControlList();
         
     },[]);
   
@@ -111,7 +134,7 @@ export default function AdminDashboard() {
     return ( 
         <Container maxW="6xl">
             <Heading paddingBlock={"1.5rem"} textAlign={'center'}>Admin Dashboard</Heading>
-            <Container maxW="3xl" padding={'2'}>
+            <Container maxW="6xl" padding={'2'}>
                 <Heading paddingBlock={"1.5rem"}>Complaints</Heading>
                 {/* <Link to = {"./complaint"} state={{complaintID:4}}>
                     <button>Click Me</button>
@@ -148,8 +171,54 @@ export default function AdminDashboard() {
                     <Button colorScheme='teal' variant={'solid'}>Complaint Dashboard</Button>
                 </Link>
             </Container>
-
-            <Container maxW="3xl" padding={'2'}>
+            <Container maxW="6xl" padding={'2'}>
+                <Heading paddingBlock={"1.5rem"}>Manage User</Heading>
+                <Stack direction={"row"} paddingBottom={2}>
+                    <Card width = {"50%"} variant={'outline'}>
+                        <CardHeader>
+                            <Heading>Users</Heading>
+                        </CardHeader>
+                        <CardBody>
+                            <Box>
+                                <Stat>
+                                    <StatLabel>Number of User</StatLabel>
+                                    <StatNumber>{numOfUser}</StatNumber>
+                                </Stat>
+                            </Box>
+                        </CardBody>
+                    </Card>
+                    <Card width = {"50%"} variant={'outline'}>
+                        <CardHeader>
+                            <Heading>Customer</Heading>
+                        </CardHeader>
+                        <CardBody>
+                            <Box>
+                                <Stat>
+                                    <StatLabel>Number of Customer</StatLabel>
+                                    <StatNumber>{numOfCustomer}</StatNumber>
+                                </Stat>
+                            </Box>
+                        </CardBody>
+                    </Card>
+                    <Card width = {"50%"} variant={'outline'}>
+                        <CardHeader>
+                            <Heading>Vendor</Heading>
+                        </CardHeader>
+                        <CardBody>
+                            <Box>
+                                <Stat>
+                                    <StatLabel>Number of Vendor</StatLabel>
+                                    <StatNumber>{numOfVendor}</StatNumber>
+                                </Stat>
+                            </Box>
+                        </CardBody>
+                    </Card>
+                </Stack>
+                <Link to = {"./user_control_dashboard"}>
+                    <Button colorScheme='teal' variant={'solid'}>Manage User Dashboard</Button>
+                </Link>
+            </Container>
+            <Container maxW="6xl" padding={'2'}>
                 <Heading paddingBlock={"1.5rem"}>Manage Access Control</Heading>
                 <Link to = {"./access_control"}>
                     <Button colorScheme='teal' variant={'solid'}>Access Control</Button>

@@ -52,3 +52,6 @@ class VendorProfile(BaseModel):
 class UserStatus(BaseModel):
     userID: int
     isDisabled: int
+
+class UserStatusByID(BaseModel):
+    userID: int

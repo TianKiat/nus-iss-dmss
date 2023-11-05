@@ -80,6 +80,15 @@ class UserService():
 
     def update_user_is_disabled(self, db, user_id, is_disabled):
         return UserGateway().update_user_is_disabled(db, user_id, is_disabled)
+    
+    def retrieve_user_control(self, db):
+        total = UserGateway().retrieve_user_details(db)
+        customer = UserGateway().retrieve_customer_data(db)
+        vendor = UserGateway().retrieve_vendor_data(db)
+        return {"total":len(total),"customer":len(customer),"vendor":len(vendor),"user_list":total}
+    
+    def retrieve_user_control_by_id(self, db, userID):
+        return UserGateway().retrieve_user_control_by_id(db, userID)
 
 class Register:
     def register(self):

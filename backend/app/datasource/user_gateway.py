@@ -152,3 +152,34 @@ class UserGateway():
             
         return {'status': status}
         
+    def retrieve_user_details(self, db: Session):
+        try:
+            user_list = []
+            result = db.query(user.User).all()
+            if result:
+                for items in result:
+                    temp_list = {}
+                    temp_list['userID'] = items.userID
+                    temp_list['username'] = items.username
+                    temp_list['roleID'] = items.roleID
+                    temp_list['isDisabled'] = items.isDisabled
+                    user_list.append(temp_list)
+            return user_list
+
+
+        except Exception as e:
+            print(f"Error: {e}")
+
+    def retrieve_user_control_by_id(self, db:Session, userID: int):
+        try:
+            result = db.query(user.User).filter(user.User.userID == userID).first()
+            if result:
+                temp_list = {}
+                temp_list['userID'] = result.userID
+                temp_list['username'] = result.username
+                temp_list['roleID'] = result.roleID
+                temp_list['isDisabled'] = result.isDisabled
+                return temp_list 
+
+        except Exception as e:
+            print(f"Error: {e}")

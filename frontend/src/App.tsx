@@ -14,6 +14,8 @@ import CreateComplaint from "./pages/CreateComplaint";
 import ComplaintDashboard from "./pages/ComplaintDashboard";
 import AccessControl from "./pages/AccessControl";
 import Complaint from "./pages/Complaint";
+import UserControlDashboard from "./pages/UserControlDashboard";
+import UserControl from "./pages/UserControl";
 import Cookies from "js-cookie";
 import { useCallback, useEffect, useState } from "react";
 
@@ -65,6 +67,8 @@ function App() {
             <Route path="complaint_dashboard" element={<ComplaintDashboard cookies={cookies}/>}/>
             <Route path="complaint" element={<Complaint cookies={cookies}/>}/>
             <Route path="access_control" element={<AccessControl cookies={cookies}/>}/>
+            <Route path="user_control_dashboard" element={<UserControlDashboard cookies={cookies}/>}/>
+            <Route path="user_control" element={<UserControl cookies={cookies}/>}/>
           </Route>
         </Routes>
       </BrowserRouter>

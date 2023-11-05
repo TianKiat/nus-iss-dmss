@@ -234,7 +234,7 @@ export default function ComplaintDashboard(props:ComplaintDashboardProps){
     return (
       <>
         <Container maxW="6xl">
-          <Heading paddingBlock={"1.5rem"}>ComplaintDashboard</Heading>
+          <Heading paddingBlock={"1.5rem"}>Complaint Dashboard</Heading>
             <Stack direction={"row"}>
                 <Card width = {"50%"}>
                     <CardHeader>
