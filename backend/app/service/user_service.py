@@ -85,7 +85,15 @@ class UserService():
         total = UserGateway().retrieve_user_details(db)
         customer = UserGateway().retrieve_customer_data(db)
         vendor = UserGateway().retrieve_vendor_data(db)
-        return {"total":len(total),"customer":len(customer),"vendor":len(vendor),"user_list":total}
+        try:
+            total_user = len(total)
+            total_customer = len(customer)
+            total_vendor = len(vendor)
+            return {"total":total_user,"customer":len(customer),"vendor":len(vendor),"user_list":total}
+        except():
+            return {"total":0,"customer":0,"vendor":0,"user_list":total}
+        
+        
     
     def retrieve_user_control_by_id(self, db, userID):
         return UserGateway().retrieve_user_control_by_id(db, userID)
