@@ -34,7 +34,8 @@ interface StoreCardProps {
 
 const StoreCard = (props: StoreCardProps) => {
     const now = new Date();
-    const storeStatus = storeOpenCloseStatus(props.openingHours[now.getDay() - 1]);
+    const day = now.getDay() > 1 ? now.getDay() - 1 : 6;
+    const storeStatus = storeOpenCloseStatus(props.openingHours[day]);
 
     return (
         <Button
