@@ -39,10 +39,11 @@ interface ComplaintProps{
 
 export default function Complaint(props:ComplaintProps){
     if(props.cookies!=null){
-        if (props.cookies["roleID"] != 1){
+        if (!props.cookies['access'].includes(5)){
             location.replace('../Error')
         }else{
-            //console.log(props.cookies)
+            // console.log(props.cookies["access"])
+            // console.log(props.cookies['access'].includes(5))
         }
         
     }else{
