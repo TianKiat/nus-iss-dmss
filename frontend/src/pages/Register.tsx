@@ -13,7 +13,6 @@ import {
   Heading,
   Text,
   useColorModeValue,
-  Link,
   Tab,
   Tabs,
   TabList,
@@ -35,6 +34,7 @@ import {
 import { useEffect, useState, useRef } from "react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import React from "react";
+import { Link, useNavigate } from 'react-router-dom'
 
 interface ICustomerData {
   name: string,
@@ -470,7 +470,10 @@ function CustomerSignUp({ formData, error, dupError, handleChange, isPasswordMat
         </Stack>
         <Stack pt={6}>
           <Text align={"center"}>
-            Already a user? <Link href="/login" color={"blue.400"}>Login</Link>
+            Already a user? <Link to="/login">
+              <Button variant={'link'} colorScheme={'blue'} size={'sm'}>
+                Sign In
+              </Button></Link>
           </Text>
         </Stack>
       </Stack>
@@ -647,7 +650,10 @@ function VendorSignUp({ formData, error, dupError, handleChange, isPasswordMatch
         </Stack>
         <Stack pt={6}>
           <Text align={"center"}>
-            Already a user? <Link href="/login" color={"blue.400"}>Login</Link>
+            Already a user? <Link to="/login">
+              <Button variant={'link'} colorScheme={'blue'} size={'sm'}>
+                Sign In
+              </Button></Link>
           </Text>
         </Stack>
       </Stack>
@@ -656,6 +662,7 @@ function VendorSignUp({ formData, error, dupError, handleChange, isPasswordMatch
 }
 
 export default function Register() {
+  const navigate = useNavigate();
   const apiURL = process.env.VITE_API_BASE_URL;
   const initialCustomerFormData = {
     role: "3", // Initialize role with a default value
@@ -998,7 +1005,7 @@ export default function Register() {
           setCustomerOpenClose(false)
           setShowAlert(true);
           setTimeout(() => {
-            window.location.href = '/login';
+            navigate('/login');
           }, 3000);
         }
       }
@@ -1155,7 +1162,7 @@ export default function Register() {
           setVendorOpenClose(false)
           setShowAlert(true);
           setTimeout(() => {
-            window.location.href = '/login';
+            navigate('/login');
           }, 3000);
         }
       }
