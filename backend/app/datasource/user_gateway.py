@@ -2,6 +2,7 @@ import uuid, bcrypt
 from sqlalchemy.orm import Session
 from app.common.user_model import User, Vendor, Login
 from app.models import user, user_profile, vendor_profile, otp
+from sqlalchemy import update
 
 class UserGateway():
     def __init__(self):
@@ -119,7 +120,7 @@ class UserGateway():
             user_session_data = {}
             checkpw = False
 
-            user_object = db.query(user.User).filter(user.User.username == login.username).first()
+            user_object = db.query(user.User).filter(user.User.isDisabled==False,user.User.username == login.username).first()
             if user_object:
                 checkpw = bcrypt.checkpw(login.password.encode('utf-8'), (user_object.userPassword).encode('utf-8'))
 
@@ -140,3 +141,14 @@ class UserGateway():
 
         except Exception as e:
             print(f"Error: {e}")
+
+    def update_user_is_disabled(self, db: Session, user_id: int, is_disabled: int):
+        db.execute(update(user.User).where(user.User.userID == user_id).values(isDisabled = is_disabled))
+        db.commit()
+        result = db.query(user.User).filter(user.User.userID == user_id).first()
+        status = ""
+        if result:
+            status = result.isDisabled
+            
+        return {'status': status}
+        

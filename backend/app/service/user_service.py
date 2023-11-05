@@ -78,6 +78,9 @@ class UserService():
 
         return auth_user
 
+    def update_user_is_disabled(self, db, user_id, is_disabled):
+        return UserGateway().update_user_is_disabled(db, user_id, is_disabled)
+
 class Register:
     def register(self):
         pass

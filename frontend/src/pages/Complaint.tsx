@@ -33,14 +33,28 @@ import {Link, useLocation} from 'react-router-dom';
 //     complaintID: number
 // }
 
-export default function Complaint(){
+interface ComplaintProps{
+    cookies: any
+}
+
+export default function Complaint(props:ComplaintProps){
+    if(props.cookies!=null){
+        if (props.cookies["roleID"] != 1){
+            location.replace('../Error')
+        }else{
+            //console.log(props.cookies)
+        }
+        
+    }else{
+      location.replace('../')
+    }
     //const [complaintData, setComplaintData] = useState<IComplaintData>();
     const [complaintList, setComplaintList] = useState<any[]>([]);
     const [showComplaint, setShowComplaint] = useState<any[]>([]);
     const [status, setStatus] = useState({isSuccessful: false});
     const [isClicked, setIsClicked] = useState(false);
-    const location = useLocation();
-    const complaintID = location != null?location.state.complaintID:0
+    const locationObj = useLocation();
+    const complaintID = locationObj != null?locationObj.state.complaintID:0
     useEffect(()=>{
         const fetchComplaintList = async() => {
           try{

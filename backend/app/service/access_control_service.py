@@ -14,30 +14,14 @@ class AccessControlService():
         original_list = AccessControlGateway().get_access_control_list(db,roleID)
         add_list = []
         remove_list = []
-        # print(access_list)
-        # print(original_list)
-
-        # if(len(access_list)>len(original_list)):
-        #     for item in access_list:
-                
-        #         if item in original_list==False:
-        #             print(item)
-        #             add_list.append(item)
-
-        # elif(len(original_list)>len(access_list)):
-        #     for item in original_list:
-                
-        #         if item in access_list==False:
-        #             print(item)
-        #             remove_list.append(item)
-        
-        # elif(len(original_list)==len(access_list)):
-        #     add_list = access_list.copy()
-        #     remove_list = original_list.copy()
-        # print("final")
-        # print(add_list,remove_list)
 
         add_list = access_list.copy()
         remove_list = original_list.copy()
-        print(add_list,remove_list)
-        return add_list,remove_list
+
+        for access_id in remove_list:
+            AccessControlGateway().delete_access_control(db,roleID, access_id)
+
+        for new_access_id in add_list:
+            AccessControlGateway().insert_access_control(db,roleID, new_access_id)
+
+        return {"status":"completed"}

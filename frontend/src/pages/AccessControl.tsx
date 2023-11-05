@@ -1,210 +1,92 @@
 "use client";
 
 import {
-    Box,
-    Input,
     Stack,
     Button,
     Heading,
-    Text,
     Container,
     Select,
-    CardBody,
-    CardHeader,
-    Card,
-    Stat,
-    StatLabel,
-    StatNumber,
-    CardFooter,
     CheckboxGroup,
     Checkbox
 } from "@chakra-ui/react";
 
 import { useEffect, useState } from "react";
 
-import Cookies from 'js-cookie';
-
 interface AccessControlProps{
     cookies: any
-}
-
-const enumRole = {
-    admin: 1,
-    vendor:2,
-    customer:3,
-
-}
-
-function load_stuff(){
-    
-    return(
-        <div>hello</div>
-    )
-}
-
-function displayList(full_list,role_list, onChangeMethod, getNewControl){
-    console.log(role_list)
-    return(
-        <>
-            {/* <div>Hello</div>
-            {
-                Object.keys(full_list).map(key=>{
-                    return(
-                        <div>
-                            <label>{key}</label>
-                            <label>{full_list[key]}</label>
-                        </div>
-                    )
-                })
-                
-            } */}
-            <CheckboxGroup defaultValue={role_list}>
-                <Stack>
-                    {Object.keys(full_list).map(key=>{
-                        console.log(key) ;   
-                        console.log(role_list.includes(parseInt(key)))   ;  
-                        return(
-                                              
-                            <Checkbox id={key} isChecked={role_list.includes(parseInt(key))} onChange={(e)=>onChangeMethod(key, e.target.checked)}> {full_list[key]}</Checkbox>
-                        )
-                    })}
-                    {/* <Checkbox value={key}>{full_list[key]}</Checkbox> */}
-                </Stack>
-            </CheckboxGroup>
-            <Button onClick={()=>getNewControl()}></Button>
-            
-        </>
-        
-    )
 }
 
 export default function AccessControl (props:AccessControlProps){
     if(props.cookies!=null){
         if (props.cookies["roleID"] != 1){
-            return location.replace('../Error')
+            location.replace('../Error')
+        }else{
+            //console.log(props.cookies)
         }
         
     }else{
-       return location.replace('../')
+       location.replace('../')
     }
-    const [retrieved, SetRetrieved] = useState([false])
-    const [fullAccessControlList, setFullAccessControlList] = useState([]);
-    const [tempList, setTempList] = useState([]);
-    const [AccessControlListByRole, setAccessControlListByRole] = useState([]);
+
+    const [fullAccessControlList, setFullAccessControlList] = useState({});
     const [filterRole, setFilterRole] = useState('Admin');
+    const [tempAccessList, setTempAccessList] = useState<any[]>([]);
 
-    function retrieveAccessControl(){
-        switch(filterRole){
-            case "Admin":
-                console.log("Admin")
-                getAccessControlList(1);
-                break
-            case "Vendor":
-                console.log("Vendor")
-                getAccessControlList(2);
-                break
-            case "Customer":
-                console.log("Customer")
-                getAccessControlList(3);
-                break
-        }
-    }
-
-    async function getAccessControlList(access_role_id: int){
-        try{
-            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/get_access_list`, {
-                method: 'GET',
-                
-            });
-            if (response.status == 200){
-                const full_list = await response.json();
-                //setComplaints([...complaints, complaint])
-                //console.log(Object.keys(full_list));
-                //console.log(Object.values(full_list));
-
-                
-                setFullAccessControlList(full_list);
-                //setFullAccessControlListName(Object.values(full_list));
-
+    useEffect(()=>{
+        const fetchAccessList = async()=>{
+            try{
+                const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/get_access_list`, {
+                    method: 'GET',
+                    
+                });
+                if (response.status == 200){
+                    const full_list = await response.json();
+    
+                    
+                    setFullAccessControlList(full_list);
+    
+    
+                }
+    
+            }catch (error){
+                console.log("got here");
             }
-
-        }catch (error){
-            console.log("got here")
         }
-        try{
-            const response1 = await fetch(`${import.meta.env.VITE_API_BASE_URL}/get_access_list_by_role`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({roleID: access_role_id}),
-                
-            });
-            if (response1.status == 200){
-                const full_list = await response1.json();
-                //setComplaints([...complaints, complaint])
-                console.log(full_list)
-                setAccessControlListByRole(full_list);
-            }
+        fetchAccessList();
+    },[])
 
-        }catch (error){
-            console.log("got here")
-        }
-    }
-
-    async function setAccessControlList(access_role_id: int){
+    async function setAccessControlList(access_role_id: number){
         try{
             const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/update_access_list`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({roleID: access_role_id, access_list: tempList}),
+                body: JSON.stringify({roleID: access_role_id, access_list: tempAccessList}),
             });
             if (response.status == 200){
-               console.log("return here")
-                //setComplaints([...complaints, complaint])
-                //console.log(Object.keys(full_list));
-                //console.log(Object.values(full_list));
-
-                
-                
-                //setFullAccessControlListName(Object.values(full_list));
+               console.log("Updated")
 
             }
 
         }catch (error){
             console.log("got here")
         }
-        try{
-            const response1 = await fetch(`${import.meta.env.VITE_API_BASE_URL}/get_access_list_by_role`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({roleID: access_role_id}),
-                
-            });
-            if (response1.status == 200){
-                const full_list = await response1.json();
-                //setComplaints([...complaints, complaint])
-                console.log(full_list)
-                setAccessControlListByRole(full_list);
-            }
-
-        }catch (error){
-            console.log("got here")
-        }
+        
     }
 
-    function onChange(e:any, isChecked){
+    function onChangeMethod(key:any, isChecked:any){
+        const tempList = tempAccessList;
         if(isChecked){
-            if(tempList.includes(e)!=true){
-                tempList.push(e);
+            if(tempList.includes(key)!=true){
+                tempList.push(key);
+                setTempAccessList(tempList);
             }
         }else{
-            if(tempList.includes(e)){
-                tempList.pop(e);
+            if(tempList.includes(key)){
+                const index = tempList.findIndex(key);
+                tempList.splice(index, 1);
+                setTempAccessList(tempList);
             }
         }
         
@@ -212,18 +94,14 @@ export default function AccessControl (props:AccessControlProps){
     }
 
     function getNewControl(){
-        console.log(tempList);
         switch(filterRole){
             case "Admin":
-                console.log("Admin");
                 setAccessControlList(1);
                 break
             case "Vendor":
-                console.log("Vendor");
                 setAccessControlList(2);
                 break
             case "Customer":
-                console.log("Customer");
                 setAccessControlList(3);
                 break
         }
@@ -239,13 +117,23 @@ export default function AccessControl (props:AccessControlProps){
                         <option value="Vendor">Vendor</option>
                         <option value="Customer">Customer</option>
                     </Select>
-                    <Button onClick={()=>retrieveAccessControl()}>Retrieve Access Control For Role</Button>
+                    {/* <Button onClick={()=>retrieveAccessControl()}>Retrieve Access Control For Role</Button> */}
                 </Stack>
 
-                {retrieved?
-                displayList(fullAccessControlList,AccessControlListByRole, onChange, getNewControl)
-                :""
-                }
+                <CheckboxGroup>
+                    <Stack>
+                        {Object.keys(fullAccessControlList).map((key)=>{
+                            return(
+                                
+                                <Checkbox id={key} onChange={(e)=>onChangeMethod(key, e.target.checked)}> {fullAccessControlList[key as keyof typeof fullAccessControlList]}</Checkbox>
+                            )
+                        })}
+                        {/* <Checkbox value={key}>{full_list[key]}</Checkbox> */}
+                    </Stack>
+                </CheckboxGroup>
+
+            
+                <Button onClick={()=>getNewControl()}>update access</Button>
             </Container>
         </>
     )

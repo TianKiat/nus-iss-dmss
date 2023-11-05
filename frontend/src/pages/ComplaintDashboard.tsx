@@ -72,7 +72,22 @@ import {Link} from "react-router-dom";
 //   )
 // }
 
-export default function ComplaintDashboard(){
+interface ComplaintDashboardProps{
+  cookies: any
+}
+
+export default function ComplaintDashboard(props:ComplaintDashboardProps){
+    if(props.cookies!=null){
+        if (props.cookies["roleID"] != 1){
+            location.replace('../Error')
+        }else{
+            //console.log(props.cookies)
+        }
+        
+    }else{
+      location.replace('../')
+    }
+
     //const [complaintData, setComplaintData] = useState<IComplaintData>();
     const [complaintList, setComplaintList] = useState<any[]>([]);
     const [numOfComplaint, setNumOfComplaint] = useState(0);
