@@ -97,7 +97,12 @@ export default function AdminDashboard() {
     const getTodayDate = ()=>{
         let today = new Date().toLocaleDateString();
         const dateArray = today.split('/');
-        let newDate = dateArray[2]+'-'+dateArray[0]+'-'+dateArray[1];
+        let newDate;
+        if(parseInt(dateArray[1])<10){
+            newDate = dateArray[2]+'-'+dateArray[0]+'-0'+dateArray[1];
+        }else{
+            newDate = dateArray[2]+'-'+dateArray[0]+'-'+dateArray[1];
+        }
         setTodayDate(newDate);
         
   
