@@ -82,15 +82,14 @@ export default function AdminDashboard() {
         
             }catch (error){
                 console.log("here error")
-            } 
-        }
-        const fetchUserControlList = async() => {
+            }
             try{
-                const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/retrieve_user_control`, {
+                const response1 = await fetch(`${import.meta.env.VITE_API_BASE_URL}/retrieve_user_control`, {
                     method: 'GET',
                 });
-                if (response.status == 200){
-                    const result = await response.json();
+                if (response1.status == 200){
+                    const result = await response1.json();
+                    console.log(result)
                     setNumOfUser(result['total'])
                     setNumOfCustomer(result['customer'])
                     setNumOfVendor(result['vendor'])
@@ -101,10 +100,11 @@ export default function AdminDashboard() {
         
             }catch (error){
                 console.log("here error")
-            } 
+            }  
         }
+        
         fetchComplaintList();
-        fetchUserControlList();
+        
         
     },[]);
   
