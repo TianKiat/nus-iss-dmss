@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -140,7 +141,7 @@ export default function ComplaintDashboard(props:ComplaintDashboardProps){
     },[complaintList]);
 
     const getTodayDate = ()=>{
-      let today = new Date().toLocaleDateString();
+      const today = new Date().toLocaleDateString();
       const dateArray = today.split('/');
       let newDate;
       if(parseInt(dateArray[1])<10){
