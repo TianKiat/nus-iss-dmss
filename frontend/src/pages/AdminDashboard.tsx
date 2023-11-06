@@ -89,7 +89,7 @@ export default function AdminDashboard() {
                 });
                 if (response1.status == 200){
                     const result = await response1.json();
-                    console.log(result)
+                    //console.log(result)
                     setNumOfUser(result['total'])
                     setNumOfCustomer(result['customer'])
                     setNumOfVendor(result['vendor'])
@@ -110,10 +110,10 @@ export default function AdminDashboard() {
   
     useEffect(()=>{
         setNumOfPendingComplaint(complaintList.filter(c=>c.status == 'pending').length);
-        console.log(complaintList.filter(c=>c.status == 'pending').length);
+        //console.log(complaintList.filter(c=>c.status == 'pending').length);
         
         getTodayDate();
-        console.log(complaintList.filter(c=>c.createdtime.toString().includes(todayDate)).length);
+        //console.log(complaintList.filter(c=>c.createdtime.toString().includes(todayDate)).length);
         setNumOfNewComplaintToday(complaintList.filter(c=>c.createdtime.toString().includes(todayDate)).length);
     },[complaintList]);
   

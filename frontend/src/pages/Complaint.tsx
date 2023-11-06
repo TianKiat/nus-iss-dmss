@@ -69,7 +69,7 @@ export default function Complaint(props:ComplaintProps){
             });
             if (response.status == 200){
                 const complaint = await response.json();
-                console.log(complaint[0]['status']);
+                //console.log(complaint[0]['status']);
                 setComplaintStatus(complaint[0]['status'])
                 setComplaintList(complaint);
                 
@@ -87,8 +87,8 @@ export default function Complaint(props:ComplaintProps){
       },[]);
 
       const handleUpdateStatus = async (complaintID: number)=>{
-        console.log("click until me");
-        console.log(complaintID);
+        //console.log("click until me");
+        //console.log(complaintID);
         try{
             const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/update_complaint_status`, {
                 method: 'POST',
@@ -99,8 +99,8 @@ export default function Complaint(props:ComplaintProps){
             });
             if (response.status == 200){
                 const result = await response.json();
-                console.log(result)
-                console.log(result['status'])
+                //console.log(result)
+                //console.log(result['status'])
                 setComplaintStatus(result['status'])
                 //setComplaintList(complaint);
                 setStatus({isSuccessful: true})
