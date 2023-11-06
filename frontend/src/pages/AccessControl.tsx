@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -93,7 +94,7 @@ export default function AccessControl (props:AccessControlProps){
 
     function onChangeMethod(key:any, isChecked:any){
         const tempList = tempAccessList;
-        console.log(key.toString())
+        //console.log(key.toString())
         if(isChecked){
             if(tempList.includes(key)!=true){
                 tempList.push(key);

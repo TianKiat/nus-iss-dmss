@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -15,7 +16,9 @@ import {
     Stat,
     StatLabel,
     StatNumber,
-    CardFooter
+    CardFooter,
+    Flex,
+    Spacer
 } from "@chakra-ui/react";
 
 import { useEffect, useState } from "react";
@@ -138,7 +141,7 @@ export default function ComplaintDashboard(props:ComplaintDashboardProps){
     },[complaintList]);
 
     const getTodayDate = ()=>{
-      let today = new Date().toLocaleDateString();
+      const today = new Date().toLocaleDateString();
       const dateArray = today.split('/');
       let newDate;
       if(parseInt(dateArray[1])<10){
@@ -214,18 +217,32 @@ export default function ComplaintDashboard(props:ComplaintDashboardProps){
       // console.log(filterStatus);
       // console.log(complaintList.filter(c => c.createdtime.includes(filterText)));
 
-      const byTitle = (complaint: any) => {return complaint.title.toLowerCase().includes(filterText.toLowerCase()) && complaint.status.includes(filterStatus)};
-      const byDescription = (complaint: any) =>{return complaint.description.toLowerCase().includes(filterText.toLowerCase()) && complaint.status.includes(filterStatus)};
-      const byComment = (complaint: any) => {return complaint.comment.toLowerCase().includes(filterText.toLowerCase()) && complaint.status.includes(filterStatus)};
-      const byUser = (complaint: any) => {return complaint.userID.toString().includes(filterText) && complaint.status.includes(filterStatus)};
-      const byDate = (complaint: any) => {return complaint.createdtime.includes(filterText.toLowerCase()) && complaint.status.includes(filterStatus)};
+      // const byTitle = (complaint: any) => {return complaint.title.toLowerCase().includes(filterText.toLowerCase()) && complaint.status.includes(filterStatus)};
+      // const byDescription = (complaint: any) =>{return complaint.description.toLowerCase().includes(filterText.toLowerCase()) && complaint.status.includes(filterStatus)};
+      // const byComment = (complaint: any) => {return complaint.comment.toLowerCase().includes(filterText.toLowerCase()) && complaint.status.includes(filterStatus)};
+      // const byUser = (complaint: any) => {return complaint.userID.toString().includes(filterText) && complaint.status.includes(filterStatus)};
+      // const byDate = (complaint: any) => {return complaint.createdtime.includes(filterText.toLowerCase()) && complaint.status.includes(filterStatus)};
+      // switch(filterSearchCategory){
+      //   case '': setFilteredList(complaintList.filter(c=>c)); break;
+      //   case 'title': setFilteredList(complaintList.filter(byTitle(filterText)));break;
+      //   case 'description': setFilteredList(complaintList.filter(byDescription(filterText)));break;
+      //   case 'comment': setFilteredList(complaintList.filter(byComment(filterText)));break;
+      //   case 'user': setFilteredList(complaintList.filter(byUser(filterText)));break;
+      //   case 'date': setFilteredList(complaintList.filter(byDate(filterText)));break;
+
+      // }
+      // const byTitle = (complaint: any) => {return complaint.title.toLowerCase().includes(filterText.toLowerCase()) && complaint.status.includes(filterStatus)};
+      // const byDescription = (complaint: any) =>{return complaint.description.toLowerCase().includes(filterText.toLowerCase()) && complaint.status.includes(filterStatus)};
+      // const byComment = (complaint: any) => {return complaint.comment.toLowerCase().includes(filterText.toLowerCase()) && complaint.status.includes(filterStatus)};
+      // const byUser = (complaint: any) => {return complaint.userID.toString().includes(filterText) && complaint.status.includes(filterStatus)};
+      // const byDate = (complaint: any) => {return complaint.createdtime.includes(filterText.toLowerCase()) && complaint.status.includes(filterStatus)};
       switch(filterSearchCategory){
         case '': setFilteredList(complaintList.filter(c=>c)); break;
-        case 'title': setFilteredList(complaintList.filter(byTitle(filterText)));break;
-        case 'description': setFilteredList(complaintList.filter(byDescription(filterText)));break;
-        case 'comment': setFilteredList(complaintList.filter(byComment(filterText)));break;
-        case 'user': setFilteredList(complaintList.filter(byUser(filterText)));break;
-        case 'date': setFilteredList(complaintList.filter(byDate(filterText)));break;
+        case 'title': setFilteredList(complaintList.filter(c => c.title.toLowerCase().includes(filterText.toLowerCase()) && c.status.includes(filterStatus)));break;
+        case 'description': setFilteredList(complaintList.filter(c => c.description.toLowerCase().includes(filterText.toLowerCase()) && c.status.includes(filterStatus)));break;
+        case 'comment': setFilteredList(complaintList.filter(c => c.comment.toLowerCase().includes(filterText.toLowerCase()) && c.status.includes(filterStatus)));break;
+        case 'user': setFilteredList(complaintList.filter(c => c.profileName.toLowerCase().includes(filterText.toLowerCase()) && c.status.includes(filterStatus)));break;
+        case 'date': setFilteredList(complaintList.filter(c => c.createdtime.includes(filterText.toLowerCase()) && c.status.includes(filterStatus)));break;
 
       }
       
@@ -234,7 +251,17 @@ export default function ComplaintDashboard(props:ComplaintDashboardProps){
     return (
       <>
         <Container maxW="6xl">
-          <Heading paddingBlock={"1.5rem"}>Complaint Dashboard</Heading>
+          <Flex paddingBlock={"1.5rem"}>
+            <Box>
+              <Heading >Complaint Dashboard</Heading>
+            </Box>
+            <Spacer />
+            <Box>
+              <Link to = {"../"}>
+                <Button colorScheme='teal' variant={'solid'}>Back to Admin Dashboard</Button>
+              </Link>
+            </Box>
+          </Flex>
             <Stack direction={"row"}>
                 <Card width = {"50%"}>
                     <CardHeader>
