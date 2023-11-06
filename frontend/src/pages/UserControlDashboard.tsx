@@ -81,7 +81,7 @@ export default function UserControlDashboard(props:UserControlDashboardProps){
     
     const searchByFilter = () =>{
       switch(filterSearchCategory){
-        case '': setFilteredList(userControlList.filter(c=>c)); break;
+        case '': setFilteredList(userControlList.filter(c=>c.username.toLowerCase().includes(filterText.toLowerCase()))); break;
         case '2': setFilteredList(userControlList.filter(c=>c.roleID == 2 && c.username.toLowerCase().includes(filterText.toLowerCase())));break;
         case '3': setFilteredList(userControlList.filter(c=>c.roleID == 3 && c.username.toLowerCase().includes(filterText.toLowerCase())));break;
       }
