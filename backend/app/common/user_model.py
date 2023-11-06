@@ -48,3 +48,10 @@ class VendorProfile(BaseModel):
     status: bool
     userID: int
     shopDesc: str
+
+class UserStatus(BaseModel):
+    userID: int
+    isDisabled: int
+
+class UserStatusByID(BaseModel):
+    userID: int

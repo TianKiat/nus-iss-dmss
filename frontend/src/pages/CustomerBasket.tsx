@@ -63,7 +63,7 @@ const PlaceOrderPopup = (props: PlaceOrderPopupProps) => {
 
     const placeOrder = async() => {
         var newInvoiceID = null;
-        if (promoCode != null && promoCode["minimumSpending"] <= props.price && promoCode["discountType"] == "ONEFORONE") {
+        if (promoCode != null && promoCode["minimumSpending"] <= props.price && String(promoCode["discountType"]).toUpperCase() == "ONEFORONE") {
             let response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/invoice/delete`, {
                 method: "POST",
                 body: JSON.stringify({invoiceID: props.invoiceID}),
@@ -114,7 +114,7 @@ const PlaceOrderPopup = (props: PlaceOrderPopupProps) => {
                 status: "PENDING",
                 discount: 
                     promoCode != null && promoCode["minimumSpending"] <= props.price ?
-                        promoCode["discountType"] == "DISCOUNT" ?
+                        String(promoCode["discountType"]).toUpperCase() == "DISCOUNT" ?
                             Number((promoCode["discount"] * props.price) / 100)
                             : props.price
                         : 0
@@ -159,12 +159,12 @@ const PlaceOrderPopup = (props: PlaceOrderPopupProps) => {
                                 <ListItem key={item["menuItemID"]} display="flex">
                                     <Text w="250px">{item["foodName"]}</Text>
                                     <Text w="50px">
-                                        X {promoCode != null && promoCode["minimumSpending"] <= props.price && promoCode["discountType"] == "ONEFORONE"?
+                                        X {promoCode != null && promoCode["minimumSpending"] <= props.price && String(promoCode["discountType"]).toUpperCase() == "ONEFORONE"?
                                             item["quantity"] * 2 : item["quantity"]
                                         }
                                     </Text>
                                     <Text w="100px" textAlign="right">
-                                        ${promoCode != null && promoCode["minimumSpending"] <= props.price && promoCode["discountType"] == "ONEFORONE"?
+                                        ${promoCode != null && promoCode["minimumSpending"] <= props.price && String(promoCode["discountType"]).toUpperCase() == "ONEFORONE"?
                                             Number(item["price"] * 2) : item["price"].toFixed(2)
                                         }
                                     </Text>
@@ -174,7 +174,7 @@ const PlaceOrderPopup = (props: PlaceOrderPopupProps) => {
                         <Flex>
                             <Heading size="sm" w="300px">Sub-total</Heading>
                             <Heading size="sm" w="100px" textAlign="right">
-                                ${promoCode != null && promoCode["minimumSpending"] <= props.price && promoCode["discountType"] == "ONEFORONE"?
+                                ${promoCode != null && promoCode["minimumSpending"] <= props.price && String(promoCode["discountType"]).toUpperCase() == "ONEFORONE"?
                                     Number(props.price * 2).toFixed(2) : props.price.toFixed(2)
                                 }
                             </Heading>
@@ -204,7 +204,7 @@ const PlaceOrderPopup = (props: PlaceOrderPopupProps) => {
                         <Flex>
                             <Text w="100px">Sub-total</Text>
                             <Text w="100px" textAlign="right">
-                                ${promoCode != null && promoCode["minimumSpending"] <= props.price && promoCode["discountType"] == "ONEFORONE"?
+                                ${promoCode != null && promoCode["minimumSpending"] <= props.price && String(promoCode["discountType"]).toUpperCase() == "ONEFORONE"?
                                     Number(props.price * 2).toFixed(2) : props.price.toFixed(2)
                                 }
                             </Text>
@@ -213,13 +213,13 @@ const PlaceOrderPopup = (props: PlaceOrderPopupProps) => {
                             <Text w="100px">Discount</Text>
                             <Text w="100px" textAlign="right">-${
                                 promoCode != null && promoCode["minimumSpending"] <= props.price ?
-                                    promoCode["discountType"] == "DISCOUNT" ?
+                                    String(promoCode["discountType"]).toUpperCase() == "DISCOUNT" ?
                                         Number((promoCode["discount"] * props.price) / 100).toFixed(2)
                                         : props.price.toFixed(2)
                                     : Number(0).toFixed(2)
                             }</Text>
                             {promoCode != null && promoCode["minimumSpending"] <= props.price ?
-                                promoCode["discountType"] == "ONEFORONE" ?
+                                String(promoCode["discountType"]).toUpperCase() == "ONEFORONE" ?
                                     <Text p="0rem 0.5rem" ml="1rem" backgroundColor="gray.200" borderRadius="5px">
                                         1-FOR-1
                                     </Text>
@@ -234,7 +234,7 @@ const PlaceOrderPopup = (props: PlaceOrderPopupProps) => {
                             <Text w="100px" fontWeight="bold">Total</Text>
                             <Text w="100px" fontWeight="bold" textAlign="right">${
                                 promoCode != null && promoCode["minimumSpending"] <= props.price ?
-                                promoCode["discountType"] == "DISCOUNT" ?
+                                String(promoCode["discountType"]).toUpperCase() == "DISCOUNT" ?
                                     Number(props.price - ((promoCode["discount"] * props.price) / 100)).toFixed(2)
                                     : Number(props.price).toFixed(2)
                                 : Number(props.price).toFixed(2)
