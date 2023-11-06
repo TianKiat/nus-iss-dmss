@@ -77,7 +77,7 @@ export default function UserControl(props:UserControlProps){
             });
             if (response.status == 200){
                 const result = await response.json();
-                console.log(result)
+                //console.log(result)
                 
                 setUserControlStatus(result['status'])
                 //setUserControlList(userControl);

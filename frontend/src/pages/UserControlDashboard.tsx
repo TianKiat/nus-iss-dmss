@@ -15,7 +15,9 @@ import {
     Stat,
     StatLabel,
     StatNumber,
-    CardFooter
+    CardFooter,
+    Spacer,
+    Flex
 } from "@chakra-ui/react";
 
 import { useEffect, useState } from "react";
@@ -61,7 +63,7 @@ export default function UserControlDashboard(props:UserControlDashboardProps){
                   setNumOfCustomer(result['customer'])
                   setNumOfVendor(result['vendor'])
                   setUserControlList(result['user_list'])
-                  console.log(result['user_list'])
+                  //console.log(result['user_list'])
 
               }else{
                   console.log("here")
@@ -89,7 +91,18 @@ export default function UserControlDashboard(props:UserControlDashboardProps){
     return (
       <>
         <Container maxW="6xl">
-          <Heading paddingBlock={"1.5rem"}>User Dashboard</Heading>
+          <Flex paddingBlock={"1.5rem"}>
+            <Box>
+              <Heading >User Dashboard</Heading>
+            </Box>
+            <Spacer />
+            <Box>
+              <Link to = {"../"}>
+                <Button colorScheme='teal' variant={'solid'}>Back to Admin Dashboard</Button>
+              </Link>
+            </Box>
+          </Flex>
+          
           <Stack direction={"row"} paddingBottom={2}>
             <Card width = {"50%"} variant={'outline'}>
               <CardHeader>
