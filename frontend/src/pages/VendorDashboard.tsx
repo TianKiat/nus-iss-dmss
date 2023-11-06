@@ -63,7 +63,7 @@ const DataCard = ({
 }: {
   id: string;
   icon: string;
-  data: Number;
+  data: number;
   subtitle: string;
 }) => {
   const iconFactory = (iconType:string) => {
@@ -96,19 +96,19 @@ const DataCard = ({
 };
 
 interface MenuItem {
-  menuItemID: Number;
+  menuItemID: number;
   menuItemName: string;
-  price: Number;
+  price: number;
   menuItemImage: string;
   menuItemDesc: string;
   isValid: boolean;
-  vendorProfileID: Number;
+  vendorProfileID: number;
 }
 
 interface MenuListProps {
   items: MenuItem[];
   onEditMenuItem: (menuItem: MenuItem) => void;
-  onDeleteMenuItem: (menuItemId: Number) => void;
+  onDeleteMenuItem: (menuItemId: number) => void;
 }
 
 const MenuList: FunctionComponent<MenuListProps> = (props) => {
@@ -164,8 +164,8 @@ const MenuList: FunctionComponent<MenuListProps> = (props) => {
 };
 
 interface TabProps {
-  userID: Number;
-  profileID: Number;
+  userID: number;
+  profileID: number;
 }
 
 function MenuTab(props: TabProps) {
@@ -173,8 +173,8 @@ function MenuTab(props: TabProps) {
   const [description, setDescription] = useState<string>("");
   const [itemName, setItemName] = useState<string>("");
   const [imageUrl, setImageUrl] = useState<string>("");
-  const [price, setPrice] = useState<Number>(0);
-  let url = `${import.meta.env.VITE_API_BASE_URL}/menu_items/get/${
+  const [price, setPrice] = useState<number>(0);
+  const url = `${import.meta.env.VITE_API_BASE_URL}/menu_items/get/${
     props.userID
   }`;
   const createUrl = `${import.meta.env.VITE_API_BASE_URL}/menu_items/create`;
@@ -189,7 +189,7 @@ function MenuTab(props: TabProps) {
     onOpen(); // Open the modal
   }
 
-  async function handleDeleteMenuItem(menuItemID: Number) {
+  async function handleDeleteMenuItem(menuItemID: number) {
     try {
       const response = await fetch(
         `${
@@ -384,7 +384,7 @@ function MenuTab(props: TabProps) {
                 <FormLabel>Price</FormLabel>
                 <Input
                   type="text"
-                  onChange={(e) => setPrice(Number(e.target.value))}
+                  onChange={(e) => setPrice(number(e.target.value))}
                   isRequired
                   defaultValue={
                     selectedMenuItem
@@ -421,21 +421,21 @@ function MenuTab(props: TabProps) {
 }
 
 interface Promotion {
-  promotionID: Number;
+  promotionID: number;
   promoCode: string;
-  discount: Number;
-  discountType: String;
-  minimumSpending: Number;
-  isValid: Boolean;
-  vendorProfileID: Number;
+  discount: number;
+  discountType: string;
+  minimumSpending: number;
+  isValid: boolean;
+  vendorProfileID: number;
 }
 
 function PromotionTab(props: TabProps) {
-  const [discount, setDiscount] = useState<Number>(0);
+  const [discount, setDiscount] = useState<number>(0);
   const [discountType, setDiscountType] = useState<string>("discount");
-  const [minimumSpending, setMinimumSpending] = useState<Number>(0);
+  const [minimumSpending, setMinimumSpending] = useState<number>(0);
   const [promoCode, setPromoCode] = useState<string>("");
-  let url = `${import.meta.env.VITE_API_BASE_URL}/vendor/promotion/get/${
+  const url = `${import.meta.env.VITE_API_BASE_URL}/vendor/promotion/get/${
     props.userID
   }`;
   const createUrl = `${import.meta.env.VITE_API_BASE_URL}/promotion/create`;
@@ -445,7 +445,6 @@ function PromotionTab(props: TabProps) {
     const fetchData = async () => {
       const response = await fetch(url);
       const newData = await response.json();
-      console.log(newData);
       setPromotions(newData);
     };
 
@@ -462,7 +461,6 @@ function PromotionTab(props: TabProps) {
       isValid: true,
       vendorProfileID: props.profileID,
     };
-    console.log(discountType);
     try {
       const response = await fetch(createUrl, {
         method: "POST",
@@ -486,7 +484,7 @@ function PromotionTab(props: TabProps) {
     }
   }
 
-  async function onDeletePromo(promoID: Number) {
+  async function onDeletePromo(promoID: number) {
     try {
       const response = await fetch(
         `${
@@ -531,7 +529,7 @@ function PromotionTab(props: TabProps) {
           <FormControl>
             <FormLabel>Discount (%)</FormLabel>
             <Input
-              onChange={(e) => setDiscount(Number(e.target.value))}
+              onChange={(e) => setDiscount(number(e.target.value))}
               isRequired
               placeholder="Set discount in % off"
               type={"number"}
@@ -541,7 +539,7 @@ function PromotionTab(props: TabProps) {
           <FormControl>
             <FormLabel>Minumum Spend ($)</FormLabel>
             <Input
-              onChange={(e) => setMinimumSpending(Number(e.target.value))}
+              onChange={(e) => setMinimumSpending(number(e.target.value))}
               isRequired
               placeholder="Set min. spend in dollars ($)"
               type={"number"}
@@ -675,7 +673,7 @@ function InvoiceTable(data: InvoiceData[]) {
 }
 
 function OrdersTab(props: TabProps) {
-  let url = `${import.meta.env.VITE_API_BASE_URL}/vendor/orders/get/${
+  const url = `${import.meta.env.VITE_API_BASE_URL}/vendor/orders/get/${
     props.userID
   }`;
   const [orders, setOrders] = useState<InvoiceData[]>([]);
@@ -710,18 +708,18 @@ function OrdersTab(props: TabProps) {
 
 interface OpeningTime {
   openTime: string;
-  vendorProfileID: Number;
-  isOpen: Boolean;
-  day: Number; // between 1 to 7
-  openingHoursID: Number;
+  vendorProfileID: number;
+  isOpen: boolean;
+  day: number; // between 1 to 7
+  openingHoursID: number;
   closingtTime: string;
 }
 
 function OpeningTimesTab(props: TabProps) {
-  let getUrl = `${import.meta.env.VITE_API_BASE_URL}/opening_hours/get/${
+  const getUrl = `${import.meta.env.VITE_API_BASE_URL}/opening_hours/get/${
     props.userID
   }`;
-  let postUrl = `${import.meta.env.VITE_API_BASE_URL}/opening_hours/update/`;
+  const postUrl = `${import.meta.env.VITE_API_BASE_URL}/opening_hours/update/`;
   const [openingTimes, setOpeningTimes] = useState<OpeningTime[]>([]);
 
   const days: readonly string[] = [
@@ -748,7 +746,6 @@ function OpeningTimesTab(props: TabProps) {
     const updatedOpeningTimes = [...openingTimes];
     updatedOpeningTimes[index].isOpen = !updatedOpeningTimes[index].isOpen;
     setOpeningTimes(updatedOpeningTimes);
-    console.log(updatedOpeningTimes);
   }
 
   function handleStartTimeChange(index: number, startTime: string) {
@@ -761,7 +758,6 @@ function OpeningTimesTab(props: TabProps) {
     const updatedOpeningTimes = [...openingTimes];
     updatedOpeningTimes[index].openTime = currentDate.toISOString();
     setOpeningTimes(updatedOpeningTimes);
-    console.log(updatedOpeningTimes);
   }
 
   function handleEndTimeChange(index: number, endTime: string) {
@@ -773,7 +769,6 @@ function OpeningTimesTab(props: TabProps) {
     const updatedOpeningTimes = [...openingTimes];
     updatedOpeningTimes[index].closingtTime = currentDate.toISOString();
     setOpeningTimes(updatedOpeningTimes);
-    console.log(updatedOpeningTimes);
   }
 
   function onSave() {
@@ -786,8 +781,7 @@ function OpeningTimesTab(props: TabProps) {
         },
       });
 
-      if (response.ok) {
-      } else {
+      if (!response.ok) {
         console.error("Failed to update opening hours.");
       }
     };
@@ -860,9 +854,9 @@ interface VendorProfile {
   phone: string;
   profileName: string;
   shopDesc: string | null;
-  status: Boolean;
-  userID: Number;
-  vendorProfileID: Number;
+  status: boolean;
+  userID: number;
+  vendorProfileID: number;
 }
 
 interface VendorDashboardProps {
@@ -873,9 +867,9 @@ export default function VendorDashboard(props: VendorDashboardProps) {
   const vendorPofileUrl = `${
     import.meta.env.VITE_API_BASE_URL
   }/vendor_profile/get/${props.userID}`;
-  const [vendorProfileId, setVendorProfileId] = useState<Number>(0);
+  const [vendorProfileId, setVendorProfileId] = useState<number>(0);
 
-  let ordersUrl = `${import.meta.env.VITE_API_BASE_URL}/vendor/orders/get/${
+  const ordersUrl = `${import.meta.env.VITE_API_BASE_URL}/vendor/orders/get/${
     props.userID
   }`;
   const [orders, setOrders] = useState<InvoiceData[]>([]);
