@@ -33,7 +33,7 @@ export default function CallToActionWithAnnotation() {
           <Text color={'gray.500'}>
             {/* Monetize your content by charging your most loyal readers and reward them
             loyalty points. Give back to your loyal readers by granting them access to
-            your pre-releases and sneak-peaks. */}
+            your pre-releases and sneak-peaks. changing comment for demo */}
             Order your food at hawker centres and food courts in no time during peak hours.
             Enjoy discounts and deals at selected stores.
           </Text>
