@@ -70,14 +70,6 @@ class UserService():
             return True
         return False
 
-    def login_user(self, db, user: Login):
-        auth_user = UserGateway().auth(db, user)
-        if (auth_user):
-            access_control_list = AccessControlService().get_access_control_list(db,auth_user['roleID'])
-            auth_user["access"] = access_control_list
-
-        return auth_user
-
     def update_user_is_disabled(self, db, user_id, is_disabled):
         return UserGateway().update_user_is_disabled(db, user_id, is_disabled)
     
@@ -110,6 +102,27 @@ class UserService():
     
     def retrieve_user_control_by_id(self, db, userID):
         return UserGateway().retrieve_user_control_by_id(db, userID)
+
+    
+class UserAuthenticator:
+    def authenticate(self):
+        pass
+
+class BasicUserAuthenticator(UserAuthenticator):
+    def authenticate(self, db, user):
+        auth_user = UserGateway().auth(db, user)
+        return auth_user
+    
+class AccessControlDecorator(UserAuthenticator):
+    def __init__(self, component):
+        self.component = component
+
+    def get_access_control_list(self, db, user):
+        auth_user = self.component.authenticate(db, user)
+        if auth_user:
+            access_control_list = AccessControlService().get_access_control_list(db,auth_user['roleID'])
+            auth_user["access"] = access_control_list
+        return auth_user
 
 class Register:
     def register(self):
